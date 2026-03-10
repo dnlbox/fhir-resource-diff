@@ -1,20 +1,40 @@
 # fhir-resource-diff
 
-Structural diff, validation, and normalization for FHIR R4 JSON resources.
+Structural diff, validation, and normalization for FHIR R4 / R4B / R5 JSON resources.
+
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![npm](https://img.shields.io/badge/npm-0.2.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+## What is FHIR?
+
+FHIR (Fast Healthcare Interoperability Resources) is the modern standard for exchanging healthcare data, published by HL7. This tool works with FHIR JSON resources — the building blocks of healthcare APIs. → [Learn more at hl7.org/fhir](https://hl7.org/fhir/)
 
 ## Why this exists
 
-FHIR resources evolve across API versions, profiles, and integration points. Diff tooling for FHIR is sparse. This tool fills that gap for developers and CI pipelines.
+FHIR resources evolve across API versions, profiles, and integration points. Diff and validation tooling for FHIR developers (outside of heavy Java validators) is sparse. `fhir-resource-diff` fills that gap for TypeScript and Node.js environments — and for CI pipelines and AI agents that need programmatic access to FHIR payloads.
 
 ## Features
 
-- Compare two FHIR JSON resources and see exactly what changed
-- Validate resource shape before diffing
-- Normalize resources before comparison (sort keys, trim strings, normalize dates)
+- Multi-version support: R4, R4B, R5 — auto-detected or explicit via `--fhir-version`
+- Structural diff with path-level change tracking
+- Structural validation with severity levels (error, warning, info)
+- Resource type lookup with HL7 documentation links (`info` command)
+- Resource discovery via `list-resources`
+- Stdin/pipe support — compose with `curl`, `jq`, and other unix tools
+- Machine-consumable JSON output with summary counts, doc URLs, and metadata envelope
+- `--quiet` mode for headless CI (exit code only, no stdout)
+- `--exit-on-diff` for CI gate checks
 - Named presets for common ignore patterns (`metadata`, `clinical`, `strict`)
-- Output as human-readable text, JSON, or Markdown
-- Browser-safe core library — works in Node.js and future web apps
-- Written in TypeScript with full type exports
+- Full TypeScript library API — import `diff()`, `validate()`, `parseJson()` directly
+
+## Supported FHIR versions
+
+| Version | Status | Spec URL |
+|---------|--------|----------|
+| R4 (4.0.1) | Default, fully supported | https://hl7.org/fhir/R4/ |
+| R4B (4.3.0) | Supported | https://hl7.org/fhir/R4B/ |
+| R5 (5.0.0) | Supported | https://hl7.org/fhir/R5/ |
 
 ## Install
 
@@ -24,6 +44,8 @@ npm install -g fhir-resource-diff
 pnpm add -g fhir-resource-diff
 ```
 
+For project-local installation: `pnpm add -D fhir-resource-diff`
+
 ## Quick start
 
 Compare two resources:
@@ -32,49 +54,23 @@ Compare two resources:
 fhir-resource-diff compare examples/patient-a.json examples/patient-b.json
 ```
 
-```
-Changed:
-  birthDate: "1985-06-15" → "1985-06-20"
-  meta.lastUpdated: "2024-01-15T10:00:00.000Z" → "2024-03-10T14:22:00.000Z"
-  name[0].given[0]: "Jane" → "Janet"
-
-Added:
-  identifier[0].system: "urn:oid:1.2.36.146.595.217.0.1"
-  identifier[0].type.coding[0].code: "MR"
-  identifier[0].type.coding[0].system: "http://terminology.hl7.org/CodeSystem/v2-0203"
-  identifier[0].use: "usual"
-  identifier[0].value: "MRN-00442817"
-  telecom[1].system: "email"
-  telecom[1].use: "work"
-  telecom[1].value: "janet.doe@example.com"
-```
-
 Validate a resource:
 
 ```bash
 fhir-resource-diff validate examples/patient-a.json
+# → valid
 ```
 
-```
-valid
+Validate with a specific FHIR version:
+
+```bash
+fhir-resource-diff validate examples/r5/patient-a.json --fhir-version R5
 ```
 
 Output diff as JSON:
 
 ```bash
 fhir-resource-diff compare a.json b.json --format json
-```
-
-```json
-{
-  "changed": [
-    { "path": "birthDate", "left": "1985-06-15", "right": "1985-06-20" }
-  ],
-  "added": [
-    { "path": "identifier[0].system", "right": "urn:oid:1.2.36.146.595.217.0.1" }
-  ],
-  "removed": []
-}
 ```
 
 ## CLI reference
@@ -84,12 +80,18 @@ fhir-resource-diff compare a.json b.json --format json
 ```
 fhir-resource-diff compare <file-a> <file-b> [options]
 
-  --format <fmt>      text | json | markdown  (default: text)
-  --ignore <paths>    comma-separated paths to ignore (e.g. meta.lastUpdated,id)
-  --preset <name>     metadata | clinical | strict
-  --normalize <name>  canonical | none
-  --no-color          disable color output
-  --exit-on-diff      exit 1 if differences found (for CI)
+Arguments:
+  file-a, file-b      File paths or - to read from stdin
+
+Options:
+  --format <fmt>        text | json | markdown  (default: text)
+  --fhir-version <ver>  R4 | R4B | R5  (default: auto-detect or R4)
+  --ignore <paths>      comma-separated paths to ignore (e.g. meta.lastUpdated,id)
+  --preset <name>       metadata | clinical | strict
+  --normalize <name>    canonical | none
+  --exit-on-diff        exit 1 if differences found (for CI)
+  --quiet               suppress stdout output
+  --envelope            wrap JSON output in metadata envelope (requires --format json)
 ```
 
 ### validate
@@ -97,7 +99,14 @@ fhir-resource-diff compare <file-a> <file-b> [options]
 ```
 fhir-resource-diff validate <file> [options]
 
-  --format <fmt>  text | json  (default: text)
+Arguments:
+  file                File path or - to read from stdin
+
+Options:
+  --format <fmt>        text | json  (default: text)
+  --fhir-version <ver>  R4 | R4B | R5  (default: auto-detect or R4)
+  --quiet               suppress stdout output
+  --envelope            wrap JSON output in metadata envelope (requires --format json)
 ```
 
 ### normalize
@@ -105,8 +114,144 @@ fhir-resource-diff validate <file> [options]
 ```
 fhir-resource-diff normalize <file> [options]
 
-  --preset <name>   canonical | none  (default: canonical)
-  --output <path>   write to file instead of stdout
+Arguments:
+  file                File path or - to read from stdin
+
+Options:
+  --preset <name>       canonical | none  (default: canonical)
+  --fhir-version <ver>  R4 | R4B | R5  (default: auto-detect or R4)
+  --output <path>       write to file instead of stdout
+  --quiet               suppress stdout output
+```
+
+### info
+
+```
+fhir-resource-diff info <resourceType> [options]
+
+Lookup a FHIR resource type and get its HL7 documentation links.
+
+Options:
+  --fhir-version <ver>  Show docs link for a specific version only
+  --format <fmt>        text | json  (default: text)
+```
+
+Example:
+
+```bash
+fhir-resource-diff info Patient
+# Patient (base)
+# FHIR versions: R4, R4B, R5
+# Documentation:
+#   R4:  https://hl7.org/fhir/R4/patient.html
+#   R4B: https://hl7.org/fhir/R4B/patient.html
+#   R5:  https://hl7.org/fhir/R5/patient.html
+```
+
+### list-resources
+
+```
+fhir-resource-diff list-resources [options]
+
+List known FHIR resource types.
+
+Options:
+  --fhir-version <ver>  Filter to types available in a specific version
+  --category <cat>      foundation | base | clinical | financial | specialized | conformance
+  --format <fmt>        text | json  (default: text)
+```
+
+Example:
+
+```bash
+fhir-resource-diff list-resources --category clinical
+fhir-resource-diff list-resources --fhir-version R5 --format json
+```
+
+## Use in CI
+
+Use `fhir-resource-diff` as a CI gate to validate and diff FHIR payloads automatically.
+
+**GitHub Actions example:**
+
+```yaml
+- name: Validate FHIR resource
+  run: fhir-resource-diff validate payload.json --format json --fhir-version R4
+
+- name: Diff against expected baseline
+  run: |
+    fhir-resource-diff compare expected.json actual.json \
+      --format json --exit-on-diff --preset metadata --quiet
+```
+
+Key points:
+
+- `--exit-on-diff` exits 1 when differences are found — fails the CI step
+- `--quiet` suppresses stdout — useful when you only need the exit code
+- `--format json` produces machine-parseable output for downstream tooling
+- `--format json --envelope` wraps results in a metadata envelope with summary counts, tool version, FHIR version, and HL7 documentation URL
+- Exit codes: 0 = success, 1 = differences found / validation errors, 2 = input error
+
+## Use with AI agents and test harnesses
+
+`fhir-resource-diff` is designed for automated tooling. Agents and test harnesses can pipe FHIR payloads directly without writing temp files.
+
+**CLI — agent validates a payload from memory (no temp file):**
+
+```bash
+echo "$FHIR_PAYLOAD" | fhir-resource-diff validate - --format json --fhir-version R4
+```
+
+**CLI — agent diffs actual vs expected and gets structured output:**
+
+```bash
+echo "$ACTUAL_PAYLOAD" | fhir-resource-diff compare - expected.json \
+  --format json --envelope --preset metadata
+```
+
+The `--envelope` JSON output is designed for automated consumers:
+
+```json
+{
+  "tool": "fhir-resource-diff",
+  "version": "0.2.0",
+  "command": "compare",
+  "fhirVersion": "R4",
+  "timestamp": "2026-03-10T21:00:00.000Z",
+  "result": {
+    "resourceType": "Patient",
+    "identical": false,
+    "summary": { "added": 5, "removed": 0, "changed": 3, "typeChanged": 0, "total": 8 },
+    "entries": [...],
+    "documentation": "https://hl7.org/fhir/R4/patient.html"
+  }
+}
+```
+
+An agent can parse this once and know: what changed, how many changes, what FHIR version, and where to find the HL7 docs — without a second tool call.
+
+**TypeScript library — agent harness imports directly:**
+
+```typescript
+import { parseJson, validate, diff } from "fhir-resource-diff";
+
+const parsed = parseJson(responseBody);
+if (!parsed.success) {
+  throw new Error(`Invalid FHIR JSON: ${parsed.error}`);
+}
+
+const validation = validate(parsed.resource, "R4");
+if (validation.valid === false) {
+  const errors = validation.errors.filter(e => e.severity === "error");
+  // errors[].docUrl points to the relevant HL7 page
+}
+
+const result = diff(parsed.resource, expectedFixture, {
+  ignorePaths: ["meta.lastUpdated", "id"],
+});
+if (!result.identical) {
+  // result.entries has structured diff for programmatic inspection
+}
 ```
 
 ## Library usage
@@ -129,19 +274,23 @@ if (left.success && right.success) {
 
 ## Architecture overview
 
-The **core library** (`src/core/`) contains browser-safe shared logic — parsing, validation, normalization, and diffing — with no Node.js dependencies. **Formatters** (`src/formatters/`) are pure string renderers for text, JSON, and Markdown output, also browser-safe. The **CLI adapter** (`src/cli/`) is a thin Node.js layer that reads files, parses flags, calls the core, and prints output.
+```
+┌─────────────────────────────────────────────────┐
+│  CLI adapter (src/cli/)                         │
+│  Node.js only — file I/O, flags, exit codes     │
+├─────────────────────────────────────────────────┤
+│  Formatters (src/formatters/)                   │
+│  Browser-safe — text, JSON, markdown renderers  │
+├─────────────────────────────────────────────────┤
+│  Core library (src/core/)                       │
+│  Browser-safe — parse, validate, diff, version  │
+├─────────────────────────────────────────────────┤
+│  Presets (src/presets/)                         │
+│  Browser-safe — ignore fields, normalization    │
+└─────────────────────────────────────────────────┘
+```
 
-This separation means the same validation and diff logic can power both the CLI and a future hosted web app.
-
-## Roadmap
-
-- **Phase 1** (current): core diff engine, validation, CLI, text/JSON/markdown output
-- **Phase 2**: normalization presets, hardened browser-safe core, integration points for a future React/Vite web app
-- **Phase 3**: profile-aware comparison, bundle support, richer semantic diffing, initial hosted app
-
-## Contributing
-
-Fork the repo, create a branch, and open a PR against `main`. `pnpm test` and `pnpm typecheck` must pass before submitting.
+The core library has no Node.js dependencies and can run in the browser. The CLI adapter is a thin layer on top that handles file I/O and process exit codes.
 
 ## Development
 
@@ -179,6 +328,19 @@ Note: the `--` separator after `pnpm cli` is required so pnpm passes flags to th
 | `pnpm lint` | ESLint |
 | `pnpm build` | Production build (tsup) |
 | `pnpm dev` | Watch mode build (tsup --watch) |
+
+## Roadmap
+
+- **Phase 1** (complete): core diff engine, validation, CLI, text/JSON/markdown output
+- **Phase 2** (current): multi-version FHIR support, resource registry, `info` and `list-resources` commands, stdin/pipe support, developer experience improvements
+- **Phase 3** (planned): profile-aware comparison, bundle support, richer semantic diffing, initial hosted web app
+
+## Related resources
+
+- [FHIR specification](https://hl7.org/fhir/)
+- [FHIR resource type listing](https://hl7.org/fhir/resourcelist.html)
+- [FHIR R4](https://hl7.org/fhir/R4/) / [R4B](https://hl7.org/fhir/R4B/) / [R5](https://hl7.org/fhir/R5/)
+- [HL7 FHIR tooling ecosystem](https://confluence.hl7.org/display/FHIR/FHIR+Tooling)
 
 ## License
 

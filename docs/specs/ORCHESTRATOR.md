@@ -47,6 +47,41 @@ Specs must be executed in order. Each spec lists its own dependencies, but the c
 
 **Rule:** Do not start a spec until all specs above it in the graph are complete and verified.
 
+### Phase 2 — from toy to tool (specs 10–19)
+
+```
+10-dev-experience         (depends on: 00–09 complete)
+       │
+12-fhir-version-model     (depends on: 01)
+       │
+13-resource-type-registry  (depends on: 12)
+       │
+       ├──── 14-info-command         (depends on: 12, 13)
+       ├──── 15-list-resources       (depends on: 12, 13)
+       │
+16-version-flag-existing   (depends on: 12)
+       │
+17-version-aware-validation (depends on: 12, 13, 16)
+       │
+18-multi-version-fixtures  (depends on: 12, 13)
+       │
+19-stdin-pipe-support      (depends on: 00–09; parallelizable with 12–18)
+       │
+20-ci-automation-affordances (depends on: 12, 13, 16)
+       │
+11-readme-overhaul        (depends on: 10, 12–15, 20; do last)
+```
+
+**Parallelization guide:**
+- Specs 10 and 19 have no Phase 2 dependencies — can run in parallel from the start.
+- Spec 12 is the Phase 2 foundation — start it as soon as v1 is verified.
+- Specs 13 depends on 12. Specs 14 and 15 depend on 13 and can run in parallel with each other.
+- Spec 16 depends only on 12 and can run in parallel with 13–15.
+- Spec 17 depends on 12, 13, and 16.
+- Spec 18 depends on 12 and 13.
+- Spec 20 depends on 12, 13, and 16 — can run in parallel with 14, 15, 17, 18.
+- Spec 11 should be done last so it can reference all new features including spec 20.
+
 ---
 
 ## Spec file template
@@ -125,3 +160,19 @@ The project is considered v1-complete when:
 | 07 | `07-cli.md` | CLI commands: compare, validate, normalize |
 | 08 | `08-examples-fixtures.md` | Example FHIR JSON files and test fixtures |
 | 09 | `09-readme.md` | Root README.md |
+
+### Phase 2
+
+| # | Spec | Key deliverable |
+|---|------|-----------------|
+| 10 | `10-dev-experience.md` | tsx, `pnpm cli` script, CONTRIBUTING.md |
+| 11 | `11-readme-overhaul.md` | README rewrite with HL7 links and FHIR version context |
+| 12 | `12-fhir-version-model.md` | `FhirVersion` type, detection, URL helpers |
+| 13 | `13-resource-type-registry.md` | Curated resource type registry with HL7 doc URLs |
+| 14 | `14-info-command.md` | `info <resourceType>` CLI command |
+| 15 | `15-list-resources.md` | `list-resources` CLI command |
+| 16 | `16-version-flag-existing.md` | `--fhir-version` flag on compare, validate, normalize |
+| 17 | `17-version-aware-validation.md` | Severity model, version-aware structural validation |
+| 18 | `18-multi-version-fixtures.md` | R4B and R5 example resources |
+| 19 | `19-stdin-pipe-support.md` | Stdin/pipe support (`-` as file argument) |
+| 20 | `20-ci-automation-affordances.md` | `--quiet`, `--envelope`, summary counts for CI/agents |
