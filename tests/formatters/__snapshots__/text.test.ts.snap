@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`formatText > snapshot: representative DiffResult with mixed changes 1`] = `
+"ResourceType: Patient
+Status: 5 difference(s) found
+
+Changed:
+  name[0].given[0]: "John" → "Johnny"
+  birthDate: "1980-01-01" → "1980-01-02"
+
+Added:
+  telecom[1]
+
+Removed:
+  identifier[0]
+
+Type-changed:
+  active: "true" → true"
+`;
