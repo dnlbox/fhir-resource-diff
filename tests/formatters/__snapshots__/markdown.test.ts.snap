@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`formatMarkdown > snapshot: representative DiffResult 1`] = `
+"## Diff: Patient
+
+**Status:** 3 difference(s) found
+
+| Kind | Path | Left | Right |
+|------|------|------|-------|
+| changed | \`name[0].given[0]\` | \`"John"\` | \`"Johnny"\` |
+| added | \`telecom[1]\` |  |  |
+| removed | \`identifier[0]\` |  |  |"
+`;
