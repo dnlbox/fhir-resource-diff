@@ -13,6 +13,18 @@ export type {
   NormalizationPreset,
 } from "@/core/types.js";
 
+export type { FhirVersion } from "@/core/fhir-version.js";
+export {
+  SUPPORTED_FHIR_VERSIONS,
+  DEFAULT_FHIR_VERSION,
+  VERSION_STRING_MAP,
+  detectFhirVersion,
+  resolveFhirVersion,
+  fhirVersionLabel,
+  fhirBaseUrl,
+  isSupportedFhirVersion,
+} from "@/core/fhir-version.js";
+
 export { parseJson, isFhirResource } from "@/core/parse.js";
 export { validate } from "@/core/validate.js";
 export { diff } from "@/core/diff.js";

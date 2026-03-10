@@ -9,6 +9,7 @@ export interface FhirResource {
 export interface FhirMeta {
   versionId?: string;
   lastUpdated?: string;
+  fhirVersion?: string;
   [key: string]: unknown;
 }
 

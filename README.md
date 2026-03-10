@@ -143,6 +143,43 @@ This separation means the same validation and diff logic can power both the CLI 
 
 Fork the repo, create a branch, and open a PR against `main`. `pnpm test` and `pnpm typecheck` must pass before submitting.
 
+## Development
+
+### Prerequisites
+
+- Node.js ≥ 20
+- pnpm ≥ 9
+
+### Setup
+
+```bash
+git clone https://github.com/<owner>/fhir-resource-diff.git
+cd fhir-resource-diff
+pnpm install
+```
+
+### Run the CLI locally (no build needed)
+
+```bash
+pnpm cli -- compare examples/patient-a.json examples/patient-b.json
+pnpm cli -- validate examples/patient-a.json
+pnpm cli -- normalize examples/observation-a.json
+```
+
+Note: the `--` separator after `pnpm cli` is required so pnpm passes flags to the script rather than consuming them.
+
+### Common scripts
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm cli -- <args>` | Run CLI from source via tsx |
+| `pnpm test` | Run tests |
+| `pnpm test:watch` | Run tests in watch mode |
+| `pnpm typecheck` | TypeScript type checking |
+| `pnpm lint` | ESLint |
+| `pnpm build` | Production build (tsup) |
+| `pnpm dev` | Watch mode build (tsup --watch) |
+
 ## License
 
 MIT.

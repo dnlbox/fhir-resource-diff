@@ -104,6 +104,13 @@ export function registerCompareCommand(program: Command): void {
     .option("--no-color", "Disable color output")
     .option("--exit-on-diff", "Exit with code 1 if differences are found")
     .action((fileA: string, fileB: string, opts: CompareOptions) => {
+      if (fileA === "-" && fileB === "-") {
+        process.stderr.write(
+          "Error: cannot read both resources from stdin. Provide at least one file path.\n",
+        );
+        process.exit(2);
+      }
+
       // 1. Read files
       const rawA = readFileOrExit(fileA);
       const rawB = readFileOrExit(fileB);
