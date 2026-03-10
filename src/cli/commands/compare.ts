@@ -14,6 +14,8 @@ import {
 } from "@/presets/index.js";
 import type { DiffOptions, FhirResource } from "@/core/types.js";
 import { readFileOrExit } from "@/cli/utils/read-file.js";
+import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
+import { detectFhirVersion, resolveFhirVersion } from "@/core/fhir-version.js";
 
 type OutputFormat = "text" | "json" | "markdown";
 
@@ -24,6 +26,7 @@ interface CompareOptions {
   normalize?: string;
   color: boolean;
   exitOnDiff: boolean;
+  fhirVersion?: string;
 }
 
 const SECTION_HEADERS = new Set(["Changed:", "Added:", "Removed:", "Type-changed:"]);
@@ -103,6 +106,7 @@ export function registerCompareCommand(program: Command): void {
     .option("--normalize <name>", "Named normalization preset to apply before diffing")
     .option("--no-color", "Disable color output")
     .option("--exit-on-diff", "Exit with code 1 if differences are found")
+    .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .action((fileA: string, fileB: string, opts: CompareOptions) => {
       if (fileA === "-" && fileB === "-") {
         process.stderr.write(
@@ -119,7 +123,22 @@ export function registerCompareCommand(program: Command): void {
       let resourceA: FhirResource = parseOrExit(fileA, rawA);
       let resourceB: FhirResource = parseOrExit(fileB, rawB);
 
-      // 3. Validate — warn but do not exit
+      // 3. Resolve FHIR version (result will be used by spec 17 version-aware validation)
+      const explicitVersion = parseVersionFlag(opts.fhirVersion);
+      void resolveFhirVersion(explicitVersion, resourceA);
+      void resolveFhirVersion(explicitVersion, resourceB);
+
+      if (explicitVersion === undefined) {
+        const detectedA = detectFhirVersion(resourceA);
+        const detectedB = detectFhirVersion(resourceB);
+        if (detectedA !== undefined && detectedB !== undefined && detectedA !== detectedB) {
+          process.stderr.write(
+            `Warning: resources appear to be from different FHIR versions (${detectedA} vs ${detectedB})\n`,
+          );
+        }
+      }
+
+      // 4. Validate — warn but do not exit
       const validA = validate(resourceA);
       if (!validA.valid) {
         process.stderr.write(`Warning: "${fileA}" has validation issues\n`);
@@ -130,7 +149,7 @@ export function registerCompareCommand(program: Command): void {
         process.stderr.write(`Warning: "${fileB}" has validation issues\n`);
       }
 
-      // 4. Normalize if requested
+      // 5. Normalize if requested
       if (opts.normalize !== undefined) {
         const normPreset = getNormalizationPreset(opts.normalize);
         if (normPreset === undefined) {
@@ -143,7 +162,7 @@ export function registerCompareCommand(program: Command): void {
         resourceB = normalize(resourceB, normPreset.options);
       }
 
-      // 5. Build DiffOptions from --ignore and --preset
+      // 6. Build DiffOptions from --ignore and --preset
       let ignorePaths: string[] = [];
 
       if (opts.preset !== undefined) {
@@ -166,10 +185,10 @@ export function registerCompareCommand(program: Command): void {
         ? { ignorePaths }
         : {};
 
-      // 6. Diff
+      // 7. Diff
       const result = diff(resourceA, resourceB, diffOptions);
 
-      // 7. Format
+      // 8. Format
       const colorsEnabled = opts.color && process.env["NO_COLOR"] === undefined;
       const format = opts.format as OutputFormat;
 
@@ -184,10 +203,10 @@ export function registerCompareCommand(program: Command): void {
         output = colorsEnabled ? applyColor(textOutput) : textOutput;
       }
 
-      // 8. Write to stdout
+      // 9. Write to stdout
       process.stdout.write(output + "\n");
 
-      // 9. Exit code
+      // 10. Exit code
       if (opts.exitOnDiff && !result.identical) {
         process.exit(1);
       }

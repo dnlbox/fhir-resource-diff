@@ -4,11 +4,14 @@ import { validate } from "@/core/validate.js";
 import { formatValidationText } from "@/formatters/text.js";
 import { formatValidationJson } from "@/formatters/json.js";
 import { readFileOrExit } from "@/cli/utils/read-file.js";
+import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
+import { resolveFhirVersion } from "@/core/fhir-version.js";
 
 type OutputFormat = "text" | "json";
 
 interface ValidateOptions {
   format: OutputFormat;
+  fhirVersion?: string;
 }
 
 /**
@@ -23,6 +26,7 @@ export function registerValidateCommand(program: Command): void {
       'Output format: text | json (default: "text")',
       "text",
     )
+    .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .action((file: string, opts: ValidateOptions) => {
       // 1. Read file
       const raw = readFileOrExit(file);
@@ -34,19 +38,23 @@ export function registerValidateCommand(program: Command): void {
         process.exit(2);
       }
 
-      // 3. Validate
+      // 3. Resolve FHIR version (result will be used by spec 17 version-aware validation)
+      const explicitVersion = parseVersionFlag(opts.fhirVersion);
+      void resolveFhirVersion(explicitVersion, parsed.resource);
+
+      // 4. Validate
       const result = validate(parsed.resource);
 
-      // 4. Format
+      // 5. Format
       const format = opts.format as OutputFormat;
       const output = format === "json"
         ? formatValidationJson(result)
         : formatValidationText(result);
 
-      // 5. Write to stdout
+      // 6. Write to stdout
       process.stdout.write(output + "\n");
 
-      // 6. Exit: 0 if valid, 1 if invalid
+      // 7. Exit: 0 if valid, 1 if invalid
       if (!result.valid) {
         process.exit(1);
       }
