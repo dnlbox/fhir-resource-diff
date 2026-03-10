@@ -12,3 +12,6 @@ export type {
   IgnorePreset,
   NormalizationPreset,
 } from "./types.js";
+
+export { parseJson, isFhirResource } from "./parse.js";
+export { validate } from "./validate.js";
