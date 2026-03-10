@@ -5,7 +5,7 @@ import {
   IGNORE_STRICT,
   getIgnorePreset,
   mergeIgnorePresets,
-} from "../../src/presets/index.js";
+} from "@/presets/index.js";
 
 describe("getIgnorePreset", () => {
   it('returns IGNORE_METADATA for "metadata"', () => {

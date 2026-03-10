@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { diff } from "../../src/core/diff.js";
-import { parseJson } from "../../src/core/parse.js";
-import { formatText } from "../../src/formatters/text.js";
-import { formatJson } from "../../src/formatters/json.js";
-import { formatMarkdown } from "../../src/formatters/markdown.js";
+import { diff } from "@/core/diff.js";
+import { parseJson } from "@/core/parse.js";
+import { formatText } from "@/formatters/text.js";
+import { formatJson } from "@/formatters/json.js";
+import { formatMarkdown } from "@/formatters/markdown.js";
 import {
   getIgnorePreset,
   mergeIgnorePresets,
-} from "../../src/presets/index.js";
-import type { FhirResource, DiffOptions } from "../../src/core/types.js";
+} from "@/presets/index.js";
+import type { FhirResource, DiffOptions } from "@/core/types.js";
 
 // ---------------------------------------------------------------------------
 // Inline test fixtures

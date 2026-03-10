@@ -6,6 +6,10 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,

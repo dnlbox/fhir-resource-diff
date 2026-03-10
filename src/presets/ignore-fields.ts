@@ -1,4 +1,4 @@
-import type { IgnorePreset } from "../core/types.js";
+import type { IgnorePreset } from "@/core/types.js";
 
 export const IGNORE_METADATA: IgnorePreset = {
   name: "metadata",

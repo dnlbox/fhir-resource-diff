@@ -1,4 +1,4 @@
-import type { FhirResource, ParseResult } from "./types.js";
+import type { FhirResource, ParseResult } from "@/core/types.js";
 
 /**
  * Narrows an unknown value to FhirResource if it has a string resourceType.

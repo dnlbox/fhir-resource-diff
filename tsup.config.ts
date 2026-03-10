@@ -9,4 +9,9 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
+  esbuildOptions(options) {
+    options.alias = {
+      "@": "./src",
+    };
+  },
 });

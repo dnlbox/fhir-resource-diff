@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { registerCompareCommand } from "./commands/compare.js";
-import { registerValidateCommand } from "./commands/validate.js";
-import { registerNormalizeCommand } from "./commands/normalize.js";
+import { registerCompareCommand } from "@/cli/commands/compare.js";
+import { registerValidateCommand } from "@/cli/commands/validate.js";
+import { registerNormalizeCommand } from "@/cli/commands/normalize.js";
 
 const program = new Command();
 program

@@ -1,4 +1,4 @@
-import type { DiffResult, ValidationResult } from "../core/types.js";
+import type { DiffResult, ValidationResult } from "@/core/types.js";
 
 function formatValue(value: unknown): string {
   if (typeof value === "string") {

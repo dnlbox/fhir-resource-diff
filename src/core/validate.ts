@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { FhirResource, ValidationError, ValidationResult } from "./types.js";
+import type { FhirResource, ValidationError, ValidationResult } from "@/core/types.js";
 
 // Internal schema — not exported. Export only `validate`.
 const fhirMetaSchema = z

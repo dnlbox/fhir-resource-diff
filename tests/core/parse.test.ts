@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isFhirResource, parseJson } from "../../src/core/parse.js";
+import { isFhirResource, parseJson } from "@/core/parse.js";
 
 describe("parseJson", () => {
   it("returns success for valid FHIR JSON", () => {

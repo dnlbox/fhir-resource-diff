@@ -1,4 +1,4 @@
-import type { NormalizationPreset } from "../core/types.js";
+import type { NormalizationPreset } from "@/core/types.js";
 
 export const NORMALIZE_CANONICAL: NormalizationPreset = {
   name: "canonical",

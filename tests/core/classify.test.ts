@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { classifyChange } from "../../src/core/classify.js";
+import { classifyChange } from "@/core/classify.js";
 
 describe("classifyChange", () => {
   it('returns "added" when left is undefined', () => {

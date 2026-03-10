@@ -3,7 +3,7 @@ import {
   NORMALIZE_CANONICAL,
   NORMALIZE_NONE,
   getNormalizationPreset,
-} from "../../src/presets/index.js";
+} from "@/presets/index.js";
 
 describe("getNormalizationPreset", () => {
   it('returns NORMALIZE_CANONICAL for "canonical"', () => {

@@ -1,9 +1,9 @@
-import type { IgnorePreset, NormalizationPreset } from "../core/types.js";
-export { IGNORE_METADATA, IGNORE_CLINICAL, IGNORE_STRICT } from "./ignore-fields.js";
-export { NORMALIZE_CANONICAL, NORMALIZE_NONE } from "./normalization.js";
+import type { IgnorePreset, NormalizationPreset } from "@/core/types.js";
+export { IGNORE_METADATA, IGNORE_CLINICAL, IGNORE_STRICT } from "@/presets/ignore-fields.js";
+export { NORMALIZE_CANONICAL, NORMALIZE_NONE } from "@/presets/normalization.js";
 
-import { IGNORE_METADATA, IGNORE_CLINICAL, IGNORE_STRICT } from "./ignore-fields.js";
-import { NORMALIZE_CANONICAL, NORMALIZE_NONE } from "./normalization.js";
+import { IGNORE_METADATA, IGNORE_CLINICAL, IGNORE_STRICT } from "@/presets/ignore-fields.js";
+import { NORMALIZE_CANONICAL, NORMALIZE_NONE } from "@/presets/normalization.js";
 
 const IGNORE_PRESETS: Record<string, IgnorePreset> = {
   [IGNORE_METADATA.name]: IGNORE_METADATA,

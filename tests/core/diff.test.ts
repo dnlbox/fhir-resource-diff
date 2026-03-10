@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { diff } from "../../src/core/diff.js";
-import type { FhirResource } from "../../src/core/types.js";
+import { diff } from "@/core/diff.js";
+import type { FhirResource } from "@/core/types.js";
 
 const base: FhirResource = {
   resourceType: "Patient",

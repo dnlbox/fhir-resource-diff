@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { parseJson } from "../../src/core/parse.js";
-import { validate } from "../../src/core/validate.js";
-import { formatValidationText } from "../../src/formatters/text.js";
-import { formatValidationJson } from "../../src/formatters/json.js";
+import { parseJson } from "@/core/parse.js";
+import { validate } from "@/core/validate.js";
+import { formatValidationText } from "@/formatters/text.js";
+import { formatValidationJson } from "@/formatters/json.js";
 
 // ---------------------------------------------------------------------------
 // Inline test fixtures

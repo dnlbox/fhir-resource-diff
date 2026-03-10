@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { formatJson, formatValidationJson } from "../../src/formatters/json.js";
-import type { DiffResult, ValidationResult } from "../../src/core/types.js";
+import { formatJson, formatValidationJson } from "@/formatters/json.js";
+import type { DiffResult, ValidationResult } from "@/core/types.js";
 
 const representativeResult: DiffResult = {
   resourceType: "Patient",

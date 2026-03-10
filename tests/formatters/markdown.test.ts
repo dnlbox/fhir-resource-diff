@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { formatMarkdown } from "../../src/formatters/markdown.js";
-import type { DiffResult } from "../../src/core/types.js";
+import { formatMarkdown } from "@/formatters/markdown.js";
+import type { DiffResult } from "@/core/types.js";
 
 const representativeResult: DiffResult = {
   resourceType: "Patient",
