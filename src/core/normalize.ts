@@ -123,7 +123,7 @@ function sortArrayAtPaths(
   for (const path of paths) {
     const arr = getValueAtPath(obj, path);
     if (Array.isArray(arr)) {
-      const sorted = [...arr].sort((a, b) => {
+      const sorted = [...(arr as unknown[])].sort((a, b) => {
         const aStr = JSON.stringify(a);
         const bStr = JSON.stringify(b);
         if (aStr < bStr) return -1;

@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import type { Command } from "commander";
 import { writeFileSync } from "node:fs";
 import { parseJson } from "@/core/parse.js";
 import { normalize } from "@/core/normalize.js";
@@ -13,6 +13,7 @@ interface NormalizeOptions {
   preset: string;
   output?: string;
   fhirVersion?: string;
+  quiet: boolean;
 }
 
 /**
@@ -29,6 +30,7 @@ export function registerNormalizeCommand(program: Command): void {
     )
     .option("--output <path>", "Write output to a file instead of stdout")
     .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
+    .option("--quiet", "Suppress all stdout output.")
     .action((file: string, opts: NormalizeOptions) => {
       // 1. Read file
       const raw = readFileOrExit(file);
@@ -60,7 +62,7 @@ export function registerNormalizeCommand(program: Command): void {
       // 6. Format as pretty-printed JSON
       const output = JSON.stringify(normalized, null, 2);
 
-      // 7. Write to file or stdout
+      // 7. Write to file or stdout (stdout suppressed when --quiet)
       if (opts.output !== undefined) {
         try {
           writeFileSync(opts.output, output + "\n", "utf-8");
@@ -70,7 +72,7 @@ export function registerNormalizeCommand(program: Command): void {
           );
           process.exit(2);
         }
-      } else {
+      } else if (!opts.quiet) {
         process.stdout.write(output + "\n");
       }
     });

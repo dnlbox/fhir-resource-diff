@@ -97,7 +97,7 @@ describe("validate command logic", () => {
 
       const result = validate(parsed.resource);
       const output = formatValidationText(result);
-      expect(output).toBe("Valid");
+      expect(output).toBe("valid");
     });
 
     it("formats an invalid result as text with error details", () => {

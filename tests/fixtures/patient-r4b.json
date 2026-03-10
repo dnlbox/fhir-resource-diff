@@ -1,0 +1,9 @@
+{
+  "resourceType": "Patient",
+  "id": "r4b-test-001",
+  "meta": {
+    "fhirVersion": "4.3.0",
+    "versionId": "1",
+    "lastUpdated": "2024-06-15T10:00:00.000Z"
+  }
+}

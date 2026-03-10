@@ -11,6 +11,8 @@ export type {
   DiffOptions,
   IgnorePreset,
   NormalizationPreset,
+  DiffSummary,
+  OutputEnvelope,
 } from "@/core/types.js";
 
 export type { FhirVersion } from "@/core/fhir-version.js";
@@ -39,6 +41,9 @@ export { validate } from "@/core/validate.js";
 export { diff } from "@/core/diff.js";
 export { classifyChange } from "@/core/classify.js";
 export { normalize } from "@/core/normalize.js";
+export { TOOL_VERSION } from "@/core/version.js";
+export { summarizeDiff } from "@/core/summary.js";
+export { buildEnvelope } from "@/core/envelope.js";
 
 // Formatters are re-exported through core for library consumers
 export {

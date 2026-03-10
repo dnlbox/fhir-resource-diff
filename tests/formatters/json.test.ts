@@ -15,7 +15,7 @@ const representativeResult: DiffResult = {
 describe("formatJson", () => {
   it("produces valid JSON parseable by JSON.parse", () => {
     const output = formatJson(representativeResult);
-    expect(() => JSON.parse(output)).not.toThrow();
+    expect(() => JSON.parse(output) as unknown).not.toThrow();
   });
 
   it("round-trip: parsed result structurally equals input", () => {
@@ -60,7 +60,7 @@ describe("formatValidationJson", () => {
   it("produces valid JSON for a valid result", () => {
     const result: ValidationResult = { valid: true };
     const output = formatValidationJson(result);
-    expect(() => JSON.parse(output)).not.toThrow();
+    expect(() => JSON.parse(output) as unknown).not.toThrow();
     const parsed = JSON.parse(output) as { valid: boolean };
     expect(parsed.valid).toBe(true);
   });
@@ -69,15 +69,33 @@ describe("formatValidationJson", () => {
     const result: ValidationResult = {
       valid: false,
       errors: [
-        { path: "resourceType", message: "required field missing" },
+        { path: "resourceType", message: "required field missing", severity: "error" },
       ],
     };
     const output = formatValidationJson(result);
-    expect(() => JSON.parse(output)).not.toThrow();
+    expect(() => JSON.parse(output) as unknown).not.toThrow();
     const parsed = JSON.parse(output) as typeof result;
     expect(parsed.valid).toBe(false);
     if (!parsed.valid) {
       expect(parsed.errors).toHaveLength(1);
     }
+  });
+
+  it("includes severity and docUrl in JSON output when present", () => {
+    const result: ValidationResult = {
+      valid: false,
+      errors: [
+        {
+          path: "resourceType",
+          message: "unknown type",
+          severity: "warning",
+          docUrl: "https://hl7.org/fhir/resourcelist.html",
+        },
+      ],
+    };
+    const output = formatValidationJson(result);
+    const parsed = JSON.parse(output) as { valid: boolean; errors: Array<{ severity: string; docUrl: string }> };
+    expect(parsed.errors[0]?.severity).toBe("warning");
+    expect(parsed.errors[0]?.docUrl).toBe("https://hl7.org/fhir/resourcelist.html");
   });
 });

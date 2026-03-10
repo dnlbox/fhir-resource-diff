@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import type { Command } from "commander";
 import pc from "picocolors";
 import { parseJson } from "@/core/parse.js";
 import { validate } from "@/core/validate.js";
@@ -16,6 +16,9 @@ import type { DiffOptions, FhirResource } from "@/core/types.js";
 import { readFileOrExit } from "@/cli/utils/read-file.js";
 import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
 import { detectFhirVersion, resolveFhirVersion } from "@/core/fhir-version.js";
+import { getResourceDocUrl } from "@/core/resource-registry.js";
+import { summarizeDiff } from "@/core/summary.js";
+import { buildEnvelope } from "@/core/envelope.js";
 
 type OutputFormat = "text" | "json" | "markdown";
 
@@ -27,6 +30,8 @@ interface CompareOptions {
   color: boolean;
   exitOnDiff: boolean;
   fhirVersion?: string;
+  quiet: boolean;
+  envelope: boolean;
 }
 
 const SECTION_HEADERS = new Set(["Changed:", "Added:", "Removed:", "Type-changed:"]);
@@ -107,6 +112,8 @@ export function registerCompareCommand(program: Command): void {
     .option("--no-color", "Disable color output")
     .option("--exit-on-diff", "Exit with code 1 if differences are found")
     .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
+    .option("--quiet", "Suppress all stdout output. Only exit code indicates result.")
+    .option("--envelope", "Wrap JSON output in a metadata envelope (requires --format json)")
     .action((fileA: string, fileB: string, opts: CompareOptions) => {
       if (fileA === "-" && fileB === "-") {
         process.stderr.write(
@@ -123,9 +130,9 @@ export function registerCompareCommand(program: Command): void {
       let resourceA: FhirResource = parseOrExit(fileA, rawA);
       let resourceB: FhirResource = parseOrExit(fileB, rawB);
 
-      // 3. Resolve FHIR version (result will be used by spec 17 version-aware validation)
+      // 3. Resolve FHIR version
       const explicitVersion = parseVersionFlag(opts.fhirVersion);
-      void resolveFhirVersion(explicitVersion, resourceA);
+      const resolvedVersionA = resolveFhirVersion(explicitVersion, resourceA);
       void resolveFhirVersion(explicitVersion, resourceB);
 
       if (explicitVersion === undefined) {
@@ -139,12 +146,13 @@ export function registerCompareCommand(program: Command): void {
       }
 
       // 4. Validate — warn but do not exit
-      const validA = validate(resourceA);
+      const validateVersion = explicitVersion !== undefined ? resolvedVersionA : undefined;
+      const validA = validate(resourceA, validateVersion);
       if (!validA.valid) {
         process.stderr.write(`Warning: "${fileA}" has validation issues\n`);
       }
 
-      const validB = validate(resourceB);
+      const validB = validate(resourceB, validateVersion);
       if (!validB.valid) {
         process.stderr.write(`Warning: "${fileB}" has validation issues\n`);
       }
@@ -188,13 +196,30 @@ export function registerCompareCommand(program: Command): void {
       // 7. Diff
       const result = diff(resourceA, resourceB, diffOptions);
 
-      // 8. Format
+      // 8. Resolve envelope flag — only valid with --format json
+      let useEnvelope = opts.envelope;
+      if (useEnvelope && opts.format !== "json") {
+        process.stderr.write(
+          "Warning: --envelope requires --format json. Ignoring --envelope.\n",
+        );
+        useEnvelope = false;
+      }
+
+      // 9. Format
       const colorsEnabled = opts.color && process.env["NO_COLOR"] === undefined;
-      const format = opts.format as OutputFormat;
+      const format = opts.format;
 
       let output: string;
       if (format === "json") {
-        output = formatJson(result);
+        if (useEnvelope) {
+          const summary = summarizeDiff(result);
+          const documentation = getResourceDocUrl(result.resourceType, resolvedVersionA);
+          const envelopeResult = { ...result, summary, documentation };
+          const envelope = buildEnvelope("compare", resolvedVersionA, envelopeResult);
+          output = JSON.stringify(envelope, null, 2);
+        } else {
+          output = formatJson(result);
+        }
       } else if (format === "markdown") {
         output = formatMarkdown(result);
       } else {
@@ -203,10 +228,12 @@ export function registerCompareCommand(program: Command): void {
         output = colorsEnabled ? applyColor(textOutput) : textOutput;
       }
 
-      // 9. Write to stdout
-      process.stdout.write(output + "\n");
+      // 10. Write to stdout (suppressed when --quiet)
+      if (!opts.quiet) {
+        process.stdout.write(output + "\n");
+      }
 
-      // 10. Exit code
+      // 11. Exit code
       if (opts.exitOnDiff && !result.identical) {
         process.exit(1);
       }
