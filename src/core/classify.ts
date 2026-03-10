@@ -1,4 +1,4 @@
-import type { DiffChangeKind } from "./types.js";
+import type { DiffChangeKind } from "@/core/types.js";
 
 /**
  * Determines the kind of change between two values at a given path.

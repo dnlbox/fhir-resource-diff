@@ -1,4 +1,4 @@
-import type { DiffResult } from "../core/types.js";
+import type { DiffResult } from "@/core/types.js";
 
 function formatCellValue(value: unknown): string {
   if (typeof value === "string") {

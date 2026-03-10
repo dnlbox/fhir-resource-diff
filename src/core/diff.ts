@@ -1,5 +1,5 @@
-import type { FhirResource, DiffEntry, DiffResult, DiffOptions } from "./types.js";
-import { classifyChange } from "./classify.js";
+import type { FhirResource, DiffEntry, DiffResult, DiffOptions } from "@/core/types.js";
+import { classifyChange } from "@/core/classify.js";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

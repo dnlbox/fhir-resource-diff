@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { normalize } from "../../src/core/normalize.js";
-import type { FhirResource } from "../../src/core/types.js";
+import { normalize } from "@/core/normalize.js";
+import type { FhirResource } from "@/core/types.js";
 
 describe("normalize", () => {
   describe("trimStrings", () => {

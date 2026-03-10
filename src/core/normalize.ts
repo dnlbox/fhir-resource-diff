@@ -1,4 +1,4 @@
-import type { FhirResource, NormalizeOptions } from "./types.js";
+import type { FhirResource, NormalizeOptions } from "@/core/types.js";
 
 // structuredClone is available in Node 17+ and modern browsers.
 // Declared here because the project's tsconfig lib target (ES2022) does not

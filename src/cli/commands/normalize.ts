@@ -1,9 +1,9 @@
 import { Command } from "commander";
 import { writeFileSync } from "node:fs";
-import { parseJson } from "../../core/parse.js";
-import { normalize } from "../../core/normalize.js";
-import { getNormalizationPreset } from "../../presets/index.js";
-import { readFileOrExit } from "../utils/read-file.js";
+import { parseJson } from "@/core/parse.js";
+import { normalize } from "@/core/normalize.js";
+import { getNormalizationPreset } from "@/presets/index.js";
+import { readFileOrExit } from "@/cli/utils/read-file.js";
 
 const DEFAULT_PRESET_NAME = "canonical";
 

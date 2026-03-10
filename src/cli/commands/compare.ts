@@ -1,19 +1,19 @@
 import { Command } from "commander";
 import pc from "picocolors";
-import { parseJson } from "../../core/parse.js";
-import { validate } from "../../core/validate.js";
-import { diff } from "../../core/diff.js";
-import { normalize } from "../../core/normalize.js";
-import { formatText } from "../../formatters/text.js";
-import { formatJson } from "../../formatters/json.js";
-import { formatMarkdown } from "../../formatters/markdown.js";
+import { parseJson } from "@/core/parse.js";
+import { validate } from "@/core/validate.js";
+import { diff } from "@/core/diff.js";
+import { normalize } from "@/core/normalize.js";
+import { formatText } from "@/formatters/text.js";
+import { formatJson } from "@/formatters/json.js";
+import { formatMarkdown } from "@/formatters/markdown.js";
 import {
   getIgnorePreset,
   getNormalizationPreset,
   mergeIgnorePresets,
-} from "../../presets/index.js";
-import type { DiffOptions, FhirResource } from "../../core/types.js";
-import { readFileOrExit } from "../utils/read-file.js";
+} from "@/presets/index.js";
+import type { DiffOptions, FhirResource } from "@/core/types.js";
+import { readFileOrExit } from "@/cli/utils/read-file.js";
 
 type OutputFormat = "text" | "json" | "markdown";
 

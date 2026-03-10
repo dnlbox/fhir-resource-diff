@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { formatText, formatValidationText } from "../../src/formatters/text.js";
-import type { DiffResult, ValidationResult } from "../../src/core/types.js";
+import { formatText, formatValidationText } from "@/formatters/text.js";
+import type { DiffResult, ValidationResult } from "@/core/types.js";
 
 describe("formatText", () => {
   it("outputs identical status when resources are identical", () => {

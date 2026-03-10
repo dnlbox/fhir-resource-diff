@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validate } from "../../src/core/validate.js";
+import { validate } from "@/core/validate.js";
 
 describe("validate", () => {
   it("returns valid for a minimal resource", () => {
@@ -27,7 +27,7 @@ describe("validate", () => {
 
   it("returns invalid when id is a number (cast as unknown)", () => {
     // Simulate a resource that passes through with wrong id type
-    const resource = { resourceType: "Patient", id: 123 } as unknown as import("../../src/core/types.js").FhirResource;
+    const resource = { resourceType: "Patient", id: 123 } as unknown as import("@/core/types.js").FhirResource;
     const result = validate(resource);
     expect(result.valid).toBe(false);
     if (!result.valid) {
@@ -37,7 +37,7 @@ describe("validate", () => {
   });
 
   it("returns invalid when meta is not an object", () => {
-    const resource = { resourceType: "Patient", meta: "not-an-object" } as unknown as import("../../src/core/types.js").FhirResource;
+    const resource = { resourceType: "Patient", meta: "not-an-object" } as unknown as import("@/core/types.js").FhirResource;
     const result = validate(resource);
     expect(result.valid).toBe(false);
     if (!result.valid) {
@@ -50,7 +50,7 @@ describe("validate", () => {
     const resource = {
       resourceType: "Patient",
       meta: { lastUpdated: 12345 },
-    } as unknown as import("../../src/core/types.js").FhirResource;
+    } as unknown as import("@/core/types.js").FhirResource;
     const result = validate(resource);
     expect(result.valid).toBe(false);
     if (!result.valid) {

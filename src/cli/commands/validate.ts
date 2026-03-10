@@ -1,9 +1,9 @@
 import { Command } from "commander";
-import { parseJson } from "../../core/parse.js";
-import { validate } from "../../core/validate.js";
-import { formatValidationText } from "../../formatters/text.js";
-import { formatValidationJson } from "../../formatters/json.js";
-import { readFileOrExit } from "../utils/read-file.js";
+import { parseJson } from "@/core/parse.js";
+import { validate } from "@/core/validate.js";
+import { formatValidationText } from "@/formatters/text.js";
+import { formatValidationJson } from "@/formatters/json.js";
+import { readFileOrExit } from "@/cli/utils/read-file.js";
 
 type OutputFormat = "text" | "json";
 

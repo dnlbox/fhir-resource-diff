@@ -11,13 +11,13 @@ export type {
   DiffOptions,
   IgnorePreset,
   NormalizationPreset,
-} from "./types.js";
+} from "@/core/types.js";
 
-export { parseJson, isFhirResource } from "./parse.js";
-export { validate } from "./validate.js";
-export { diff } from "./diff.js";
-export { classifyChange } from "./classify.js";
-export { normalize } from "./normalize.js";
+export { parseJson, isFhirResource } from "@/core/parse.js";
+export { validate } from "@/core/validate.js";
+export { diff } from "@/core/diff.js";
+export { classifyChange } from "@/core/classify.js";
+export { normalize } from "@/core/normalize.js";
 
 // Formatters are re-exported through core for library consumers
 export {
@@ -26,4 +26,4 @@ export {
   formatJson,
   formatValidationJson,
   formatMarkdown,
-} from "../formatters/index.js";
+} from "@/formatters/index.js";
