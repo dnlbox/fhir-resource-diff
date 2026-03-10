@@ -1,0 +1,6 @@
+{
+  "resourceType": "Observation",
+  "status": "final",
+  "code": { "coding": [{ "system": "http://loinc.org", "code": "8867-4" }] },
+  "subject": { "reference": "Patient/example-patient-001" }
+}
