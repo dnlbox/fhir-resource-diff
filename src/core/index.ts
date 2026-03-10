@@ -1,2 +1,14 @@
-// Core entry point — implemented in Spec 01+
-export {};
+export type {
+  FhirResource,
+  FhirMeta,
+  ParseResult,
+  ValidationError,
+  ValidationResult,
+  DiffChangeKind,
+  DiffEntry,
+  DiffResult,
+  NormalizeOptions,
+  DiffOptions,
+  IgnorePreset,
+  NormalizationPreset,
+} from "./types.js";
