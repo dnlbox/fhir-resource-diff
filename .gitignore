@@ -22,6 +22,9 @@ coverage/
 *.swo
 .DS_Store
 
+# Claude Code
+.claude/
+
 # pnpm
 .pnpm-debug.log
 
