@@ -25,6 +25,15 @@ export {
   isSupportedFhirVersion,
 } from "@/core/fhir-version.js";
 
+export type { ResourceCategory, ResourceTypeInfo } from "@/core/resource-registry.js";
+export {
+  RESOURCE_REGISTRY,
+  getResourceInfo,
+  getResourceDocUrl,
+  isKnownResourceType,
+  listResourceTypes,
+} from "@/core/resource-registry.js";
+
 export { parseJson, isFhirResource } from "@/core/parse.js";
 export { validate } from "@/core/validate.js";
 export { diff } from "@/core/diff.js";

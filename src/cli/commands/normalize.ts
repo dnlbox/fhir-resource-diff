@@ -4,12 +4,15 @@ import { parseJson } from "@/core/parse.js";
 import { normalize } from "@/core/normalize.js";
 import { getNormalizationPreset } from "@/presets/index.js";
 import { readFileOrExit } from "@/cli/utils/read-file.js";
+import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
+import { resolveFhirVersion } from "@/core/fhir-version.js";
 
 const DEFAULT_PRESET_NAME = "canonical";
 
 interface NormalizeOptions {
   preset: string;
   output?: string;
+  fhirVersion?: string;
 }
 
 /**
@@ -25,6 +28,7 @@ export function registerNormalizeCommand(program: Command): void {
       DEFAULT_PRESET_NAME,
     )
     .option("--output <path>", "Write output to a file instead of stdout")
+    .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .action((file: string, opts: NormalizeOptions) => {
       // 1. Read file
       const raw = readFileOrExit(file);
@@ -36,7 +40,11 @@ export function registerNormalizeCommand(program: Command): void {
         process.exit(2);
       }
 
-      // 3. Look up normalization preset
+      // 3. Resolve FHIR version (result will be used by spec 17 version-aware validation)
+      const explicitVersion = parseVersionFlag(opts.fhirVersion);
+      void resolveFhirVersion(explicitVersion, parsed.resource);
+
+      // 4. Look up normalization preset
       const presetName = opts.preset;
       const preset = getNormalizationPreset(presetName);
       if (preset === undefined) {
@@ -46,13 +54,13 @@ export function registerNormalizeCommand(program: Command): void {
         process.exit(2);
       }
 
-      // 4. Normalize
+      // 5. Normalize
       const normalized = normalize(parsed.resource, preset.options);
 
-      // 5. Format as pretty-printed JSON
+      // 6. Format as pretty-printed JSON
       const output = JSON.stringify(normalized, null, 2);
 
-      // 6. Write to file or stdout
+      // 7. Write to file or stdout
       if (opts.output !== undefined) {
         try {
           writeFileSync(opts.output, output + "\n", "utf-8");

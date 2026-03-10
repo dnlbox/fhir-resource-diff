@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { parseJson } from "@/core/parse.js";
 import { validate } from "@/core/validate.js";
 import { formatValidationText } from "@/formatters/text.js";
 import { formatValidationJson } from "@/formatters/json.js";
+import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
 
 // ---------------------------------------------------------------------------
 // Inline test fixtures
@@ -145,5 +146,43 @@ describe("validate command logic", () => {
       const result = runValidate('{"id": "abc", "name": "No type"}');
       expect(result).toBeNull();
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// --fhir-version flag logic (validate command)
+// ---------------------------------------------------------------------------
+
+describe("--fhir-version flag (validate command)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("accepts R4 without error", () => {
+    const result = parseVersionFlag("R4");
+    expect(result).toBe("R4");
+  });
+
+  it("accepts R4B without error", () => {
+    const result = parseVersionFlag("R4B");
+    expect(result).toBe("R4B");
+  });
+
+  it("accepts R5 without error", () => {
+    const result = parseVersionFlag("R5");
+    expect(result).toBe("R5");
+  });
+
+  it("writes error to stderr and exits with code 2 for INVALID version", () => {
+    const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((_code) => {
+      throw new Error("process.exit called");
+    });
+
+    expect(() => parseVersionFlag("INVALID")).toThrow("process.exit called");
+    expect(stderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Unknown FHIR version "INVALID"'),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(2);
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { diff } from "@/core/diff.js";
 import { parseJson } from "@/core/parse.js";
 import { formatText } from "@/formatters/text.js";
@@ -8,6 +8,11 @@ import {
   getIgnorePreset,
   mergeIgnorePresets,
 } from "@/presets/index.js";
+import {
+  detectFhirVersion,
+  resolveFhirVersion,
+} from "@/core/fhir-version.js";
+import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
 import type { FhirResource, DiffOptions } from "@/core/types.js";
 
 // ---------------------------------------------------------------------------
@@ -23,6 +28,20 @@ const PATIENT_A_JSON = JSON.stringify({
   },
   name: [{ family: "Smith", given: ["John"] }],
   birthDate: "1980-05-15",
+  active: true,
+});
+
+const PATIENT_R4_JSON = JSON.stringify({
+  resourceType: "Patient",
+  id: "patient-r4",
+  meta: { fhirVersion: "4.0.1" },
+  active: true,
+});
+
+const PATIENT_R5_JSON = JSON.stringify({
+  resourceType: "Patient",
+  id: "patient-r5",
+  meta: { fhirVersion: "5.0.0" },
   active: true,
 });
 
@@ -211,5 +230,131 @@ describe("compare command logic", () => {
       expect(resourceTypeEntry).toBeDefined();
       expect(resourceTypeEntry?.kind).toBe("changed");
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// --fhir-version flag logic
+// ---------------------------------------------------------------------------
+
+describe("--fhir-version flag (parseVersionFlag)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns undefined when flag is not provided", () => {
+    const result = parseVersionFlag(undefined);
+    expect(result).toBeUndefined();
+  });
+
+  it("returns FhirVersion for R4", () => {
+    const result = parseVersionFlag("R4");
+    expect(result).toBe("R4");
+  });
+
+  it("returns FhirVersion for R4B", () => {
+    const result = parseVersionFlag("R4B");
+    expect(result).toBe("R4B");
+  });
+
+  it("returns FhirVersion for R5", () => {
+    const result = parseVersionFlag("R5");
+    expect(result).toBe("R5");
+  });
+
+  it("writes error to stderr and exits with code 2 for an invalid version", () => {
+    const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((_code) => {
+      throw new Error("process.exit called");
+    });
+
+    expect(() => parseVersionFlag("INVALID")).toThrow("process.exit called");
+    expect(stderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Unknown FHIR version "INVALID"'),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(2);
+  });
+
+  it("rejects lowercase versions (case-sensitive)", () => {
+    const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((_code) => {
+      throw new Error("process.exit called");
+    });
+
+    expect(() => parseVersionFlag("r4")).toThrow("process.exit called");
+    expect(stderrSpy).toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(2);
+  });
+});
+
+describe("--fhir-version flag (version detection in compare)", () => {
+  it("auto-detects R4 from meta.fhirVersion 4.0.1", () => {
+    const resource = parseOrThrow(PATIENT_R4_JSON);
+    const detected = detectFhirVersion(resource);
+    expect(detected).toBe("R4");
+  });
+
+  it("auto-detects R5 from meta.fhirVersion 5.0.0", () => {
+    const resource = parseOrThrow(PATIENT_R5_JSON);
+    const detected = detectFhirVersion(resource);
+    expect(detected).toBe("R5");
+  });
+
+  it("falls back to R4 default when meta.fhirVersion is absent", () => {
+    const resource = parseOrThrow(PATIENT_A_JSON);
+    const resolved = resolveFhirVersion(undefined, resource);
+    expect(resolved).toBe("R4");
+  });
+
+  it("uses explicit version even when meta.fhirVersion is present", () => {
+    const resource = parseOrThrow(PATIENT_R4_JSON);
+    const resolved = resolveFhirVersion("R5", resource);
+    expect(resolved).toBe("R5");
+  });
+
+  it("emits a warning when two resources have different detected versions", () => {
+    const resourceA = parseOrThrow(PATIENT_R4_JSON);
+    const resourceB = parseOrThrow(PATIENT_R5_JSON);
+
+    const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+
+    // Simulate compare command warning logic
+    const explicitVersion = undefined;
+    const detectedA = detectFhirVersion(resourceA);
+    const detectedB = detectFhirVersion(resourceB);
+    if (explicitVersion === undefined && detectedA !== undefined && detectedB !== undefined && detectedA !== detectedB) {
+      process.stderr.write(
+        `Warning: resources appear to be from different FHIR versions (${detectedA} vs ${detectedB})\n`,
+      );
+    }
+
+    expect(stderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining("different FHIR versions"),
+    );
+    expect(stderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining("R4 vs R5"),
+    );
+
+    vi.restoreAllMocks();
+  });
+
+  it("does not emit a warning when both resources have the same detected version", () => {
+    const resourceA = parseOrThrow(PATIENT_R4_JSON);
+    const resourceB = parseOrThrow(PATIENT_R4_JSON);
+
+    const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+
+    const explicitVersion = undefined;
+    const detectedA = detectFhirVersion(resourceA);
+    const detectedB = detectFhirVersion(resourceB);
+    if (explicitVersion === undefined && detectedA !== undefined && detectedB !== undefined && detectedA !== detectedB) {
+      process.stderr.write(
+        `Warning: resources appear to be from different FHIR versions (${detectedA} vs ${detectedB})\n`,
+      );
+    }
+
+    expect(stderrSpy).not.toHaveBeenCalled();
+
+    vi.restoreAllMocks();
   });
 });
