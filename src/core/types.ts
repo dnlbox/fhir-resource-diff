@@ -17,10 +17,15 @@ export type ParseResult =
   | { success: true; resource: FhirResource }
   | { success: false; error: string };
 
+export type ValidationSeverity = "error" | "warning" | "info";
+
 export interface ValidationError {
   /** Dot-notation path, e.g. "name[0].given" */
   path: string;
   message: string;
+  severity: ValidationSeverity;
+  /** Optional HL7 documentation link for context. */
+  docUrl?: string;
 }
 
 export type ValidationResult =
@@ -69,4 +74,27 @@ export interface NormalizationPreset {
   name: string;
   description: string;
   options: NormalizeOptions;
+}
+
+export interface DiffSummary {
+  added: number;
+  removed: number;
+  changed: number;
+  typeChanged: number;
+  total: number;
+}
+
+export interface OutputEnvelope<T> {
+  /** Tool identifier — always "fhir-resource-diff". */
+  tool: string;
+  /** Tool version from package.json. */
+  version: string;
+  /** Command that produced this output. */
+  command: string;
+  /** Resolved FHIR version used for this operation. */
+  fhirVersion: string;
+  /** Timestamp of when the operation ran (ISO 8601). */
+  timestamp: string;
+  /** The actual result payload. */
+  result: T;
 }

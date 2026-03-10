@@ -3,6 +3,8 @@ import { Command } from "commander";
 import { registerCompareCommand } from "@/cli/commands/compare.js";
 import { registerValidateCommand } from "@/cli/commands/validate.js";
 import { registerNormalizeCommand } from "@/cli/commands/normalize.js";
+import { registerInfoCommand } from "@/cli/commands/info.js";
+import { registerListResourcesCommand } from "@/cli/commands/list-resources.js";
 
 const program = new Command();
 program
@@ -13,5 +15,7 @@ program
 registerCompareCommand(program);
 registerValidateCommand(program);
 registerNormalizeCommand(program);
+registerInfoCommand(program);
+registerListResourcesCommand(program);
 
 program.parse();

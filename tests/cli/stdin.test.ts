@@ -22,7 +22,7 @@ describe("stdin support — validate", () => {
   it("validates from stdin with - argument", () => {
     const patientJson = readFileSync(join(cwd, "examples/patient-a.json"), "utf-8");
     const result = runCli(["validate", "-"], patientJson);
-    expect(result.stdout).toContain("Valid");
+    expect(result.stdout).toContain("valid");
     expect(result.status).toBe(0);
   });
 

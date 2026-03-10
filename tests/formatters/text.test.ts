@@ -162,21 +162,75 @@ describe("formatText", () => {
 });
 
 describe("formatValidationText", () => {
-  it("returns 'Valid' for a valid result", () => {
+  it("returns 'valid' for a valid result", () => {
     const result: ValidationResult = { valid: true };
-    expect(formatValidationText(result)).toBe("Valid");
+    expect(formatValidationText(result)).toBe("valid");
   });
 
-  it("lists errors one per line with path and message", () => {
+  it("lists errors one per line with severity icon, path and message", () => {
     const result: ValidationResult = {
       valid: false,
       errors: [
-        { path: "resourceType", message: "required field missing" },
-        { path: "name[0].use", message: "invalid value" },
+        { path: "resourceType", message: "required field missing", severity: "error" },
+        { path: "name[0].use", message: "invalid value", severity: "error" },
       ],
     };
     const output = formatValidationText(result);
-    expect(output).toContain("  resourceType: required field missing");
-    expect(output).toContain("  name[0].use: invalid value");
+    expect(output).toContain("  ✗ resourceType: required field missing");
+    expect(output).toContain("  ✗ name[0].use: invalid value");
+  });
+
+  it("shows 'invalid' header when error-severity issues present", () => {
+    const result: ValidationResult = {
+      valid: false,
+      errors: [
+        { path: "resourceType", message: "required field missing", severity: "error" },
+      ],
+    };
+    const output = formatValidationText(result);
+    expect(output).toContain("invalid");
+  });
+
+  it("shows 'valid (with warnings)' header when only warnings/info present", () => {
+    const result: ValidationResult = {
+      valid: false,
+      errors: [
+        { path: "resourceType", message: "unknown type", severity: "warning" },
+      ],
+    };
+    const output = formatValidationText(result);
+    expect(output).toContain("valid (with warnings)");
+  });
+
+  it("shows warning icon for warning severity", () => {
+    const result: ValidationResult = {
+      valid: false,
+      errors: [{ path: "resourceType", message: "unknown type", severity: "warning" }],
+    };
+    expect(formatValidationText(result)).toContain("  ⚠ resourceType: unknown type");
+  });
+
+  it("shows info icon for info severity", () => {
+    const result: ValidationResult = {
+      valid: false,
+      errors: [{ path: "", message: "Use HL7 validator for full validation", severity: "info" }],
+    };
+    expect(formatValidationText(result)).toContain("  ℹ Use HL7 validator for full validation");
+  });
+
+  it("appends docUrl with arrow when present", () => {
+    const result: ValidationResult = {
+      valid: false,
+      errors: [
+        {
+          path: "resourceType",
+          message: "unknown type",
+          severity: "warning",
+          docUrl: "https://hl7.org/fhir/resourcelist.html",
+        },
+      ],
+    };
+    const output = formatValidationText(result);
+    expect(output).toContain("    → https://hl7.org/fhir/resourcelist.html");
   });
 });

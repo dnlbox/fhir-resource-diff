@@ -64,14 +64,28 @@ export function formatText(result: DiffResult): string {
   return lines.join("\n");
 }
 
+const SEVERITY_ICON: Record<string, string> = {
+  error: "✗",
+  warning: "⚠",
+  info: "ℹ",
+};
+
 export function formatValidationText(result: ValidationResult): string {
   if (result.valid) {
-    return "Valid";
+    return "valid";
   }
 
-  const lines: string[] = [];
+  const hasErrors = result.errors.some((e) => e.severity === "error");
+  const header = hasErrors ? "invalid" : "valid (with warnings)";
+
+  const lines: string[] = [header];
   for (const error of result.errors) {
-    lines.push(`  ${error.path}: ${error.message}`);
+    const icon = SEVERITY_ICON[error.severity] ?? "✗";
+    const pathPrefix = error.path !== "" ? `${error.path}: ` : "";
+    lines.push(`  ${icon} ${pathPrefix}${error.message}`);
+    if (error.docUrl !== undefined) {
+      lines.push(`    → ${error.docUrl}`);
+    }
   }
   return lines.join("\n");
 }
