@@ -1,5 +1,7 @@
 # Spec 03 — Core: diff and classify
 
+**Status:** complete
+
 ## Goal
 
 Implement the recursive diff engine (`src/core/diff.ts`) and change classifier

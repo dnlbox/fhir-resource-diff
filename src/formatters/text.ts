@@ -71,21 +71,27 @@ const SEVERITY_ICON: Record<string, string> = {
 };
 
 export function formatValidationText(result: ValidationResult): string {
-  if (result.valid) {
-    return "valid";
-  }
+  const findings = result.valid ? [] : result.errors;
+  const hasErrors = findings.some((e) => e.severity === "error");
+  const hasWarnings = findings.some((e) => e.severity === "warning" || e.severity === "info");
 
-  const hasErrors = result.errors.some((e) => e.severity === "error");
-  const header = hasErrors ? "invalid" : "valid (with warnings)";
-
+  const header = hasErrors ? "invalid" : hasWarnings ? "valid (with warnings)" : "valid";
   const lines: string[] = [header];
-  for (const error of result.errors) {
-    const icon = SEVERITY_ICON[error.severity] ?? "✗";
-    const pathPrefix = error.path !== "" ? `${error.path}: ` : "";
-    lines.push(`  ${icon} ${pathPrefix}${error.message}`);
-    if (error.docUrl !== undefined) {
-      lines.push(`    → ${error.docUrl}`);
+
+  for (const finding of findings) {
+    const icon = SEVERITY_ICON[finding.severity] ?? "✗";
+    const pathPrefix = finding.path !== "" ? `${finding.path}: ` : "";
+    lines.push(`  ${icon} ${pathPrefix}${finding.message}`);
+    if (finding.docUrl !== undefined) {
+      lines.push(`    → ${finding.docUrl}`);
     }
   }
+
+  if (result.hint !== undefined) {
+    if (findings.length > 0) lines.push("");
+    lines.push(`  ℹ ${result.hint.message}`);
+    lines.push(`    → ${result.hint.docUrl}`);
+  }
+
   return lines.join("\n");
 }

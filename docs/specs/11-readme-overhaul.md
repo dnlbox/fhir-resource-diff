@@ -1,5 +1,7 @@
 # Spec 11 — README overhaul
 
+**Status:** complete
+
 ## Goal
 
 Rewrite the README to position the tool as a credible FHIR interoperability utility used by

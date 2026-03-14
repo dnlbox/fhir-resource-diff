@@ -1,5 +1,7 @@
 # Spec 19 — Stdin and pipe support
 
+**Status:** complete
+
 ## Goal
 
 Support reading FHIR resources from stdin so the CLI works in unix pipelines **and** can be

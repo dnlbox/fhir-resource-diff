@@ -1,5 +1,7 @@
 # Spec 07 — CLI adapter
 
+**Status:** complete
+
 ## Goal
 
 Implement the Node.js CLI adapter that wires the core library and formatters into a runnable

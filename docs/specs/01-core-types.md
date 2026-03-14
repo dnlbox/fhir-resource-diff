@@ -1,5 +1,7 @@
 # Spec 01 — Core types
 
+**Status:** complete
+
 ## Goal
 
 Define all shared TypeScript types and interfaces in `src/core/types.ts` and `src/core/index.ts`.

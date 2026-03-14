@@ -1,5 +1,7 @@
 # Spec 20 — CI and automation affordances
 
+**Status:** complete
+
 ## Goal
 
 Add CLI flags and output features designed specifically for CI pipelines and AI agents.

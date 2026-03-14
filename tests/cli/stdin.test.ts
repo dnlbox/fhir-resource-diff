@@ -49,11 +49,11 @@ describe("stdin support — compare", () => {
 });
 
 describe("readStdinSync", () => {
-  it("throws when stdin is a TTY", async () => {
+  it("rejects when stdin is a TTY", async () => {
     const { readStdinSync } = await import("@/cli/utils/read-stdin.js");
     const original = process.stdin.isTTY;
     Object.defineProperty(process.stdin, "isTTY", { value: true, configurable: true });
-    expect(() => readStdinSync()).toThrow("No input on stdin (stdin is a TTY)");
+    await expect(readStdinSync()).rejects.toThrow("No input on stdin (stdin is a TTY)");
     Object.defineProperty(process.stdin, "isTTY", { value: original, configurable: true });
   });
 });

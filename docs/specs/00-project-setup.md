@@ -1,5 +1,7 @@
 # Spec 00 — Project setup
 
+**Status:** complete
+
 ## Goal
 
 Bootstrap the repository with all tooling configuration so subsequent specs can immediately write

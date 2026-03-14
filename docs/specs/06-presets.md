@@ -1,5 +1,7 @@
 # Spec 06 — Presets
 
+**Status:** complete
+
 ## Goal
 
 Define built-in named presets for ignore-field lists and normalization configurations.

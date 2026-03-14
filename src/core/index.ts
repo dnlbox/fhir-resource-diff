@@ -3,6 +3,7 @@ export type {
   FhirMeta,
   ParseResult,
   ValidationError,
+  ValidationHint,
   ValidationResult,
   DiffChangeKind,
   DiffEntry,
@@ -38,6 +39,8 @@ export {
 
 export { parseJson, isFhirResource } from "@/core/parse.js";
 export { validate } from "@/core/validate.js";
+export type { ValidationRule } from "@/core/rules/index.js";
+export { FORMAT_RULES, runRules, walkResource } from "@/core/rules/index.js";
 export { diff } from "@/core/diff.js";
 export { classifyChange } from "@/core/classify.js";
 export { normalize } from "@/core/normalize.js";

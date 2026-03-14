@@ -1,5 +1,7 @@
 # Spec 13 — Resource type registry
 
+**Status:** complete
+
 ## Goal
 
 A lightweight, hand-curated registry of common FHIR resource types with per-version availability,

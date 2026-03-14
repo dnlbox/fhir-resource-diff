@@ -1,5 +1,7 @@
 # Spec 15 — `list-resources` command
 
+**Status:** complete
+
 ## Goal
 
 Add `fhir-resource-diff list-resources` — a discovery command that lists known FHIR resource

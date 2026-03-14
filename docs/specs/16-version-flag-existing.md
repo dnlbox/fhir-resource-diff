@@ -1,5 +1,7 @@
 # Spec 16 — `--fhir-version` flag on existing commands
 
+**Status:** complete
+
 ## Goal
 
 Add `--fhir-version <R4|R4B|R5>` to the `compare`, `validate`, and `normalize` commands.

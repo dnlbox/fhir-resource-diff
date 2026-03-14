@@ -1,5 +1,7 @@
 # Spec 09 — README
 
+**Status:** complete
+
 ## Goal
 
 Write `README.md` at the repo root. It should look like the README of a serious, public

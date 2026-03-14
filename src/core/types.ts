@@ -26,11 +26,22 @@ export interface ValidationError {
   severity: ValidationSeverity;
   /** Optional HL7 documentation link for context. */
   docUrl?: string;
+  /** Identifier of the rule that produced this finding, e.g. "fhir-id-format". */
+  ruleId?: string;
+}
+
+/**
+ * An informational note about the tool's validation scope — not a finding about
+ * the resource itself. Rendered as a footer, never counted as a warning.
+ */
+export interface ValidationHint {
+  message: string;
+  docUrl: string;
 }
 
 export type ValidationResult =
-  | { valid: true }
-  | { valid: false; errors: ValidationError[] };
+  | { valid: true; hint?: ValidationHint }
+  | { valid: false; errors: ValidationError[]; hint?: ValidationHint };
 
 export type DiffChangeKind = "added" | "removed" | "changed" | "type-changed";
 

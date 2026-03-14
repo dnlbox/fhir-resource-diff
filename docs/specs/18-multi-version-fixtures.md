@@ -1,5 +1,7 @@
 # Spec 18 — Multi-version example fixtures
 
+**Status:** complete
+
 ## Goal
 
 Add R4B and R5 example resources so users and tests can exercise multi-version scenarios.

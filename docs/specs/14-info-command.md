@@ -1,5 +1,7 @@
 # Spec 14 — `info` command
 
+**Status:** complete
+
 ## Goal
 
 Add `fhir-resource-diff info <resourceType>` — a quick lookup command that shows a resource
