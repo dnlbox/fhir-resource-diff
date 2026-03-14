@@ -1,5 +1,7 @@
 # Spec 05 — Formatters
 
+**Status:** complete
+
 ## Goal
 
 Implement three output formatters in `src/formatters/` that render a `DiffResult` or

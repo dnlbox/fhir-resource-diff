@@ -1,8 +1,9 @@
 import { z } from "zod";
-import type { FhirResource, ValidationError, ValidationResult } from "@/core/types.js";
+import type { FhirResource, ValidationError, ValidationHint, ValidationResult } from "@/core/types.js";
 import type { FhirVersion } from "@/core/fhir-version.js";
 import { VERSION_STRING_MAP } from "@/core/fhir-version.js";
 import { isKnownResourceType } from "@/core/resource-registry.js";
+import { FORMAT_RULES, runRules } from "@/core/rules/index.js";
 
 // Internal schema — not exported. Export only `validate`.
 const fhirMetaSchema = z
@@ -78,19 +79,25 @@ export function validate(resource: FhirResource, version?: FhirVersion): Validat
       }
     }
 
-    // Full validation hint — always when version is provided
-    errors.push({
-      path: "",
-      message:
-        "For full FHIR schema validation, use the official HL7 FHIR Validator: https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator",
-      severity: "info",
-      docUrl: "https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator",
-    });
   }
+
+  // Format and pattern rules — always run, version passed through for registry checks
+  errors.push(...runRules(resource, FORMAT_RULES, version));
+
+  // The HL7 validator hint is a note about the tool's scope, not a finding about the
+  // resource. It lives outside `errors` so it never inflates the warning count.
+  const hint: ValidationHint | undefined =
+    version !== undefined
+      ? {
+          message:
+            "For full FHIR schema validation, use the official HL7 FHIR Validator",
+          docUrl: "https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator",
+        }
+      : undefined;
 
   if (errors.length === 0) {
-    return { valid: true };
+    return hint !== undefined ? { valid: true, hint } : { valid: true };
   }
 
-  return { valid: false, errors };
+  return hint !== undefined ? { valid: false, errors, hint } : { valid: false, errors };
 }

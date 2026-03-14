@@ -1,5 +1,7 @@
 # Spec 12 — FHIR version model
 
+**Status:** complete
+
 ## Goal
 
 Introduce first-class FHIR version awareness into the core library. This module is the

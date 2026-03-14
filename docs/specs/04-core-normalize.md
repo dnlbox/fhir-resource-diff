@@ -1,5 +1,7 @@
 # Spec 04 — Core: normalize
 
+**Status:** complete
+
 ## Goal
 
 Implement `src/core/normalize.ts` — a pure function that transforms a `FhirResource` according to

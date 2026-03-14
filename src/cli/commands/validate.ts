@@ -33,9 +33,9 @@ export function registerValidateCommand(program: Command): void {
     .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .option("--quiet", "Suppress all stdout output. Only exit code indicates result.")
     .option("--envelope", "Wrap JSON output in a metadata envelope (requires --format json)")
-    .action((file: string, opts: ValidateOptions) => {
+    .action(async (file: string, opts: ValidateOptions) => {
       // 1. Read file
-      const raw = readFileOrExit(file);
+      const raw = await readFileOrExit(file);
 
       // 2. Parse — exit(2) on failure
       const parsed = parseJson(raw);

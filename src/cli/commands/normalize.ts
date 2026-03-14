@@ -31,9 +31,9 @@ export function registerNormalizeCommand(program: Command): void {
     .option("--output <path>", "Write output to a file instead of stdout")
     .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .option("--quiet", "Suppress all stdout output.")
-    .action((file: string, opts: NormalizeOptions) => {
+    .action(async (file: string, opts: NormalizeOptions) => {
       // 1. Read file
-      const raw = readFileOrExit(file);
+      const raw = await readFileOrExit(file);
 
       // 2. Parse — exit(2) on failure
       const parsed = parseJson(raw);

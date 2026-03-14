@@ -89,8 +89,9 @@ describe("validate", () => {
 describe("validate with version", () => {
   it("passes for known resource type with matching version", () => {
     const result = validate({ resourceType: "Patient", id: "1" }, "R4");
-    // Should have no error-severity issues, but will have info hint
-    expect(result.valid === false ? result.errors.filter((e) => e.severity === "error") : []).toHaveLength(0);
+    // Clean resource — no findings, hint is separate
+    expect(result.valid).toBe(true);
+    expect(result.hint).toBeDefined();
   });
 
   it("warns for unknown resource type", () => {
@@ -120,11 +121,9 @@ describe("validate with version", () => {
 
   it("always adds full validation hint when version is provided", () => {
     const result = validate({ resourceType: "Patient" }, "R4");
-    expect(result.valid).toBe(false);
-    if (result.valid === false) {
-      const hint = result.errors.find((e) => e.path === "" && e.severity === "info");
-      expect(hint).toBeDefined();
-    }
+    // Clean resource with known type should now be valid — hint is not a finding
+    expect(result.hint).toBeDefined();
+    expect(result.hint?.docUrl).toContain("hl7.org");
   });
 
   it("adds R5 narrative info when text has status but no div", () => {
@@ -167,5 +166,62 @@ describe("validate with version", () => {
         expect(error.severity).toBeDefined();
       }
     }
+  });
+});
+
+describe("validate — format rules integration", () => {
+  it("warns for malformed id and includes ruleId", () => {
+    const result = validate({ resourceType: "Patient", id: "has spaces!!" });
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-id-format");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+      expect(finding?.path).toBe("id");
+    }
+  });
+
+  it("warns for malformed date and includes ruleId", () => {
+    const result = validate({ resourceType: "Patient", birthDate: "03/15/1990" });
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-date-format");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+    }
+  });
+
+  it("warns for bare reference id and includes ruleId", () => {
+    const result = validate({
+      resourceType: "Observation",
+      subject: { reference: "12345" },
+    });
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-reference-format");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+    }
+  });
+
+  it("produces no rule findings for a clean resource", () => {
+    const result = validate({
+      resourceType: "Patient",
+      id: "patient-001",
+      meta: { lastUpdated: "2024-03-15T10:00:00Z" },
+      name: [{ family: "Doe" }],
+      birthDate: "1990-01-15",
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it("format rules run even without --fhir-version", () => {
+    const result = validate({ resourceType: "Patient", id: "bad id!" });
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      expect(result.errors.find((e) => e.ruleId === "fhir-id-format")).toBeDefined();
+    }
+    // No hint without --fhir-version
+    expect(result.hint).toBeUndefined();
   });
 });

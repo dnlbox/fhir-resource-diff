@@ -1,5 +1,7 @@
 # Spec 17 — Version-aware validation
 
+**Status:** complete
+
 ## Goal
 
 Extend the validation system with version-aware structural checks and a severity model.

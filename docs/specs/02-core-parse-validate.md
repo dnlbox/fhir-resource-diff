@@ -1,5 +1,7 @@
 # Spec 02 — Core: parse and validate
 
+**Status:** complete
+
 ## Goal
 
 Implement `src/core/parse.ts` and `src/core/validate.ts`, and write unit tests for both.

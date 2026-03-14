@@ -82,6 +82,20 @@ Specs must be executed in order. Each spec lists its own dependencies, but the c
 - Spec 20 depends on 12, 13, and 16 — can run in parallel with 14, 15, 17, 18.
 - Spec 11 should be done last so it can reference all new features including spec 20.
 
+### Phase 3 — validation rules (specs 21–23)
+
+```
+21-format-validation-rules       (depends on: 01, 02, 12, 13)
+       │
+       ├──── 22-structural-validation-rules   (depends on: 21)
+       │
+       └──── 23-profile-awareness             (depends on: 21)
+```
+
+**Parallelization guide:**
+- Spec 21 must be done first — it creates the rules infrastructure (ValidationRule type, walkResource, runRules).
+- Specs 22 and 23 both depend on 21 and can run in parallel with each other.
+
 ---
 
 ## Spec file template
@@ -134,45 +148,53 @@ case, document it explicitly in a `TODO` comment with the blocking spec number.
 
 The project is considered v1-complete when:
 
-- [ ] `pnpm build` succeeds and produces a working CLI binary
-- [ ] `pnpm test` passes with coverage of all core modules
-- [ ] `fhir-resource-diff compare examples/patient-a.json examples/patient-b.json` produces correct diff output
-- [ ] `fhir-resource-diff validate examples/patient-a.json` exits 0 for valid resources
-- [ ] `fhir-resource-diff compare a.json b.json --format json` produces stable JSON output
-- [ ] `fhir-resource-diff compare a.json b.json --ignore meta.lastUpdated,id` respects ignore list
-- [ ] README accurately describes the tool and includes working examples
-- [ ] No TypeScript errors, no lint errors
-- [ ] No Node-specific imports in `src/core/` or `src/formatters/`
+- [x] `pnpm build` succeeds and produces a working CLI binary
+- [x] `pnpm test` passes with coverage of all core modules
+- [x] `fhir-resource-diff compare examples/patient-a.json examples/patient-b.json` produces correct diff output
+- [x] `fhir-resource-diff validate examples/patient-a.json` exits 0 for valid resources
+- [x] `fhir-resource-diff compare a.json b.json --format json` produces stable JSON output
+- [x] `fhir-resource-diff compare a.json b.json --ignore meta.lastUpdated,id` respects ignore list
+- [x] README accurately describes the tool and includes working examples
+- [x] No TypeScript errors, no lint errors
+- [x] No Node-specific imports in `src/core/` or `src/formatters/`
 
 ---
 
 ## Spec index
 
-| # | Spec | Key deliverable |
-|---|------|----------------|
-| 00 | `00-project-setup.md` | package.json, tsconfig, eslint, prettier, vitest |
-| 01 | `01-core-types.md` | All shared TypeScript types and interfaces |
-| 02 | `02-core-parse-validate.md` | `parse.ts`, `validate.ts` |
-| 03 | `03-core-diff-classify.md` | `diff.ts`, `classify.ts` |
-| 04 | `04-core-normalize.md` | `normalize.ts` |
-| 05 | `05-formatters.md` | `text.ts`, `json.ts`, `markdown.ts` |
-| 06 | `06-presets.md` | `ignore-fields.ts`, `normalization.ts` |
-| 07 | `07-cli.md` | CLI commands: compare, validate, normalize |
-| 08 | `08-examples-fixtures.md` | Example FHIR JSON files and test fixtures |
-| 09 | `09-readme.md` | Root README.md |
+| # | Spec | Key deliverable | Status |
+|---|------|----------------|--------|
+| 00 | `00-project-setup.md` | package.json, tsconfig, eslint, prettier, vitest | ✓ complete |
+| 01 | `01-core-types.md` | All shared TypeScript types and interfaces | ✓ complete |
+| 02 | `02-core-parse-validate.md` | `parse.ts`, `validate.ts` | ✓ complete |
+| 03 | `03-core-diff-classify.md` | `diff.ts`, `classify.ts` | ✓ complete |
+| 04 | `04-core-normalize.md` | `normalize.ts` | ✓ complete |
+| 05 | `05-formatters.md` | `text.ts`, `json.ts`, `markdown.ts` | ✓ complete |
+| 06 | `06-presets.md` | `ignore-fields.ts`, `normalization.ts` | ✓ complete |
+| 07 | `07-cli.md` | CLI commands: compare, validate, normalize | ✓ complete |
+| 08 | `08-examples-fixtures.md` | Example FHIR JSON files and test fixtures | ✓ complete |
+| 09 | `09-readme.md` | Root README.md | ✓ complete |
 
 ### Phase 2
 
-| # | Spec | Key deliverable |
-|---|------|-----------------|
-| 10 | `10-dev-experience.md` | tsx, `pnpm cli` script, CONTRIBUTING.md |
-| 11 | `11-readme-overhaul.md` | README rewrite with HL7 links and FHIR version context |
-| 12 | `12-fhir-version-model.md` | `FhirVersion` type, detection, URL helpers |
-| 13 | `13-resource-type-registry.md` | Curated resource type registry with HL7 doc URLs |
-| 14 | `14-info-command.md` | `info <resourceType>` CLI command |
-| 15 | `15-list-resources.md` | `list-resources` CLI command |
-| 16 | `16-version-flag-existing.md` | `--fhir-version` flag on compare, validate, normalize |
-| 17 | `17-version-aware-validation.md` | Severity model, version-aware structural validation |
-| 18 | `18-multi-version-fixtures.md` | R4B and R5 example resources |
-| 19 | `19-stdin-pipe-support.md` | Stdin/pipe support (`-` as file argument) |
-| 20 | `20-ci-automation-affordances.md` | `--quiet`, `--envelope`, summary counts for CI/agents |
+| # | Spec | Key deliverable | Status |
+|---|------|-----------------|--------|
+| 10 | `10-dev-experience.md` | tsx, `pnpm cli` script, CONTRIBUTING.md | ✓ complete |
+| 11 | `11-readme-overhaul.md` | README rewrite with HL7 links and FHIR version context | ✓ complete |
+| 12 | `12-fhir-version-model.md` | `FhirVersion` type, detection, URL helpers | ✓ complete |
+| 13 | `13-resource-type-registry.md` | Curated resource type registry with HL7 doc URLs | ✓ complete |
+| 14 | `14-info-command.md` | `info <resourceType>` CLI command | ✓ complete |
+| 15 | `15-list-resources.md` | `list-resources` CLI command | ✓ complete |
+| 16 | `16-version-flag-existing.md` | `--fhir-version` flag on compare, validate, normalize | ✓ complete |
+| 17 | `17-version-aware-validation.md` | Severity model, version-aware structural validation | ✓ complete |
+| 18 | `18-multi-version-fixtures.md` | R4B and R5 example resources | ✓ complete |
+| 19 | `19-stdin-pipe-support.md` | Stdin/pipe support (`-` as file argument) | ✓ complete |
+| 20 | `20-ci-automation-affordances.md` | `--quiet`, `--envelope`, summary counts for CI/agents | ✓ complete |
+
+### Phase 3
+
+| # | Spec | Key deliverable | Status |
+|---|------|-----------------|--------|
+| 21 | `21-format-validation-rules.md` | FHIR id, date, reference format checks | ✓ complete |
+| 22 | `22-structural-validation-rules.md` | Required fields, status value sets, CodeableConcept shape | open |
+| 23 | `23-profile-awareness.md` | Profile URL validation, IG registry, named profile recognition | open |

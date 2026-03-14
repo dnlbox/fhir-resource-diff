@@ -114,7 +114,7 @@ export function registerCompareCommand(program: Command): void {
     .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .option("--quiet", "Suppress all stdout output. Only exit code indicates result.")
     .option("--envelope", "Wrap JSON output in a metadata envelope (requires --format json)")
-    .action((fileA: string, fileB: string, opts: CompareOptions) => {
+    .action(async (fileA: string, fileB: string, opts: CompareOptions) => {
       if (fileA === "-" && fileB === "-") {
         process.stderr.write(
           "Error: cannot read both resources from stdin. Provide at least one file path.\n",
@@ -123,8 +123,8 @@ export function registerCompareCommand(program: Command): void {
       }
 
       // 1. Read files
-      const rawA = readFileOrExit(fileA);
-      const rawB = readFileOrExit(fileB);
+      const rawA = await readFileOrExit(fileA);
+      const rawB = await readFileOrExit(fileB);
 
       // 2. Parse — exit(2) on failure
       let resourceA: FhirResource = parseOrExit(fileA, rawA);

@@ -1,5 +1,7 @@
 # Spec 10 — Developer experience & local CLI
 
+**Status:** complete
+
 ## Goal
 
 Make local development frictionless. A contributor should be able to clone, install, and run

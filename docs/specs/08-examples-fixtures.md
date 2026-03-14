@@ -1,5 +1,7 @@
 # Spec 08 — Examples and test fixtures
 
+**Status:** complete
+
 ## Goal
 
 Create realistic synthetic FHIR JSON example files in `examples/` and shared test fixtures in
