@@ -12,7 +12,7 @@ FHIR (Fast Healthcare Interoperability Resources) is the modern standard for exc
 
 ## Why this exists
 
-FHIR resources evolve across API versions, profiles, and integration points. Diff and validation tooling for FHIR developers (outside of heavy Java validators) is sparse. `fhir-resource-diff` fills that gap for TypeScript and Node.js environments — and for CI pipelines and AI agents that need programmatic access to FHIR payloads.
+FHIR resources evolve across API versions, profiles, and integration points. `fhir-resource-diff` is a fast, local tool for TypeScript and Node.js environments — built for CI pipelines, developer workflows, and AI agents that need programmatic access to FHIR payloads without a server-side validation dependency.
 
 ## Features
 
