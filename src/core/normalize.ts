@@ -107,7 +107,8 @@ function setValueAtPath(
       UNSAFE_KEYS.has(part) ||
       current === null ||
       typeof current !== "object" ||
-      Array.isArray(current)
+      Array.isArray(current) ||
+      !Object.prototype.hasOwnProperty.call(current, part)
     ) {
       return;
     }
