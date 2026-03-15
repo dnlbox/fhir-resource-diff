@@ -212,5 +212,5 @@ The project is considered v1-complete when:
 
 | # | Spec | Key deliverable | Status |
 |---|------|-----------------|--------|
-| 24 | `24-snyk-github-action.md` | Snyk dependency scan GitHub Action + portal setup guide | open |
+| 24 | `24-snyk-github-action.md` | Snyk dependency scan GitHub Action + portal setup guide | ✓ complete |
 | 25 | `25-info-command-enrichment.md` | Maturity level, use cases, key fields, version notes in `info` | open |

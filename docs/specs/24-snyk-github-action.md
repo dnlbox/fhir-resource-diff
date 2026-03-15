@@ -1,6 +1,6 @@
 # Spec 24 — Snyk security scanning GitHub Action
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
