@@ -205,7 +205,7 @@ The project is considered v1-complete when:
 | # | Spec | Key deliverable | Status |
 |---|------|-----------------|--------|
 | 21 | `21-format-validation-rules.md` | FHIR id, date, reference format checks | ✓ complete |
-| 22 | `22-structural-validation-rules.md` | Required fields, status value sets, CodeableConcept shape | open |
+| 22 | `22-structural-validation-rules.md` | Required fields, status value sets, CodeableConcept shape | ✓ complete |
 | 23 | `23-profile-awareness.md` | Profile URL validation, IG registry, named profile recognition | ✓ complete |
 
 ### Phase 4
@@ -214,7 +214,7 @@ The project is considered v1-complete when:
 |---|------|-----------------|--------|
 | 24 | `24-snyk-github-action.md` | Snyk dependency scan GitHub Action + portal setup guide | ✓ complete |
 | 25 | `25-info-command-enrichment.md` | Maturity level, use cases, key fields, version notes in `info` | open |
-| 26 | `26-contributing-overhaul.md` | CONTRIBUTING.md rewrite: FP paradigm, curated scope, spec-driven dev | open |
+| 26 | `26-contributing-overhaul.md` | CONTRIBUTING.md rewrite: FP paradigm, curated scope, spec-driven dev | ✓ complete |
 | 27 | `27-documentation-site.md` | VitePress docs site deployed to GitHub Pages | open |
 | 28 | `28-npm-publish.md` | npm registry publish: account setup, package.json, publish workflow | open |
 | 29 | `29-github-repository-settings.md` | GitHub settings: About, branch protection, CI badge, releases, CHANGELOG | open |
