@@ -28,29 +28,34 @@ FHIR resources evolve across API versions, profiles, and integration points. `fh
 - Named presets for common ignore patterns (`metadata`, `clinical`, `strict`)
 - Full TypeScript library API — import `diff()`, `validate()`, `parseJson()` directly
 
-## How this compares
+## The FHIR TypeScript ecosystem
 
-The JavaScript/TypeScript FHIR ecosystem has type packages, API clients, and one
-platform SDK — but no standalone diff tool and limited validation tooling outside
-platform-specific SDKs.
+The JavaScript/TypeScript FHIR community has built excellent tools across the stack
+— type systems, API clients, platform SDKs, auth libraries, and IG authoring tools.
+Each project solves a different slice of the problem, and `fhir-resource-diff` is
+designed to complement them, not compete.
 
-| Capability | fhir-resource-diff | `fhir` (Lantana) | `@medplum/core` | `@types/fhir` |
-|---|:---:|:---:|:---:|:---:|
-| Structural diff | **yes** | — | — | — |
-| Validation (structural) | **yes** | basic (JSON Schema) | yes (profiles) | — |
-| R4 + R4B + R5 | **yes** | R4 only | yes | R4 only |
-| CLI with stdin/pipes | **yes** | — | — | — |
-| JSON + Markdown + text output | **yes** | — | — | — |
-| CI/CD flags (exit codes, quiet, envelope) | **yes** | — | — | — |
-| Zero platform dependency | **yes** | yes | no (Medplum SDK) | yes |
-| TypeScript library API | **yes** | yes | yes | types only |
+### Where each tool shines
 
-Three things this tool does that nothing else in the npm ecosystem does today:
+| Focus area | Tool | What it does best |
+|---|---|---|
+| Type definitions | [`@types/fhir`](https://www.npmjs.com/package/@types/fhir), [`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes) | TypeScript interfaces for FHIR resources — essential for type-safe application code |
+| Platform SDK | [`@medplum/core`](https://www.npmjs.com/package/@medplum/core) | Full-featured FHIR client with profile validation, FHIRPath, and the Medplum platform |
+| XML/JSON serialization | [`fhir`](https://www.npmjs.com/package/fhir) (Lantana) | FHIR XML ↔ JSON conversion and JSON Schema validation — one of the earliest FHIR JS tools |
+| Auth & API client | [`fhirclient`](https://www.npmjs.com/package/fhirclient) | SMART on FHIR auth flows and API calls, maintained by SMART Health IT at Boston Children's |
+| Conformance validation | [HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator) | The reference implementation for full profile, terminology, and invariant validation |
+| **Diff, fast validation, CI/CD** | **`fhir-resource-diff`** | **Structural diffing, format validation, and automation-first output** |
+
+### What this tool adds to the ecosystem
+
+`fhir-resource-diff` focuses on three areas where we saw a gap in the existing
+tooling — not because other tools should have built these, but because they fall
+outside the scope of what type libraries, API clients, and platform SDKs are designed
+to solve:
 
 **FHIR-aware structural diff.** Compare two resources path by path and get a
 classified list of additions, removals, and changes — with dot-notation paths,
-array index tracking, and ignore presets for metadata noise. No existing npm
-package does this.
+array index tracking, and ignore presets for metadata noise.
 
 **AI agent and automation friendly.** Every command supports `--format json` for
 structured output, `--envelope` for metadata wrapping (tool version, FHIR version,
@@ -63,13 +68,13 @@ pass, and follow the documentation links — no second tool call needed.
 severity-aware — warnings and info findings never produce non-zero exits.
 JSON envelope output includes summary counts for automated triage.
 
-### Complementary tools
+### Using them together
 
-This tool doesn't replace everything — it's designed to work alongside the ecosystem:
+These tools work well in combination:
 
-- **[`@types/fhir`](https://www.npmjs.com/package/@types/fhir)** / **[`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes)** — TypeScript type definitions for FHIR resources. Use these for your application code; use `fhir-resource-diff` for runtime validation and diffing.
-- **[HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator)** — the authoritative tool for full profile conformance validation. `fhir-resource-diff` catches format and structural issues locally and fast; the HL7 Validator handles StructureDefinition evaluation, terminology binding, and invariant checking.
-- **[`fhirclient`](https://www.npmjs.com/package/fhirclient)** — SMART on FHIR auth and API client. Handles the transport; pipe the responses into `fhir-resource-diff` for validation and comparison.
+- **[`@types/fhir`](https://www.npmjs.com/package/@types/fhir)** or **[`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes)** for your application's TypeScript types, `fhir-resource-diff` for runtime validation and diffing
+- **[`fhirclient`](https://www.npmjs.com/package/fhirclient)** for SMART auth and API transport, then pipe responses into `fhir-resource-diff` for validation and comparison
+- **[HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator)** for full profile conformance checks in staging, `fhir-resource-diff` for fast local validation and CI gates in the development loop
 
 ## Supported FHIR versions
 
