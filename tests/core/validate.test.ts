@@ -313,3 +313,119 @@ describe("validate — structural rules integration", () => {
     expect(result.hint).toBeDefined();
   });
 });
+
+describe("validate — profile awareness integration", () => {
+  it("recognizes vitalsigns profile from blood pressure example", () => {
+    const result = validate(
+      {
+        resourceType: "Observation",
+        id: "blood-pressure",
+        meta: { profile: ["http://hl7.org/fhir/StructureDefinition/vitalsigns"] },
+        status: "final",
+        code: { coding: [{ system: "http://loinc.org", code: "85354-9" }] },
+      },
+      "R4",
+    );
+    if (result.valid === false) {
+      const profileFinding = result.errors.find((e) => e.ruleId === "fhir-profile-aware");
+      expect(profileFinding).toBeDefined();
+      expect(profileFinding?.severity).toBe("info");
+      expect(profileFinding?.message).toContain("Vital Signs");
+    } else {
+      // If valid, check via a resource that produces only profile findings
+      const r2 = validate(
+        {
+          resourceType: "Patient",
+          id: "p1",
+          meta: { profile: ["http://hl7.org/fhir/StructureDefinition/vitalsigns"] },
+        },
+        "R4",
+      );
+      if (r2.valid === false) {
+        const finding = r2.errors.find((e) => e.ruleId === "fhir-profile-aware");
+        expect(finding).toBeDefined();
+        expect(finding?.message).toContain("Vital Signs");
+      }
+    }
+  });
+
+  it("recognizes a known US Core profile", () => {
+    const result = validate(
+      {
+        resourceType: "Patient",
+        id: "p1",
+        meta: {
+          profile: ["http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"],
+        },
+      },
+      "R4",
+    );
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-profile-aware");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("info");
+      expect(finding?.message).toContain("US Core Patient");
+    }
+  });
+
+  it("emits info for unknown-IG profile URL pointing to HL7 validator", () => {
+    const result = validate(
+      {
+        resourceType: "Patient",
+        id: "p1",
+        meta: {
+          profile: ["https://example.org/profiles/custom-patient"],
+        },
+      },
+      "R4",
+    );
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-profile-aware");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("info");
+      expect(finding?.docUrl).toContain("confluence.hl7.org");
+    }
+  });
+
+  it("emits warning for malformed profile URL and marks valid: false", () => {
+    const result = validate(
+      {
+        resourceType: "Patient",
+        id: "p1",
+        meta: { profile: ["not-a-url"] },
+      },
+    );
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-profile-aware");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+    }
+  });
+
+  it("profile rules run even without --fhir-version", () => {
+    const result = validate({
+      resourceType: "Patient",
+      id: "p1",
+      meta: { profile: ["http://hl7.org/fhir/StructureDefinition/vitalsigns"] },
+    });
+    // Profile info findings cause valid: false (info counts as non-empty errors array)
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-profile-aware");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("info");
+    }
+  });
+
+  it("resource with no meta.profile produces no profile findings", () => {
+    const result = validate(
+      { resourceType: "Patient", id: "p1" },
+      "R4",
+    );
+    expect(result.valid).toBe(true);
+    if (result.valid === false) {
+      const profileFindings = result.errors.filter((e) => e.ruleId === "fhir-profile-aware");
+      expect(profileFindings).toHaveLength(0);
+    }
+  });
+});

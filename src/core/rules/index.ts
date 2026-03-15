@@ -22,6 +22,7 @@ import { referenceFormatRule } from "@/core/rules/reference-format.js";
 import { requiredFieldsRule } from "@/core/rules/required-fields.js";
 import { statusValuesRule } from "@/core/rules/status-values.js";
 import { codeableConceptRule } from "@/core/rules/codeable-concept.js";
+import { profileAwareRule } from "@/core/rules/profile-aware.js";
 
 /** Format and pattern rules — always run, no version required. */
 export const FORMAT_RULES: readonly ValidationRule[] = [
@@ -37,8 +38,15 @@ export const STRUCTURAL_RULES: readonly ValidationRule[] = [
   codeableConceptRule,
 ];
 
+/** Profile awareness rules — always run, profile detection doesn't require version. */
+export const PROFILE_RULES: readonly ValidationRule[] = [profileAwareRule];
+
 /** All rules combined. */
-export const ALL_RULES: readonly ValidationRule[] = [...FORMAT_RULES, ...STRUCTURAL_RULES];
+export const ALL_RULES: readonly ValidationRule[] = [
+  ...FORMAT_RULES,
+  ...STRUCTURAL_RULES,
+  ...PROFILE_RULES,
+];
 
 /** Run a set of rules against a resource and collect all findings. */
 export function runRules(

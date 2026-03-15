@@ -39,8 +39,17 @@ export {
 
 export { parseJson, isFhirResource } from "@/core/parse.js";
 export { validate } from "@/core/validate.js";
+export type { ProfileInfo, ProfileNamespace } from "@/core/profile-registry.js";
+export {
+  KNOWN_PROFILES,
+  PROFILE_NAMESPACES,
+  lookupProfile,
+  lookupProfileNamespace,
+  isValidCanonicalUrl,
+} from "@/core/profile-registry.js";
+
 export type { ValidationRule } from "@/core/rules/index.js";
-export { FORMAT_RULES, runRules, walkResource } from "@/core/rules/index.js";
+export { FORMAT_RULES, PROFILE_RULES, runRules, walkResource } from "@/core/rules/index.js";
 export { diff } from "@/core/diff.js";
 export { classifyChange } from "@/core/classify.js";
 export { normalize } from "@/core/normalize.js";

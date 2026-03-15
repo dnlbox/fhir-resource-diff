@@ -3,7 +3,7 @@ import type { FhirResource, ValidationError, ValidationHint, ValidationResult } 
 import type { FhirVersion } from "@/core/fhir-version.js";
 import { VERSION_STRING_MAP } from "@/core/fhir-version.js";
 import { isKnownResourceType } from "@/core/resource-registry.js";
-import { FORMAT_RULES, STRUCTURAL_RULES, runRules } from "@/core/rules/index.js";
+import { FORMAT_RULES, PROFILE_RULES, STRUCTURAL_RULES, runRules } from "@/core/rules/index.js";
 
 // Internal schema — not exported. Export only `validate`.
 const fhirMetaSchema = z
@@ -88,6 +88,9 @@ export function validate(resource: FhirResource, version?: FhirVersion): Validat
   if (version !== undefined) {
     errors.push(...runRules(resource, STRUCTURAL_RULES, version));
   }
+
+  // Profile awareness rules — always run, profile detection is version-independent
+  errors.push(...runRules(resource, PROFILE_RULES, version));
 
   // The HL7 validator hint is a note about the tool's scope, not a finding about the
   // resource. It lives outside `errors` so it never inflates the warning count.
