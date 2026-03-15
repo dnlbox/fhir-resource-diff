@@ -1,8 +1,5 @@
 import type { FhirResource, NormalizeOptions } from "@/core/types.js";
-
-// Keys that must never be assigned via bracket notation — assigning to these
-// via obj[key] = value modifies Object.prototype (prototype pollution, CWE-915).
-const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+import { getPath, setPath } from "@/core/utils/path.js";
 
 // structuredClone is available in Node 17+ and modern browsers.
 // Declared here because the project's tsconfig lib target (ES2022) does not
@@ -18,6 +15,15 @@ declare function structuredClone<T>(value: T): T;
 const DATETIME_WITH_TIME_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 
+/**
+ * Keys that JSON.parse() can produce as own enumerable properties but that,
+ * when written via bracket notation to a plain object, modify Object.prototype.
+ * Unlike regular object traversal (where hasOwnProperty guards are sufficient),
+ * deep-copy functions build new objects via `result[key] = ...` where `result`
+ * is freshly created — so every key from the source must be checked.
+ */
+const PROTOTYPE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 function trimStringsDeep(value: unknown): unknown {
   if (typeof value === "string") {
     return value.trim();
@@ -28,7 +34,7 @@ function trimStringsDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>)) {
-      if (UNSAFE_KEYS.has(key)) continue;
+      if (PROTOTYPE_KEYS.has(key)) continue;
       result[key] = trimStringsDeep(
         (value as Record<string, unknown>)[key],
       );
@@ -51,7 +57,7 @@ function normalizeDatesDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>)) {
-      if (UNSAFE_KEYS.has(key)) continue;
+      if (PROTOTYPE_KEYS.has(key)) continue;
       result[key] = normalizeDatesDeep(
         (value as Record<string, unknown>)[key],
       );
@@ -68,7 +74,7 @@ function sortObjectKeysDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const sorted: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-      if (UNSAFE_KEYS.has(key)) continue;
+      if (PROTOTYPE_KEYS.has(key)) continue;
       sorted[key] = sortObjectKeysDeep(
         (value as Record<string, unknown>)[key],
       );
@@ -78,60 +84,12 @@ function sortObjectKeysDeep(value: unknown): unknown {
   return value;
 }
 
-function getValueAtPath(
-  obj: Record<string, unknown>,
-  path: string,
-): unknown {
-  const parts = path.split(".");
-  let current: unknown = obj;
-  for (const part of parts) {
-    if (current === null || typeof current !== "object" || Array.isArray(current)) {
-      return undefined;
-    }
-    current = (current as Record<string, unknown>)[part];
-  }
-  return current;
-}
-
-function setValueAtPath(
-  obj: Record<string, unknown>,
-  path: string,
-  value: unknown,
-): void {
-  const parts = path.split(".");
-  let current: unknown = obj;
-  for (let i = 0; i < parts.length - 1; i++) {
-    const part = parts[i];
-    if (
-      part === undefined ||
-      UNSAFE_KEYS.has(part) ||
-      current === null ||
-      typeof current !== "object" ||
-      Array.isArray(current) ||
-      !Object.prototype.hasOwnProperty.call(current, part)
-    ) {
-      return;
-    }
-    current = (current as Record<string, unknown>)[part];
-  }
-  const lastPart = parts[parts.length - 1];
-  if (
-    lastPart !== undefined &&
-    !UNSAFE_KEYS.has(lastPart) &&
-    current !== null &&
-    typeof current === "object" &&
-    !Array.isArray(current)
-  ) {
-    (current as Record<string, unknown>)[lastPart] = value;
-  }
-}
-
 function sortArrayAtPaths(
   obj: Record<string, unknown>,
   paths: string[],
 ): void {
   for (const path of paths) {
-    const arr = getValueAtPath(obj, path);
+    const arr = getPath(obj, path);
     if (Array.isArray(arr)) {
       const sorted = [...(arr as unknown[])].sort((a, b) => {
         const aStr = JSON.stringify(a);
@@ -140,7 +98,7 @@ function sortArrayAtPaths(
         if (aStr > bStr) return 1;
         return 0;
       });
-      setValueAtPath(obj, path, sorted);
+      setPath(obj, path, sorted);
     }
   }
 }
