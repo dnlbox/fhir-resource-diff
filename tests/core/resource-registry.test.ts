@@ -120,3 +120,81 @@ describe("RESOURCE_REGISTRY", () => {
     }
   });
 });
+
+describe("maturityLevel", () => {
+  it("Observation has maturityLevel N (Normative)", () => {
+    expect(getResourceInfo("Observation")?.maturityLevel).toBe("N");
+  });
+
+  it("Encounter has maturityLevel 2", () => {
+    expect(getResourceInfo("Encounter")?.maturityLevel).toBe(2);
+  });
+
+  it("Patient has maturityLevel N (Normative)", () => {
+    expect(getResourceInfo("Patient")?.maturityLevel).toBe("N");
+  });
+
+  it("Bundle has maturityLevel N (Normative)", () => {
+    expect(getResourceInfo("Bundle")?.maturityLevel).toBe("N");
+  });
+
+  it("ResearchStudy has maturityLevel 1", () => {
+    expect(getResourceInfo("ResearchStudy")?.maturityLevel).toBe(1);
+  });
+});
+
+describe("useCases", () => {
+  it("Observation has 3 use cases", () => {
+    const useCases = getResourceInfo("Observation")?.useCases;
+    expect(useCases).toBeDefined();
+    expect(useCases?.length).toBe(3);
+  });
+
+  it("ResearchStudy has no useCases (minimal curation)", () => {
+    const info = getResourceInfo("ResearchStudy");
+    expect(info?.useCases).toBeUndefined();
+  });
+});
+
+describe("keyFields", () => {
+  it("Observation has keyFields", () => {
+    const keyFields = getResourceInfo("Observation")?.keyFields;
+    expect(keyFields).toBeDefined();
+    expect(keyFields?.length).toBeGreaterThan(0);
+  });
+
+  it("Observation status field is required", () => {
+    const keyFields = getResourceInfo("Observation")?.keyFields;
+    const statusField = keyFields?.find((f) => f.name === "status");
+    expect(statusField).toBeDefined();
+    expect(statusField?.required).toBe(true);
+  });
+
+  it("Observation value[x] field is not required", () => {
+    const keyFields = getResourceInfo("Observation")?.keyFields;
+    const valueField = keyFields?.find((f) => f.name === "value[x]");
+    expect(valueField).toBeDefined();
+    expect(valueField?.required).toBe(false);
+  });
+
+  it("ResearchStudy has no keyFields (minimal curation)", () => {
+    expect(getResourceInfo("ResearchStudy")?.keyFields).toBeUndefined();
+  });
+});
+
+describe("versionNotes", () => {
+  it("Observation has R4B→R5 version notes", () => {
+    const notes = getResourceInfo("Observation")?.versionNotes;
+    expect(notes?.["R4B→R5"]).toBeDefined();
+    expect(typeof notes?.["R4B→R5"]).toBe("string");
+  });
+
+  it("Bundle R4→R4B is undefined (no significant changes)", () => {
+    const notes = getResourceInfo("Bundle")?.versionNotes;
+    expect(notes?.["R4→R4B"]).toBeUndefined();
+  });
+
+  it("ResearchStudy has no versionNotes (minimal curation)", () => {
+    expect(getResourceInfo("ResearchStudy")?.versionNotes).toBeUndefined();
+  });
+});
