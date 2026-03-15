@@ -225,3 +225,91 @@ describe("validate — format rules integration", () => {
     expect(result.hint).toBeUndefined();
   });
 });
+
+describe("validate — structural rules integration", () => {
+  it("warns for missing required field with ruleId fhir-required-fields", () => {
+    const result = validate({ resourceType: "Observation" }, "R4");
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-required-fields");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+    }
+  });
+
+  it("warns for invalid status value with ruleId fhir-status-values", () => {
+    const result = validate(
+      {
+        resourceType: "Observation",
+        status: "active",
+        code: { coding: [{ system: "http://loinc.org", code: "1234-5" }] },
+      },
+      "R4",
+    );
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-status-values");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+    }
+  });
+
+  it("warns for broken Coding with ruleId fhir-codeable-concept", () => {
+    const result = validate(
+      {
+        resourceType: "Observation",
+        status: "final",
+        code: { coding: [{ code: "1234-5" }] }, // missing system
+      },
+      "R4",
+    );
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const finding = result.errors.find((e) => e.ruleId === "fhir-codeable-concept");
+      expect(finding).toBeDefined();
+      expect(finding?.severity).toBe("warning");
+    }
+  });
+
+  it("structural rules do not fire without version", () => {
+    const result = validate({ resourceType: "Observation" });
+    // Without version, no structural rules run — only format rules run
+    if (result.valid === false) {
+      const structuralFindings = result.errors.filter(
+        (e) =>
+          e.ruleId === "fhir-required-fields" ||
+          e.ruleId === "fhir-status-values" ||
+          e.ruleId === "fhir-codeable-concept",
+      );
+      expect(structuralFindings).toHaveLength(0);
+    }
+  });
+
+  it("warnings do not cause valid: false — but warnings ARE included in errors array", () => {
+    // The result is valid:false because errors array is non-empty (warnings count)
+    // but warning severity is "warning" not "error"
+    const result = validate({ resourceType: "Observation" }, "R4");
+    expect(result.valid).toBe(false);
+    if (result.valid === false) {
+      const errorSeverity = result.errors.filter((e) => e.severity === "error");
+      // No hard errors — only warnings from structural rules
+      expect(errorSeverity).toHaveLength(0);
+    }
+  });
+
+  it("clean resource with version passes structural validation", () => {
+    const result = validate(
+      {
+        resourceType: "Observation",
+        id: "obs-001",
+        status: "final",
+        code: {
+          coding: [{ system: "http://loinc.org", code: "8867-4" }],
+        },
+      },
+      "R4",
+    );
+    expect(result.valid).toBe(true);
+    expect(result.hint).toBeDefined();
+  });
+});
