@@ -1,5 +1,9 @@
 import type { FhirResource, NormalizeOptions } from "@/core/types.js";
 
+// Keys that must never be assigned via bracket notation — assigning to these
+// via obj[key] = value modifies Object.prototype (prototype pollution, CWE-915).
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 // structuredClone is available in Node 17+ and modern browsers.
 // Declared here because the project's tsconfig lib target (ES2022) does not
 // include it — adding the declaration keeps the code browser-safe and avoids
@@ -24,6 +28,7 @@ function trimStringsDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>)) {
+      if (UNSAFE_KEYS.has(key)) continue;
       result[key] = trimStringsDeep(
         (value as Record<string, unknown>)[key],
       );
@@ -46,6 +51,7 @@ function normalizeDatesDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>)) {
+      if (UNSAFE_KEYS.has(key)) continue;
       result[key] = normalizeDatesDeep(
         (value as Record<string, unknown>)[key],
       );
@@ -62,6 +68,7 @@ function sortObjectKeysDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const sorted: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>).sort()) {
+      if (UNSAFE_KEYS.has(key)) continue;
       sorted[key] = sortObjectKeysDeep(
         (value as Record<string, unknown>)[key],
       );
@@ -108,6 +115,7 @@ function setValueAtPath(
   const lastPart = parts[parts.length - 1];
   if (
     lastPart !== undefined &&
+    !UNSAFE_KEYS.has(lastPart) &&
     current !== null &&
     typeof current === "object" &&
     !Array.isArray(current)

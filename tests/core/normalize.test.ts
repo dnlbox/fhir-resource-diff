@@ -243,3 +243,30 @@ describe("normalize", () => {
     });
   });
 });
+
+describe("normalize — prototype pollution prevention (CWE-915)", () => {
+  it("trimStrings: drops __proto__ keys and does not pollute Object.prototype", () => {
+    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
+    const before = ({} as Record<string, unknown>)["polluted"];
+    normalize(malicious, { trimStrings: true });
+    expect(({} as Record<string, unknown>)["polluted"]).toBe(before);
+  });
+
+  it("normalizeDates: drops __proto__ keys and does not pollute Object.prototype", () => {
+    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
+    normalize(malicious, { normalizeDates: true });
+    expect(({} as Record<string, unknown>)["polluted"]).toBeUndefined();
+  });
+
+  it("sortObjectKeys: drops __proto__ keys and does not pollute Object.prototype", () => {
+    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
+    normalize(malicious, { sortObjectKeys: true });
+    expect(({} as Record<string, unknown>)["polluted"]).toBeUndefined();
+  });
+
+  it("does not carry __proto__ key into normalized output", () => {
+    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"x":1}}') as FhirResource;
+    const result = normalize(malicious, { sortObjectKeys: true });
+    expect(Object.keys(result)).not.toContain("__proto__");
+  });
+});
