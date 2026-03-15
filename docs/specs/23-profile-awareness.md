@@ -1,6 +1,6 @@
 # Spec 23 — Profile awareness
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 

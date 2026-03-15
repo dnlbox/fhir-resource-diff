@@ -206,7 +206,7 @@ The project is considered v1-complete when:
 |---|------|-----------------|--------|
 | 21 | `21-format-validation-rules.md` | FHIR id, date, reference format checks | ✓ complete |
 | 22 | `22-structural-validation-rules.md` | Required fields, status value sets, CodeableConcept shape | open |
-| 23 | `23-profile-awareness.md` | Profile URL validation, IG registry, named profile recognition | open |
+| 23 | `23-profile-awareness.md` | Profile URL validation, IG registry, named profile recognition | ✓ complete |
 
 ### Phase 4
 
