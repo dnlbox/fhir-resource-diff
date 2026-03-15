@@ -1,12 +1,43 @@
 {
   "name": "fhir-resource-diff",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CLI and library for diffing and validating FHIR JSON resources",
+  "author": "Daniel Veronez",
+  "license": "MIT",
+  "keywords": [
+    "fhir",
+    "hl7",
+    "healthcare",
+    "diff",
+    "validate",
+    "r4",
+    "r4b",
+    "r5",
+    "cli",
+    "json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnlbox/fhir-resource-diff.git"
+  },
+  "homepage": "https://github.com/dnlbox/fhir-resource-diff#readme",
+  "bugs": {
+    "url": "https://github.com/dnlbox/fhir-resource-diff/issues"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "bin": { "fhir-resource-diff": "./dist/cli/index.js" },
   "main": "./dist/core/index.js",
+  "types": "./dist/core/index.d.ts",
   "exports": {
-    ".": "./dist/core/index.js"
+    ".": {
+      "import": "./dist/core/index.js",
+      "types": "./dist/core/index.d.ts"
+    }
   },
   "scripts": {
     "build": "tsup",

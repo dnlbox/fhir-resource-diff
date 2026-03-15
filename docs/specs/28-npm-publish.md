@@ -270,3 +270,6 @@ Call out any breaking changes explicitly in the release notes.
 - Do not implement man page support in this spec — that is a future spec
 - Do not add a `postinstall` script — it runs on every `npm install` and
   is hostile to consumers
+- Do not put an email address in the `author` field — `"author": "Daniel Veronez"`
+  (name only) is correct; email in `author` is baked into every published tarball
+  and is public forever. Use `bugs.url` (GitHub Issues) as the contact point instead
