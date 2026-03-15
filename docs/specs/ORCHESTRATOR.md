@@ -96,6 +96,15 @@ Specs must be executed in order. Each spec lists its own dependencies, but the c
 - Spec 21 must be done first — it creates the rules infrastructure (ValidationRule type, walkResource, runRules).
 - Specs 22 and 23 both depend on 21 and can run in parallel with each other.
 
+### Phase 4 — security and ops (spec 24)
+
+```
+24-snyk-github-action   (no code dependencies — requires Snyk portal setup first)
+```
+
+**Note:** Spec 24 has no source code dependencies. It only requires the Snyk portal
+prerequisites (account, token, GitHub secret) before the workflow file is committed.
+
 ---
 
 ## Spec file template
@@ -198,3 +207,9 @@ The project is considered v1-complete when:
 | 21 | `21-format-validation-rules.md` | FHIR id, date, reference format checks | ✓ complete |
 | 22 | `22-structural-validation-rules.md` | Required fields, status value sets, CodeableConcept shape | open |
 | 23 | `23-profile-awareness.md` | Profile URL validation, IG registry, named profile recognition | open |
+
+### Phase 4
+
+| # | Spec | Key deliverable | Status |
+|---|------|-----------------|--------|
+| 24 | `24-snyk-github-action.md` | Snyk dependency scan GitHub Action + portal setup guide | open |
