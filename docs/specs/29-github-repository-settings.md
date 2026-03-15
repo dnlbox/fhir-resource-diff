@@ -1,6 +1,6 @@
 # Spec 29 — GitHub repository settings and hygiene
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
