@@ -214,3 +214,5 @@ The project is considered v1-complete when:
 |---|------|-----------------|--------|
 | 24 | `24-snyk-github-action.md` | Snyk dependency scan GitHub Action + portal setup guide | ✓ complete |
 | 25 | `25-info-command-enrichment.md` | Maturity level, use cases, key fields, version notes in `info` | open |
+| 26 | `26-contributing-overhaul.md` | CONTRIBUTING.md rewrite: FP paradigm, curated scope, spec-driven dev | open |
+| 27 | `27-documentation-site.md` | VitePress docs site deployed to GitHub Pages | open |
