@@ -19,6 +19,9 @@ export { walkResource } from "@/core/rules/walk.js";
 import { idFormatRule } from "@/core/rules/id-format.js";
 import { dateFormatRule } from "@/core/rules/date-format.js";
 import { referenceFormatRule } from "@/core/rules/reference-format.js";
+import { requiredFieldsRule } from "@/core/rules/required-fields.js";
+import { statusValuesRule } from "@/core/rules/status-values.js";
+import { codeableConceptRule } from "@/core/rules/codeable-concept.js";
 
 /** Format and pattern rules — always run, no version required. */
 export const FORMAT_RULES: readonly ValidationRule[] = [
@@ -26,6 +29,16 @@ export const FORMAT_RULES: readonly ValidationRule[] = [
   dateFormatRule,
   referenceFormatRule,
 ];
+
+/** Structural rules — run when version is known (version-gated). */
+export const STRUCTURAL_RULES: readonly ValidationRule[] = [
+  requiredFieldsRule,
+  statusValuesRule,
+  codeableConceptRule,
+];
+
+/** All rules combined. */
+export const ALL_RULES: readonly ValidationRule[] = [...FORMAT_RULES, ...STRUCTURAL_RULES];
 
 /** Run a set of rules against a resource and collect all findings. */
 export function runRules(
