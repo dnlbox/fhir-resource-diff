@@ -1,6 +1,6 @@
 # Spec 27 — Documentation site
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
