@@ -269,4 +269,13 @@ describe("normalize — prototype pollution prevention (CWE-915)", () => {
     const result = normalize(malicious, { sortObjectKeys: true });
     expect(Object.keys(result)).not.toContain("__proto__");
   });
+
+  it("sortArrayAtPaths: intermediate __proto__ path segment does not pollute prototype", () => {
+    // If path contains __proto__ as a segment, current would become Object.prototype —
+    // any write after that pollutes every plain object. Must bail out early.
+    const resource: FhirResource = { resourceType: "Patient" };
+    const before = ({} as Record<string, unknown>)["injected"];
+    normalize(resource, { sortArrayPaths: ["__proto__.injected"] });
+    expect(({} as Record<string, unknown>)["injected"]).toBe(before);
+  });
 });
