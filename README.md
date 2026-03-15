@@ -28,6 +28,49 @@ FHIR resources evolve across API versions, profiles, and integration points. `fh
 - Named presets for common ignore patterns (`metadata`, `clinical`, `strict`)
 - Full TypeScript library API — import `diff()`, `validate()`, `parseJson()` directly
 
+## How this compares
+
+The JavaScript/TypeScript FHIR ecosystem has type packages, API clients, and one
+platform SDK — but no standalone diff tool and limited validation tooling outside
+platform-specific SDKs.
+
+| Capability | fhir-resource-diff | `fhir` (Lantana) | `@medplum/core` | `@types/fhir` |
+|---|:---:|:---:|:---:|:---:|
+| Structural diff | **yes** | — | — | — |
+| Validation (structural) | **yes** | basic (JSON Schema) | yes (profiles) | — |
+| R4 + R4B + R5 | **yes** | R4 only | yes | R4 only |
+| CLI with stdin/pipes | **yes** | — | — | — |
+| JSON + Markdown + text output | **yes** | — | — | — |
+| CI/CD flags (exit codes, quiet, envelope) | **yes** | — | — | — |
+| Zero platform dependency | **yes** | yes | no (Medplum SDK) | yes |
+| TypeScript library API | **yes** | yes | yes | types only |
+
+Three things this tool does that nothing else in the npm ecosystem does today:
+
+**FHIR-aware structural diff.** Compare two resources path by path and get a
+classified list of additions, removals, and changes — with dot-notation paths,
+array index tracking, and ignore presets for metadata noise. No existing npm
+package does this.
+
+**AI agent and automation friendly.** Every command supports `--format json` for
+structured output, `--envelope` for metadata wrapping (tool version, FHIR version,
+timestamps, HL7 doc URLs), and stdin pipes for in-memory payloads. An agent can
+validate and diff FHIR payloads without writing temp files, parse the output in one
+pass, and follow the documentation links — no second tool call needed.
+
+**CI/CD native.** `--exit-on-diff` fails the step when resources diverge.
+`--quiet` suppresses stdout for exit-code-only gates. Exit codes are
+severity-aware — warnings and info findings never produce non-zero exits.
+JSON envelope output includes summary counts for automated triage.
+
+### Complementary tools
+
+This tool doesn't replace everything — it's designed to work alongside the ecosystem:
+
+- **[`@types/fhir`](https://www.npmjs.com/package/@types/fhir)** / **[`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes)** — TypeScript type definitions for FHIR resources. Use these for your application code; use `fhir-resource-diff` for runtime validation and diffing.
+- **[HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator)** — the authoritative tool for full profile conformance validation. `fhir-resource-diff` catches format and structural issues locally and fast; the HL7 Validator handles StructureDefinition evaluation, terminology binding, and invariant checking.
+- **[`fhirclient`](https://www.npmjs.com/package/fhirclient)** — SMART on FHIR auth and API client. Handles the transport; pipe the responses into `fhir-resource-diff` for validation and comparison.
+
 ## Supported FHIR versions
 
 | Version | Status | Spec URL |
@@ -331,9 +374,10 @@ Note: the `--` separator after `pnpm cli` is required so pnpm passes flags to th
 
 ## Roadmap
 
-- **Phase 1** (complete): core diff engine, validation, CLI, text/JSON/markdown output
-- **Phase 2** (current): multi-version FHIR support, resource registry, `info` and `list-resources` commands, stdin/pipe support, developer experience improvements
-- **Phase 3** (planned): profile-aware comparison, bundle support, richer semantic diffing, initial hosted web app
+- **Phase 1** (complete): core diff engine, validation, CLI, text/JSON/markdown output, presets
+- **Phase 2** (complete): multi-version FHIR support (R4/R4B/R5), resource registry, `info` and `list-resources` commands, stdin/pipe support, CI affordances (`--quiet`, `--envelope`, `--exit-on-diff`)
+- **Phase 3** (in progress): format validation rules (id, date, reference), structural validation rules (required fields, status values, CodeableConcept shape), profile awareness (meta.profile detection, IG registry)
+- **Phase 4** (planned): enriched `info` command (maturity levels, use cases, key fields, version notes), Snyk security scanning, showcase with real HL7 R4 data
 
 ## Related resources
 
