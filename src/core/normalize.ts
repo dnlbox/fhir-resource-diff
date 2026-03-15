@@ -104,6 +104,7 @@ function setValueAtPath(
     const part = parts[i];
     if (
       part === undefined ||
+      UNSAFE_KEYS.has(part) ||
       current === null ||
       typeof current !== "object" ||
       Array.isArray(current)
