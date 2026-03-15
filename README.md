@@ -2,9 +2,10 @@
 
 Structural diff, validation, and normalization for FHIR R4 / R4B / R5 JSON resources.
 
-![Build](https://img.shields.io/badge/build-passing-brightgreen)
-![npm](https://img.shields.io/badge/npm-0.2.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/ci.yml/badge.svg)](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/codeql.yml/badge.svg)](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/codeql.yml)
+[![npm](https://img.shields.io/npm/v/fhir-resource-diff)](https://www.npmjs.com/package/fhir-resource-diff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## What is FHIR?
 
