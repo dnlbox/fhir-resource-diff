@@ -1,6 +1,6 @@
 # Spec 25 — Info command enrichment
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
