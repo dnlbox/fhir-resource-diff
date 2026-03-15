@@ -1,6 +1,6 @@
 # Spec 22 — Structural validation rules
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 

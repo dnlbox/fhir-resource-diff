@@ -1,6 +1,6 @@
 # Spec 26 — CONTRIBUTING.md overhaul
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
