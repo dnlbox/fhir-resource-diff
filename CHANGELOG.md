@@ -4,8 +4,14 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+- `normalize` command: `--summary` flag prints a one-line change summary to stderr (`↳ normalized: 5 keys sorted, 2 dates normalized`) without contaminating stdout piping
+- `NormalizeStats` and `NormalizeResult` types exported from the library — `normalize()` now returns `{ resource, stats }` instead of a bare resource
+
 ### Changed
 - `info` command and resource registry lookups are now case-insensitive — `info observation` and `info OBSERVATION` both resolve to `Observation`
+- `normalize` command description updated to explain canonical form and when to use it
+- `canonical` and `none` normalization preset descriptions rewritten in plain terms
 
 ## [0.2.0] — 2026-03-15
 
