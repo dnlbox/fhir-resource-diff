@@ -14,6 +14,7 @@ export default defineConfig({
     globals: false,
     passWithNoTests: true,
     include: ["tests/**/*.test.ts"],
+    exclude: ["tests/compat/**"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
