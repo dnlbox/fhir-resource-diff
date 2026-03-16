@@ -45,7 +45,7 @@ describe("normalize command — --summary flag", () => {
       const result = runCli(["normalize", path, "--summary"]);
       expect(result.status).toBe(0);
       // stdout has valid JSON
-      expect(() => JSON.parse(result.stdout)).not.toThrow();
+      expect(() => { JSON.parse(result.stdout); }).not.toThrow();
       // stderr has summary line
       expect(result.stderr).toContain("↳ normalized:");
     });
