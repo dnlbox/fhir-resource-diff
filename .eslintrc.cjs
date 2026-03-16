@@ -4,6 +4,7 @@
 
 module.exports = {
   root: true,
+  ignorePatterns: ["tests/compat/**"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2022,

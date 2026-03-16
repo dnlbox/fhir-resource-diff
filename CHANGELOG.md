@@ -6,6 +6,9 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ### Added
 - Pre-commit hook via lefthook: runs `typecheck`, `lint`, and `test` in parallel before every commit (Spec 32)
+- Renovate configuration for automated dependency update PRs — coupled packages grouped, no automerge (Spec 33)
+- CI now tests on Node 20 (minimum) and `lts/*` to catch accidental use of newer APIs (Spec 33)
+- Runtime compatibility CI jobs: Bun and Deno smoke tests in separate `compat.yml` workflow (Spec 33)
 
 - `normalize` command: `--summary` flag prints a one-line change summary to stderr (`↳ normalized: 5 keys sorted, 2 dates normalized`) without contaminating stdout piping
 - `NormalizeStats` and `NormalizeResult` types exported from the library — `normalize()` now returns `{ resource, stats }` instead of a bare resource

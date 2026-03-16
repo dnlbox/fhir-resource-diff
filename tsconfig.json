@@ -22,5 +22,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src", "tests", "vitest.config.ts", "tsup.config.ts"]
+  "include": ["src", "tests", "vitest.config.ts", "tsup.config.ts"],
+  "exclude": ["tests/compat"]
 }

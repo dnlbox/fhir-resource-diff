@@ -1,6 +1,6 @@
 # Spec 33 — Dependency discipline and runtime compatibility
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
