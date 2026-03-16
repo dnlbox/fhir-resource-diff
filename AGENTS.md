@@ -56,6 +56,28 @@ The CLI adapter is the only place that may use Node-specific APIs.
 - Commit messages: imperative mood, concise summary line, optional body for "why".
 - Do not commit generated files, secrets, or proprietary data.
 
+## Changelog discipline
+
+**Every user-facing change must be recorded in `CHANGELOG.md` under `[Unreleased]`
+in the same commit that introduces the change.** This applies to any agent or
+contributor, not just humans.
+
+User-facing changes include: new features, bug fixes, behaviour changes, new CLI
+flags, new validation rules, output format changes, and performance improvements
+visible to users.
+
+Does NOT require a changelog entry: internal refactors with no observable
+behaviour change, test-only changes, documentation-only changes, dependency
+bumps with no user impact.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
+use `### Added`, `### Changed`, `### Fixed`, or `### Removed` under
+`## [Unreleased]`. When a release is cut, the maintainer moves `[Unreleased]`
+items into a versioned section.
+
+If you are implementing a spec and are unsure whether something is user-facing:
+err on the side of adding it.
+
 ## What NOT to do
 
 - Do not add full FHIR specification parsing in v1.
