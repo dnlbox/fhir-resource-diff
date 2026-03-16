@@ -69,6 +69,22 @@ export interface NormalizeOptions {
   sortArrayPaths?: string[];
 }
 
+export interface NormalizeStats {
+  /** Number of object keys sorted across the entire resource tree. */
+  keysSorted: number;
+  /** Number of string values trimmed. */
+  stringsTrimmed: number;
+  /** Number of date/datetime strings normalized to ISO 8601. */
+  datesNormalized: number;
+  /** Number of arrays sorted (from sortArrayPaths). */
+  arraysSorted: number;
+}
+
+export interface NormalizeResult {
+  resource: FhirResource;
+  stats: NormalizeStats;
+}
+
 export interface DiffOptions {
   /** Field paths to exclude from comparison. Dot-notation, supports wildcards: "meta.*" */
   ignorePaths?: string[];

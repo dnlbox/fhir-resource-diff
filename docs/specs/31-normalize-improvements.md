@@ -1,6 +1,6 @@
 # Spec 31 — normalize command improvements
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 

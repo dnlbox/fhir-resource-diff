@@ -9,6 +9,8 @@ export type {
   DiffEntry,
   DiffResult,
   NormalizeOptions,
+  NormalizeStats,
+  NormalizeResult,
   DiffOptions,
   IgnorePreset,
   NormalizationPreset,

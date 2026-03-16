@@ -9,7 +9,7 @@ describe("normalize", () => {
         resourceType: "Patient",
         id: " patient-1 ",
       };
-      const result = normalize(resource, { trimStrings: true });
+      const { resource: result } = normalize(resource, { trimStrings: true });
       expect(result.id).toBe("patient-1");
     });
 
@@ -18,7 +18,7 @@ describe("normalize", () => {
         resourceType: "Patient",
         name: [{ family: " Smith ", given: [" John "] }],
       };
-      const result = normalize(resource, { trimStrings: true });
+      const { resource: result } = normalize(resource, { trimStrings: true });
       const name = result.name as Array<{ family: string; given: string[] }>;
       expect(name[0]?.family).toBe("Smith");
       expect(name[0]?.given[0]).toBe("John");
@@ -29,7 +29,7 @@ describe("normalize", () => {
         resourceType: "Patient",
         tags: [" alpha ", " beta "],
       };
-      const result = normalize(resource, { trimStrings: true });
+      const { resource: result } = normalize(resource, { trimStrings: true });
       expect(result.tags).toEqual(["alpha", "beta"]);
     });
 
@@ -40,7 +40,7 @@ describe("normalize", () => {
         count: 42,
         ratio: 3.14,
       };
-      const result = normalize(resource, { trimStrings: true });
+      const { resource: result } = normalize(resource, { trimStrings: true });
       expect(result.active).toBe(true);
       expect(result.count).toBe(42);
       expect(result.ratio).toBe(3.14);
@@ -53,7 +53,7 @@ describe("normalize", () => {
         resourceType: "Observation",
         effectiveDateTime: "2024-01-01T00:00:00+05:00",
       };
-      const result = normalize(resource, { normalizeDates: true });
+      const { resource: result } = normalize(resource, { normalizeDates: true });
       expect(result.effectiveDateTime).toBe("2023-12-31T19:00:00.000Z");
     });
 
@@ -62,7 +62,7 @@ describe("normalize", () => {
         resourceType: "Observation",
         effectiveDateTime: "2024-06-15T12:00:00-08:00",
       };
-      const result = normalize(resource, { normalizeDates: true });
+      const { resource: result } = normalize(resource, { normalizeDates: true });
       expect(result.effectiveDateTime).toBe("2024-06-15T20:00:00.000Z");
     });
 
@@ -71,7 +71,7 @@ describe("normalize", () => {
         resourceType: "Observation",
         effectiveDateTime: "2024-01-01T00:00:00Z",
       };
-      const result = normalize(resource, { normalizeDates: true });
+      const { resource: result } = normalize(resource, { normalizeDates: true });
       // Should still parse and output as ISO string — same UTC value
       expect(result.effectiveDateTime).toBe("2024-01-01T00:00:00.000Z");
     });
@@ -81,7 +81,7 @@ describe("normalize", () => {
         resourceType: "Patient",
         birthDate: "1990-05-20",
       };
-      const result = normalize(resource, { normalizeDates: true });
+      const { resource: result } = normalize(resource, { normalizeDates: true });
       expect(result.birthDate).toBe("1990-05-20");
     });
 
@@ -90,7 +90,7 @@ describe("normalize", () => {
         resourceType: "Patient",
         id: "patient-abc",
       };
-      const result = normalize(resource, { normalizeDates: true });
+      const { resource: result } = normalize(resource, { normalizeDates: true });
       expect(result.id).toBe("patient-abc");
     });
 
@@ -101,7 +101,7 @@ describe("normalize", () => {
           lastUpdated: "2024-03-10T08:30:00+02:00",
         },
       };
-      const result = normalize(resource, { normalizeDates: true });
+      const { resource: result } = normalize(resource, { normalizeDates: true });
       const meta = result.meta as { lastUpdated: string };
       expect(meta.lastUpdated).toBe("2024-03-10T06:30:00.000Z");
     });
@@ -115,7 +115,7 @@ describe("normalize", () => {
         a: 2,
         m: 3,
       };
-      const result = normalize(resource, { sortObjectKeys: true });
+      const { resource: result } = normalize(resource, { sortObjectKeys: true });
       expect(Object.keys(result)).toEqual(["a", "m", "resourceType", "z"]);
     });
 
@@ -125,7 +125,7 @@ describe("normalize", () => {
         z: 1,
         a: 2,
       };
-      const result = normalize(resource, { sortObjectKeys: true });
+      const { resource: result } = normalize(resource, { sortObjectKeys: true });
       const keys = Object.keys(result);
       expect(keys.indexOf("a")).toBeLessThan(keys.indexOf("z"));
     });
@@ -135,7 +135,7 @@ describe("normalize", () => {
         resourceType: "Patient",
         name: [{ z: "last", a: "first" }],
       };
-      const result = normalize(resource, { sortObjectKeys: true });
+      const { resource: result } = normalize(resource, { sortObjectKeys: true });
       const nameArr = result.name as Array<Record<string, string>>;
       expect(Object.keys(nameArr[0] ?? {})).toEqual(["a", "z"]);
     });
@@ -151,7 +151,7 @@ describe("normalize", () => {
           { family: "Mu" },
         ],
       };
-      const result = normalize(resource, { sortArrayPaths: ["name"] });
+      const { resource: result } = normalize(resource, { sortArrayPaths: ["name"] });
       const nameArr = result.name as Array<{ family: string }>;
       expect(nameArr.map((n) => n.family)).toEqual(["Alpha", "Mu", "Zeta"]);
     });
@@ -162,7 +162,7 @@ describe("normalize", () => {
         name: [{ family: "Zeta" }, { family: "Alpha" }],
         identifier: [{ value: "Z" }, { value: "A" }],
       };
-      const result = normalize(resource, { sortArrayPaths: ["name"] });
+      const { resource: result } = normalize(resource, { sortArrayPaths: ["name"] });
       const identifiers = result.identifier as Array<{ value: string }>;
       // identifier was not in sortArrayPaths so original order preserved
       expect(identifiers.map((i) => i.value)).toEqual(["Z", "A"]);
@@ -175,7 +175,7 @@ describe("normalize", () => {
           telecom: [{ value: "c" }, { value: "a" }, { value: "b" }],
         },
       };
-      const result = normalize(resource, { sortArrayPaths: ["contact.telecom"] });
+      const { resource: result } = normalize(resource, { sortArrayPaths: ["contact.telecom"] });
       const contact = result.contact as { telecom: Array<{ value: string }> };
       expect(contact.telecom.map((t) => t.value)).toEqual(["a", "b", "c"]);
     });
@@ -232,7 +232,7 @@ describe("normalize", () => {
         name: [{ family: "Zeta" }, { family: "Alpha" }],
         birthDate: "1990-05-20",
       };
-      const result = normalize(resource, {});
+      const { resource: result } = normalize(resource, {});
       // Values unchanged
       expect(result.id).toBe(" patient-1 ");
       const nameArr = result.name as Array<{ family: string }>;
@@ -244,29 +244,118 @@ describe("normalize", () => {
   });
 });
 
+describe("normalize — stats", () => {
+  it("counts trimmed strings", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+      id: " patient-1 ",
+      name: [{ family: " Smith " }],
+    };
+    const { stats } = normalize(resource, { trimStrings: true });
+    expect(stats.stringsTrimmed).toBe(2); // " patient-1 " and " Smith " have whitespace; "Patient" does not change
+  });
+
+  it("does not count strings where trim makes no difference", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+      id: "patient-1",
+    };
+    const { stats } = normalize(resource, { trimStrings: true });
+    expect(stats.stringsTrimmed).toBe(0);
+  });
+
+  it("counts normalized dates", () => {
+    const resource: FhirResource = {
+      resourceType: "Observation",
+      effectiveDateTime: "2024-01-01T00:00:00+05:00",
+      issued: "2024-06-15T12:00:00-08:00",
+    };
+    const { stats } = normalize(resource, { normalizeDates: true });
+    expect(stats.datesNormalized).toBe(2);
+  });
+
+  it("does not count dates that are already UTC ISO 8601 without milliseconds", () => {
+    // "2024-01-01T00:00:00Z" becomes "2024-01-01T00:00:00.000Z" — that IS a change
+    const resource: FhirResource = {
+      resourceType: "Observation",
+      effectiveDateTime: "2024-01-01T00:00:00.000Z",
+    };
+    const { stats } = normalize(resource, { normalizeDates: true });
+    expect(stats.datesNormalized).toBe(0);
+  });
+
+  it("counts sorted keys across all objects in tree", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+      z: 1,
+      a: 2,
+    };
+    const { stats } = normalize(resource, { sortObjectKeys: true });
+    // "resourceType" < "z", "a" < "z": keys [resourceType, z, a] sorted to [a, resourceType, z]
+    // "z" and "a" are both displaced from their original positions
+    expect(stats.keysSorted).toBeGreaterThan(0);
+  });
+
+  it("returns zero keysSorted when keys are already sorted", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+    };
+    const { stats } = normalize(resource, { sortObjectKeys: true });
+    expect(stats.keysSorted).toBe(0);
+  });
+
+  it("counts sorted arrays", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+      name: [{ family: "Zeta" }, { family: "Alpha" }],
+      identifier: [{ value: "Z" }, { value: "A" }],
+    };
+    const { stats } = normalize(resource, { sortArrayPaths: ["name", "identifier"] });
+    expect(stats.arraysSorted).toBe(2);
+  });
+
+  it("does not count arrays already in sorted order", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+      name: [{ family: "Alpha" }, { family: "Zeta" }],
+    };
+    const { stats } = normalize(resource, { sortArrayPaths: ["name"] });
+    expect(stats.arraysSorted).toBe(0);
+  });
+
+  it("returns all-zero stats for empty options", () => {
+    const resource: FhirResource = {
+      resourceType: "Patient",
+      id: " patient-1 ",
+    };
+    const { stats } = normalize(resource, {});
+    expect(stats).toEqual({ keysSorted: 0, stringsTrimmed: 0, datesNormalized: 0, arraysSorted: 0 });
+  });
+});
+
 describe("normalize — prototype pollution prevention (CWE-915)", () => {
   it("trimStrings: drops __proto__ keys and does not pollute Object.prototype", () => {
-    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
+    const resourceWithProtoKey = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
     const before = ({} as Record<string, unknown>)["polluted"];
-    normalize(malicious, { trimStrings: true });
+    normalize(resourceWithProtoKey, { trimStrings: true });
     expect(({} as Record<string, unknown>)["polluted"]).toBe(before);
   });
 
   it("normalizeDates: drops __proto__ keys and does not pollute Object.prototype", () => {
-    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
-    normalize(malicious, { normalizeDates: true });
+    const resourceWithProtoKey = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
+    normalize(resourceWithProtoKey, { normalizeDates: true });
     expect(({} as Record<string, unknown>)["polluted"]).toBeUndefined();
   });
 
   it("sortObjectKeys: drops __proto__ keys and does not pollute Object.prototype", () => {
-    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
-    normalize(malicious, { sortObjectKeys: true });
+    const resourceWithProtoKey = JSON.parse('{"resourceType":"Patient","__proto__":{"polluted":true}}') as FhirResource;
+    normalize(resourceWithProtoKey, { sortObjectKeys: true });
     expect(({} as Record<string, unknown>)["polluted"]).toBeUndefined();
   });
 
   it("does not carry __proto__ key into normalized output", () => {
-    const malicious = JSON.parse('{"resourceType":"Patient","__proto__":{"x":1}}') as FhirResource;
-    const result = normalize(malicious, { sortObjectKeys: true });
+    const resourceWithProtoKey = JSON.parse('{"resourceType":"Patient","__proto__":{"x":1}}') as FhirResource;
+    const { resource: result } = normalize(resourceWithProtoKey, { sortObjectKeys: true });
     expect(Object.keys(result)).not.toContain("__proto__");
   });
 
