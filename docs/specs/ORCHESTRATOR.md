@@ -219,3 +219,4 @@ The project is considered v1-complete when:
 | 28 | `28-npm-publish.md` | npm registry publish: account setup, package.json, publish workflow | ✓ complete |
 | 29 | `29-github-repository-settings.md` | GitHub settings: About, branch protection, CI badge, releases, CHANGELOG | ✓ complete |
 | 30 | `30-case-insensitive-info.md` | Case-insensitive resource type lookup in `info` and registry | ✓ complete |
+| 31 | `31-normalize-improvements.md` | normalize: stats, --summary flag, preset descriptions, help text | open |
