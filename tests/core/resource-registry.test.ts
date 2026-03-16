@@ -21,8 +21,22 @@ describe("getResourceInfo", () => {
     expect(getResourceInfo("NotAResource")).toBeUndefined();
   });
 
-  it("is case-sensitive", () => {
-    expect(getResourceInfo("patient")).toBeUndefined();
+  it("is case-insensitive — lowercase resolves to canonical entry", () => {
+    const info = getResourceInfo("patient");
+    expect(info).toBeDefined();
+    expect(info?.resourceType).toBe("Patient");
+  });
+
+  it("is case-insensitive — all-caps resolves to canonical entry", () => {
+    const info = getResourceInfo("OBSERVATION");
+    expect(info).toBeDefined();
+    expect(info?.resourceType).toBe("Observation");
+  });
+
+  it("is case-insensitive — mixed case works for compound names", () => {
+    const info = getResourceInfo("medicationrequest");
+    expect(info).toBeDefined();
+    expect(info?.resourceType).toBe("MedicationRequest");
   });
 });
 

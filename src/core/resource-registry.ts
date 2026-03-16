@@ -876,7 +876,8 @@ export const RESOURCE_REGISTRY: readonly ResourceTypeInfo[] = [
  * Looks up a resource type by name (case-sensitive, exact match).
  */
 export function getResourceInfo(resourceType: string): ResourceTypeInfo | undefined {
-  return RESOURCE_REGISTRY.find((r) => r.resourceType === resourceType);
+  const lower = resourceType.toLowerCase();
+  return RESOURCE_REGISTRY.find((r) => r.resourceType.toLowerCase() === lower);
 }
 
 /**
