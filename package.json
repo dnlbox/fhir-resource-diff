@@ -29,7 +29,7 @@
     "type": "git",
     "url": "https://github.com/dnlbox/fhir-resource-diff.git"
   },
-  "homepage": "https://github.com/dnlbox/fhir-resource-diff#readme",
+  "homepage": "https://dnlbox.github.io/fhir-resource-diff/",
   "bugs": {
     "url": "https://github.com/dnlbox/fhir-resource-diff/issues"
   },
