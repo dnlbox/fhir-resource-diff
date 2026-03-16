@@ -216,6 +216,6 @@ The project is considered v1-complete when:
 | 25 | `25-info-command-enrichment.md` | Maturity level, use cases, key fields, version notes in `info` | ✓ complete |
 | 26 | `26-contributing-overhaul.md` | CONTRIBUTING.md rewrite: FP paradigm, curated scope, spec-driven dev | ✓ complete |
 | 27 | `27-documentation-site.md` | VitePress docs site deployed to GitHub Pages | ✓ complete |
-| 28 | `28-npm-publish.md` | npm registry publish: account setup, package.json, publish workflow | open |
+| 28 | `28-npm-publish.md` | npm registry publish: account setup, package.json, publish workflow | ✓ complete |
 | 29 | `29-github-repository-settings.md` | GitHub settings: About, branch protection, CI badge, releases, CHANGELOG | ✓ complete |
 | 30 | `30-case-insensitive-info.md` | Case-insensitive resource type lookup in `info` and registry | ✓ complete |

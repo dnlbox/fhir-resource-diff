@@ -378,20 +378,9 @@ Note: the `--` separator after `pnpm cli` is required so pnpm passes flags to th
 | `pnpm build` | Production build (tsup) |
 | `pnpm dev` | Watch mode build (tsup --watch) |
 
-## Roadmap
-
-- **Phase 1** (complete): core diff engine, validation, CLI, text/JSON/markdown output, presets
-- **Phase 2** (complete): multi-version FHIR support (R4/R4B/R5), resource registry, `info` and `list-resources` commands, stdin/pipe support, CI affordances (`--quiet`, `--envelope`, `--exit-on-diff`)
-- **Phase 3** (in progress): format validation rules (id, date, reference), structural validation rules (required fields, status values, CodeableConcept shape), profile awareness (meta.profile detection, IG registry)
-- **Phase 4** (planned): enriched `info` command (maturity levels, use cases, key fields, version notes), Snyk security scanning, showcase with real HL7 R4 data
-
 ## Related resources
 
 - [FHIR specification](https://hl7.org/fhir/)
 - [FHIR resource type listing](https://hl7.org/fhir/resourcelist.html)
 - [FHIR R4](https://hl7.org/fhir/R4/) / [R4B](https://hl7.org/fhir/R4B/) / [R5](https://hl7.org/fhir/R5/)
 - [HL7 FHIR tooling ecosystem](https://confluence.hl7.org/display/FHIR/FHIR+Tooling)
-
-## License
-
-MIT.
