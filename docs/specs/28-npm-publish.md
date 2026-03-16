@@ -1,6 +1,6 @@
 # Spec 28 — npm registry publish preparation
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
