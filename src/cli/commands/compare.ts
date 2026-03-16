@@ -166,8 +166,8 @@ export function registerCompareCommand(program: Command): void {
           );
           process.exit(2);
         }
-        resourceA = normalize(resourceA, normPreset.options);
-        resourceB = normalize(resourceB, normPreset.options);
+        resourceA = normalize(resourceA, normPreset.options).resource;
+        resourceB = normalize(resourceB, normPreset.options).resource;
       }
 
       // 6. Build DiffOptions from --ignore and --preset
