@@ -4,6 +4,9 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+- `info` command and resource registry lookups are now case-insensitive — `info observation` and `info OBSERVATION` both resolve to `Observation`
+
 ## [0.2.0] — 2026-03-15
 
 ### Added
