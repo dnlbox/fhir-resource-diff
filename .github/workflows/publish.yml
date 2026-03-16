@@ -3,6 +3,7 @@ name: Publish
 on:
   release:
     types: [published]
+  workflow_dispatch:  # allows manual trigger from Actions tab
 
 jobs:
   publish-npm:
@@ -39,6 +40,8 @@ jobs:
     name: Publish to GitHub Packages
     runs-on: ubuntu-latest
     needs: publish-npm
+    # on workflow_dispatch the npm job is skipped — run gpr independently
+    if: always() && (needs.publish-npm.result == 'success' || github.event_name == 'workflow_dispatch')
     permissions:
       contents: read
       packages: write
