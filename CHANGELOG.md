@@ -4,19 +4,20 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-03-16
+
 ### Added
+- `normalize` command: `--summary` flag prints a one-line change summary to stderr (`↳ normalized: 5 keys sorted, 2 dates normalized`) without contaminating stdout piping (Spec 31)
+- `NormalizeStats` and `NormalizeResult` types exported from the library — `normalize()` now returns `{ resource, stats }` instead of a bare resource (Spec 31)
 - Pre-commit hook via lefthook: runs `typecheck`, `lint`, and `test` in parallel before every commit (Spec 32)
 - Renovate configuration for automated dependency update PRs — coupled packages grouped, no automerge (Spec 33)
 - CI now tests on Node 20 (minimum) and `lts/*` to catch accidental use of newer APIs (Spec 33)
 - Runtime compatibility CI jobs: Bun and Deno smoke tests in separate `compat.yml` workflow (Spec 33)
 
-- `normalize` command: `--summary` flag prints a one-line change summary to stderr (`↳ normalized: 5 keys sorted, 2 dates normalized`) without contaminating stdout piping
-- `NormalizeStats` and `NormalizeResult` types exported from the library — `normalize()` now returns `{ resource, stats }` instead of a bare resource
-
 ### Changed
-- `info` command and resource registry lookups are now case-insensitive — `info observation` and `info OBSERVATION` both resolve to `Observation`
-- `normalize` command description updated to explain canonical form and when to use it
-- `canonical` and `none` normalization preset descriptions rewritten in plain terms
+- `info` command and resource registry lookups are now case-insensitive — `info observation` and `info OBSERVATION` both resolve to `Observation` (Spec 30)
+- `normalize` command description updated to explain canonical form and when to use it (Spec 31)
+- `canonical` and `none` normalization preset descriptions rewritten in plain terms (Spec 31)
 
 ## [0.2.0] — 2026-03-15
 
