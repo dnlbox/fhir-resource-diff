@@ -1,6 +1,6 @@
 # fhir-resource-diff
 
-> The only JavaScript and TypeScript library for diffing FHIR resources. Compare,
+> A dedicated JavaScript and TypeScript library for diffing FHIR resources. Compare,
 > validate, and normalize FHIR R4/R4B/R5 JSON from the CLI or as a library, with
 > structured output designed for AI agents and CI pipelines.
 
