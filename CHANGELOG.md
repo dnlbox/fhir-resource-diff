@@ -5,6 +5,8 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 ## [Unreleased]
 
 ### Added
+- Pre-commit hook via lefthook: runs `typecheck`, `lint`, and `test` in parallel before every commit (Spec 32)
+
 - `normalize` command: `--summary` flag prints a one-line change summary to stderr (`↳ normalized: 5 keys sorted, 2 dates normalized`) without contaminating stdout piping
 - `NormalizeStats` and `NormalizeResult` types exported from the library — `normalize()` now returns `{ resource, stats }` instead of a bare resource
 

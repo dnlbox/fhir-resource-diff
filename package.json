@@ -60,6 +60,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "prepare": "lefthook install",
     "prepublishOnly": "pnpm build && pnpm typecheck && pnpm test",
     "cli": "tsx src/cli/index.ts",
     "cli:watch": "tsx --watch src/cli/index.ts",
@@ -79,6 +80,7 @@
     "@vitest/coverage-v8": "^2.1.8",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
+    "lefthook": "^2.1.4",
     "prettier": "^3.3.3",
     "tsup": "^8.3.5",
     "tsx": "^4.19.1",
@@ -92,7 +94,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "lefthook"
     ]
   }
 }
