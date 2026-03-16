@@ -1,6 +1,6 @@
 # Spec 32 — Pre-commit hooks
 
-**Status:** open
+**Status:** complete
 
 ## Goal
 
