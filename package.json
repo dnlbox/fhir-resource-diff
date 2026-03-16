@@ -9,12 +9,21 @@
     "hl7",
     "healthcare",
     "diff",
+    "fhir-diff",
+    "fhir-compare",
+    "fhir-validate",
     "validate",
     "r4",
+    "fhir-r4",
     "r4b",
     "r5",
+    "fhir-r5",
     "cli",
-    "json"
+    "json",
+    "ai",
+    "llm",
+    "ai-agent",
+    "healthcare-ai"
   ],
   "repository": {
     "type": "git",

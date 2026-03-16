@@ -1,6 +1,6 @@
 # fhir-resource-diff
 
-Structural diff, validation, and normalization for FHIR R4 / R4B / R5 JSON resources.
+`fhir-resource-diff` is the only JavaScript and TypeScript library for diffing FHIR resources — compare, validate, and normalize FHIR R4 / R4B / R5 JSON from the CLI or as a library, with structured output designed for CI pipelines and AI agents.
 
 [![CI](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/ci.yml/badge.svg)](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/codeql.yml/badge.svg)](https://github.com/dnlbox/fhir-resource-diff/actions/workflows/codeql.yml)
@@ -13,7 +13,7 @@ FHIR (Fast Healthcare Interoperability Resources) is the modern standard for exc
 
 ## Why this exists
 
-FHIR resources evolve across API versions, profiles, and integration points. `fhir-resource-diff` is a fast, local tool for TypeScript and Node.js environments — built for CI pipelines, developer workflows, and AI agents that need programmatic access to FHIR payloads without a server-side validation dependency.
+No JavaScript or TypeScript library for diffing FHIR resources existed before this one. FHIR resources evolve across API versions, profiles, and integration points — comparing them, validating them, and understanding what changed between two versions are daily developer needs that had no dedicated tooling in the JS/TS ecosystem. `fhir-resource-diff` fills that gap: a fast, local tool built for CI pipelines, developer workflows, and AI agents that need programmatic access to FHIR payloads without a server-side dependency.
 
 ## Features
 
@@ -241,7 +241,7 @@ Key points:
 - `--format json --envelope` wraps results in a metadata envelope with summary counts, tool version, FHIR version, and HL7 documentation URL
 - Exit codes: 0 = success, 1 = differences found / validation errors, 2 = input error
 
-## Use with AI agents and test harnesses
+## Use with AI agents, LLMs, and test harnesses
 
 `fhir-resource-diff` is designed for automated tooling. Agents and test harnesses can pipe FHIR payloads directly without writing temp files.
 
