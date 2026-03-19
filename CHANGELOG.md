@@ -4,24 +4,25 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-03-19
+
 ### Added
-- `fhir-date-format` FORMAT_RULE now validates `Period.start` and `Period.end` fields as FHIR dateTime; closes the `malformed-date` fault gap for `effectivePeriod`, `onsetPeriod`, `performedPeriod`, and `period` across all resource types (Spec 42)
-- `fhir-common-bindings` STRUCTURAL_RULE now validates `Observation.valueQuantity.system` and `Observation.component[].valueQuantity.system` against UCUM (`http://unitsofmeasure.org`); warnings when a non-UCUM system URI is present (Spec 43)
-- `MedicationStatement.status` now validated against the R4/R4B value set (`active | completed | entered-in-error | intended | stopped | on-hold | unknown | not-taken`); arbitrary values produce a warning (Spec 41)
-- `MedicationUsage` added to the R5 resource registry (renamed from `MedicationStatement` in R5); `info MedicationUsage` now works and `validate --fhir-version R5` no longer warns (Spec 35)
-- `fhir-resource-type` FORMAT_RULE: unknown `resourceType` values now produce a warning on every `validate` call, even without `--fhir-version`; version-mismatched types (e.g. `MedicationStatement` in R5) also warn (Spec 39)
-- `fhir-common-bindings` STRUCTURAL_RULE: validates `Patient.gender` against `AdministrativeGender` value set and `telecom[].system` against `ContactPointSystem` value set (Specs 37, 38)
-
-### Fixed
-- `validate -` now correctly handles pretty-printed single JSON objects (e.g. `generate patient --pretty | validate -`); previously every line was treated as a separate NDJSON entry (Spec 40)
-- `AllergyIntolerance.type` no longer triggers a false "should be CodeableConcept" warning in R4 and R4B — it is correctly a plain string code in those versions (Spec 36)
-- `MedicationStatement` registry entry updated to `R4`/`R4B` only (does not exist in R5) (Spec 35)
-
 - `validate -` now accepts multiple FHIR resources from stdin: a JSON array, NDJSON (one resource per line), or the existing single-object format — auto-detected without a flag (Spec 34)
 - Multi-resource text output: `[N/M] ResourceType/id` headers per resource, summary line (`N resources: X valid, Y invalid`) (Spec 34)
 - Multi-resource JSON output: array of result objects, each with `index`, `resource`, and the existing validation fields (Spec 34)
 - `--envelope` with `--format json` wraps the multi-resource array in the standard envelope (Spec 34)
 - `detectInputFormat` and `parseMultiResource` utilities in `src/cli/utils/` (Spec 34)
+- `MedicationUsage` added to the R5 resource registry (renamed from `MedicationStatement` in R5); `info MedicationUsage` now works and `validate --fhir-version R5` no longer warns (Spec 35)
+- `fhir-resource-type` FORMAT_RULE: unknown `resourceType` values now produce a warning on every `validate` call, even without `--fhir-version`; version-mismatched types (e.g. `MedicationStatement` in R5) also warn (Spec 39)
+- `fhir-common-bindings` STRUCTURAL_RULE: validates `Patient.gender` against `AdministrativeGender` value set and `telecom[].system` against `ContactPointSystem` value set (Specs 37, 38)
+- `MedicationStatement.status` now validated against the R4/R4B value set (`active | completed | entered-in-error | intended | stopped | on-hold | unknown | not-taken`); arbitrary values produce a warning (Spec 41)
+- `fhir-date-format` FORMAT_RULE now validates `Period.start` and `Period.end` fields as FHIR dateTime; closes the `malformed-date` fault gap for `effectivePeriod`, `onsetPeriod`, `performedPeriod`, and `period` across all resource types (Spec 42)
+- `fhir-common-bindings` STRUCTURAL_RULE now validates `Observation.valueQuantity.system` and `Observation.component[].valueQuantity.system` against UCUM (`http://unitsofmeasure.org`); warnings when a non-UCUM system URI is present (Spec 43)
+
+### Fixed
+- `validate -` now correctly handles pretty-printed single JSON objects (e.g. `generate patient --pretty | validate -`); previously every line was treated as a separate NDJSON entry (Spec 40)
+- `AllergyIntolerance.type` no longer triggers a false "should be CodeableConcept" warning in R4 and R4B — it is correctly a plain string code in those versions (Spec 36)
+- `MedicationStatement` registry entry updated to `R4`/`R4B` only (does not exist in R5) (Spec 35)
 
 ## [0.3.0] — 2026-03-16
 
