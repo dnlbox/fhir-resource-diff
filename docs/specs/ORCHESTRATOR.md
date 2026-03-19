@@ -237,3 +237,4 @@ The project is considered v1-complete when:
 | 41 | `41-medication-statement-status-validation.md` | MedicationStatement (R4/R4B) and MedicationUsage (R5) status value binding validation | ✓ complete |
 | 42 | `42-period-date-validation.md` | Validate Period.start / Period.end as FHIR date/dateTime; closes malformed-date gap on MedicationStatement | ✓ complete |
 | 43 | `43-observation-ucum-validation.md` | Warn when Observation.valueQuantity.system is not UCUM (`http://unitsofmeasure.org`) | ✓ complete |
+| 44 | `44-version-independent-binding-rules.md` | Move gender/telecom binding checks to FORMAT_RULES so they fire without `--fhir-version` | open |
