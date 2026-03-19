@@ -5,6 +5,8 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 ## [Unreleased]
 
 ### Added
+- `fhir-date-format` FORMAT_RULE now validates `Period.start` and `Period.end` fields as FHIR dateTime; closes the `malformed-date` fault gap for `effectivePeriod`, `onsetPeriod`, `performedPeriod`, and `period` across all resource types (Spec 42)
+- `fhir-common-bindings` STRUCTURAL_RULE now validates `Observation.valueQuantity.system` and `Observation.component[].valueQuantity.system` against UCUM (`http://unitsofmeasure.org`); warnings when a non-UCUM system URI is present (Spec 43)
 - `MedicationStatement.status` now validated against the R4/R4B value set (`active | completed | entered-in-error | intended | stopped | on-hold | unknown | not-taken`); arbitrary values produce a warning (Spec 41)
 - `MedicationUsage` added to the R5 resource registry (renamed from `MedicationStatement` in R5); `info MedicationUsage` now works and `validate --fhir-version R5` no longer warns (Spec 35)
 - `fhir-resource-type` FORMAT_RULE: unknown `resourceType` values now produce a warning on every `validate` call, even without `--fhir-version`; version-mismatched types (e.g. `MedicationStatement` in R5) also warn (Spec 39)

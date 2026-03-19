@@ -119,3 +119,85 @@ describe("dateFormatRule — non-date fields", () => {
     expect(check({ resourceType: "Patient", active: true })).toHaveLength(0);
   });
 });
+
+describe("dateFormatRule — Period.start / Period.end", () => {
+  it("passes for valid date in effectivePeriod.start", () => {
+    const findings = check({
+      resourceType: "Observation",
+      effectivePeriod: { start: "2024-01-01", end: "2024-12-31" },
+    });
+    expect(findings).toHaveLength(0);
+  });
+
+  it("passes for valid dateTime in effectivePeriod.start", () => {
+    const findings = check({
+      resourceType: "Observation",
+      effectivePeriod: { start: "2024-01-01T08:00:00Z" },
+    });
+    expect(findings).toHaveLength(0);
+  });
+
+  it("warns for invalid date in effectivePeriod.start", () => {
+    const findings = check({
+      resourceType: "Observation",
+      effectivePeriod: { start: "not-a-date" },
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("effectivePeriod.start");
+    expect(findings[0]?.ruleId).toBe("fhir-date-format");
+    expect(findings[0]?.severity).toBe("warning");
+    expect(findings[0]?.message).toContain("not-a-date");
+  });
+
+  it("warns for invalid date in effectivePeriod.end", () => {
+    const findings = check({
+      resourceType: "Observation",
+      effectivePeriod: { start: "2024-01-01", end: "31/12/2024" },
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("effectivePeriod.end");
+  });
+
+  it("warns for invalid date in onsetPeriod.start (Condition)", () => {
+    const findings = check({
+      resourceType: "Condition",
+      onsetPeriod: { start: "not-a-date" },
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("onsetPeriod.start");
+  });
+
+  it("warns for invalid date in performedPeriod.start (Procedure)", () => {
+    const findings = check({
+      resourceType: "Procedure",
+      performedPeriod: { start: "not-a-date" },
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("performedPeriod.start");
+  });
+
+  it("warns for invalid date in bare period.start (Encounter)", () => {
+    const findings = check({
+      resourceType: "Encounter",
+      period: { start: "not-a-date" },
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("period.start");
+  });
+
+  it("skips Period when start/end are absent (optional fields)", () => {
+    const findings = check({
+      resourceType: "Observation",
+      effectivePeriod: {},
+    });
+    expect(findings).toHaveLength(0);
+  });
+
+  it("skips Period.start when value is not a string", () => {
+    const findings = check({
+      resourceType: "Observation",
+      effectivePeriod: { start: 20240101 },
+    });
+    expect(findings).toHaveLength(0);
+  });
+});

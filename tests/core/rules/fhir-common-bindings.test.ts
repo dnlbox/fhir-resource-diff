@@ -111,3 +111,118 @@ describe("commonBindingsRule — telecom[].system", () => {
     expect(check({ resourceType: "Patient" }, "R4")).toHaveLength(0);
   });
 });
+
+describe("commonBindingsRule — Observation.valueQuantity UCUM system", () => {
+  const UCUM = "http://unitsofmeasure.org";
+
+  it("passes for UCUM system on valueQuantity", () => {
+    const findings = check(
+      {
+        resourceType: "Observation",
+        valueQuantity: { value: 12.3, unit: "g/dL", system: UCUM, code: "g/dL" },
+      },
+      "R4",
+    );
+    expect(findings).toHaveLength(0);
+  });
+
+  it("warns for non-UCUM system on valueQuantity", () => {
+    const findings = check(
+      {
+        resourceType: "Observation",
+        valueQuantity: { value: 12.3, system: "http://some-other-system.com", code: "g/dL" },
+      },
+      "R4",
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.severity).toBe("warning");
+    expect(findings[0]?.ruleId).toBe("fhir-common-bindings");
+    expect(findings[0]?.path).toBe("valueQuantity.system");
+    expect(findings[0]?.message).toContain("http://some-other-system.com");
+    expect(findings[0]?.message).toContain(UCUM);
+    expect(findings[0]?.docUrl).toBeDefined();
+  });
+
+  it("passes when valueQuantity.system is absent (system is optional)", () => {
+    const findings = check(
+      { resourceType: "Observation", valueQuantity: { value: 12.3, unit: "g/dL" } },
+      "R4",
+    );
+    expect(findings).toHaveLength(0);
+  });
+
+  it("passes when valueQuantity is absent entirely", () => {
+    const findings = check({ resourceType: "Observation", status: "final" }, "R4");
+    expect(findings).toHaveLength(0);
+  });
+
+  it("does not run UCUM check when version is not provided (structural rule)", () => {
+    const findings = check({
+      resourceType: "Observation",
+      valueQuantity: { value: 12.3, system: "http://bad-system.com" },
+    });
+    expect(findings).toHaveLength(0);
+  });
+
+  it("warns for non-UCUM system on valueQuantity in R5", () => {
+    const findings = check(
+      {
+        resourceType: "Observation",
+        valueQuantity: { value: 12.3, system: "http://bad-system.com" },
+      },
+      "R5",
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("valueQuantity.system");
+  });
+
+  it("warns for non-UCUM in component[0].valueQuantity and passes for component[1] with UCUM", () => {
+    const findings = check(
+      {
+        resourceType: "Observation",
+        component: [
+          { valueQuantity: { value: 120, system: "http://bad.system", code: "mm[Hg]" } },
+          { valueQuantity: { value: 80, system: UCUM, code: "mm[Hg]" } },
+        ],
+      },
+      "R4",
+    );
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.path).toBe("component[0].valueQuantity.system");
+  });
+
+  it("warns for both component entries with non-UCUM systems", () => {
+    const findings = check(
+      {
+        resourceType: "Observation",
+        component: [
+          { valueQuantity: { value: 120, system: "http://bad.system" } },
+          { valueQuantity: { value: 80, system: "http://other-bad.system" } },
+        ],
+      },
+      "R4",
+    );
+    expect(findings).toHaveLength(2);
+    expect(findings[0]?.path).toBe("component[0].valueQuantity.system");
+    expect(findings[1]?.path).toBe("component[1].valueQuantity.system");
+  });
+
+  it("passes when component[].valueQuantity.system is absent", () => {
+    const findings = check(
+      {
+        resourceType: "Observation",
+        component: [{ valueQuantity: { value: 120, unit: "mm[Hg]" } }],
+      },
+      "R4",
+    );
+    expect(findings).toHaveLength(0);
+  });
+
+  it("does not check valueQuantity on non-Observation resources", () => {
+    const findings = check(
+      { resourceType: "MedicationRequest", valueQuantity: { system: "http://bad.system" } },
+      "R4",
+    );
+    expect(findings).toHaveLength(0);
+  });
+});

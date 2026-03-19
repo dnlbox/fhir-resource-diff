@@ -235,5 +235,5 @@ The project is considered v1-complete when:
 | 39 | `39-unknown-resource-type-detection.md` | Warn on resourceType not found in registry; detect invalid-resource-type fault | ✓ complete |
 | 40 | `40-stdin-pretty-json-detection.md` | Fix stdin format detection for pretty-printed single JSON objects (bundle pipe broken) | ✓ complete |
 | 41 | `41-medication-statement-status-validation.md` | MedicationStatement (R4/R4B) and MedicationUsage (R5) status value binding validation | ✓ complete |
-| 42 | `42-period-date-validation.md` | Validate Period.start / Period.end as FHIR date/dateTime; closes malformed-date gap on MedicationStatement | open |
-| 43 | `43-observation-ucum-validation.md` | Warn when Observation.valueQuantity.system is not UCUM (`http://unitsofmeasure.org`) | open |
+| 42 | `42-period-date-validation.md` | Validate Period.start / Period.end as FHIR date/dateTime; closes malformed-date gap on MedicationStatement | ✓ complete |
+| 43 | `43-observation-ucum-validation.md` | Warn when Observation.valueQuantity.system is not UCUM (`http://unitsofmeasure.org`) | ✓ complete |

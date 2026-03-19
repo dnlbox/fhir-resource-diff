@@ -39,6 +39,29 @@ function exampleFor(type: DateFieldType): string {
   return "e.g. 2024, 2024-03, or 2024-03-15";
 }
 
+/**
+ * Validate `start` and `end` inside a FHIR Period object.
+ * Called when the walker encounters a key ending with "Period" or the bare "period" key.
+ */
+function validatePeriodFields(
+  period: Record<string, unknown>,
+  path: string,
+  findings: ValidationError[],
+): void {
+  for (const field of ["start", "end"] as const) {
+    const value = period[field];
+    if (typeof value !== "string") continue;
+    if (!FHIR_DATETIME_PATTERN.test(value)) {
+      findings.push({
+        path: `${path}.${field}`,
+        message: `Invalid FHIR dateTime '${value}' at '${path}.${field}': ${exampleFor("dateTime")}`,
+        severity: "warning",
+        ruleId: "fhir-date-format",
+      });
+    }
+  }
+}
+
 export const dateFormatRule: ValidationRule = {
   id: "fhir-date-format",
   description: "FHIR date/dateTime/instant fields must follow the FHIR date format subset",
@@ -47,6 +70,18 @@ export const dateFormatRule: ValidationRule = {
     const findings: ValidationError[] = [];
 
     walkResource(resource, (path, key, value) => {
+      // Period objects: validate start and end as dateTime
+      if (
+        (key === "period" || key.endsWith("Period")) &&
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        validatePeriodFields(value as Record<string, unknown>, path, findings);
+        return;
+      }
+
+      // Named date/dateTime/instant fields
       const fieldType = classifyDateField(key);
       if (fieldType === null) return;
       if (typeof value !== "string") return;
