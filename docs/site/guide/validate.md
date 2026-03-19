@@ -122,6 +122,82 @@ echo "$FHIR_PAYLOAD" | fhir-resource-diff validate - --format json --fhir-versio
 
 Use `-` as the file argument to read from stdin.
 
+## Multi-resource stdin
+
+When reading from stdin (`-`), `validate` auto-detects whether the input is a single JSON object, a JSON array, or NDJSON (one resource per line) — no flag required.
+
+```bash
+# JSON array — e.g. from a bulk export or fhir-test-data
+cat resources.json | fhir-resource-diff validate -
+
+# NDJSON — one resource per line
+cat resources.ndjson | fhir-resource-diff validate -
+
+# Single resource — unchanged behaviour
+cat patient.json | fhir-resource-diff validate -
+```
+
+### Multi-resource text output
+
+```
+[1/3] Patient/abc123
+valid
+
+[2/3] Patient/def456
+invalid
+  ✗ resourceType: resourceType must be a non-empty string
+
+[3/3] Observation/ghi789
+valid
+
+---
+3 resources: 2 valid, 1 invalid
+```
+
+Each block has a `[index/total] ResourceType/id` header (`ResourceType (no id)` when `id` is absent). A summary line follows the last block. A single-element array uses the existing single-resource output format (no header, no summary).
+
+### Multi-resource JSON output
+
+```bash
+cat resources.json | fhir-resource-diff validate - --format json
+```
+
+```json
+[
+  {
+    "index": 1,
+    "resource": { "resourceType": "Patient", "id": "abc123" },
+    "valid": true
+  },
+  {
+    "index": 2,
+    "resource": { "resourceType": "Patient", "id": "def456" },
+    "valid": false,
+    "errors": [
+      { "path": "resourceType", "message": "resourceType must be a non-empty string", "severity": "error" }
+    ]
+  }
+]
+```
+
+`--envelope` wraps the array in the standard metadata envelope when combined with `--format json`.
+
+### Exit codes for multiple resources
+
+| Condition | Exit code |
+|-----------|-----------|
+| All resources valid (no errors) | `0` |
+| At least one resource has error-severity issues | `1` |
+| Input could not be parsed at all | `2` |
+
+### Empty input
+
+```bash
+echo "[]" | fhir-resource-diff validate -
+# stdout: 0 resources validated
+# exit 0
+```
+
 ## With --envelope
 
 ```bash
