@@ -39,8 +39,13 @@ export const REQUIRED_FIELDS: RequiredFieldMap = {
     { field: "subject", label: "subject" },
   ],
   MedicationStatement: [
-    { field: "status", label: "status" },
-    { field: "subject", label: "subject" },
+    { field: "status", label: "status", versions: ["R4", "R4B"] },
+    { field: "subject", label: "subject", versions: ["R4", "R4B"] },
+  ],
+  MedicationUsage: [
+    { field: "status", label: "status", versions: ["R5"] },
+    { field: "medication", label: "medication", versions: ["R5"] },
+    { field: "subject", label: "subject", versions: ["R5"] },
   ],
   DiagnosticReport: [
     { field: "status", label: "status" },

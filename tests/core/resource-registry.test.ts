@@ -113,6 +113,33 @@ describe("listResourceTypes", () => {
   });
 });
 
+describe("MedicationUsage / MedicationStatement versioning", () => {
+  it("MedicationUsage is valid in R5 only", () => {
+    expect(isKnownResourceType("MedicationUsage", "R5")).toBe(true);
+    expect(isKnownResourceType("MedicationUsage", "R4")).toBe(false);
+    expect(isKnownResourceType("MedicationUsage", "R4B")).toBe(false);
+  });
+
+  it("MedicationStatement is valid in R4 and R4B but not R5", () => {
+    expect(isKnownResourceType("MedicationStatement", "R4")).toBe(true);
+    expect(isKnownResourceType("MedicationStatement", "R4B")).toBe(true);
+    expect(isKnownResourceType("MedicationStatement", "R5")).toBe(false);
+  });
+
+  it("MedicationUsage info includes R5-only version and correct description", () => {
+    const info = getResourceInfo("MedicationUsage");
+    expect(info).toBeDefined();
+    expect(info?.versions).toEqual(["R5"]);
+    expect(info?.description).toContain("MedicationStatement");
+  });
+
+  it("MedicationStatement info includes R4B→R5 version note", () => {
+    const notes = getResourceInfo("MedicationStatement")?.versionNotes;
+    expect(notes?.["R4B→R5"]).toBeDefined();
+    expect(notes?.["R4B→R5"]).toContain("MedicationUsage");
+  });
+});
+
 describe("RESOURCE_REGISTRY", () => {
   it("has at least 25 entries", () => {
     expect(RESOURCE_REGISTRY.length).toBeGreaterThanOrEqual(25);

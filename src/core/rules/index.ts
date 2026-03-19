@@ -23,12 +23,15 @@ import { requiredFieldsRule } from "@/core/rules/required-fields.js";
 import { statusValuesRule } from "@/core/rules/status-values.js";
 import { codeableConceptRule } from "@/core/rules/codeable-concept.js";
 import { profileAwareRule } from "@/core/rules/profile-aware.js";
+import { commonBindingsRule } from "@/core/rules/fhir-common-bindings.js";
+import { resourceTypeRule } from "@/core/rules/fhir-resource-type.js";
 
 /** Format and pattern rules — always run, no version required. */
 export const FORMAT_RULES: readonly ValidationRule[] = [
   idFormatRule,
   dateFormatRule,
   referenceFormatRule,
+  resourceTypeRule,
 ];
 
 /** Structural rules — run when version is known (version-gated). */
@@ -36,6 +39,7 @@ export const STRUCTURAL_RULES: readonly ValidationRule[] = [
   requiredFieldsRule,
   statusValuesRule,
   codeableConceptRule,
+  commonBindingsRule,
 ];
 
 /** Profile awareness rules — always run, profile detection doesn't require version. */

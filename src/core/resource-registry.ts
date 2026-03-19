@@ -558,9 +558,36 @@ export const RESOURCE_REGISTRY: readonly ResourceTypeInfo[] = [
   {
     resourceType: "MedicationStatement",
     category: "clinical",
-    versions: ["R4", "R4B", "R5"],
+    versions: ["R4", "R4B"],
     description: "Record of medication use",
     maturityLevel: 3,
+    versionNotes: {
+      "R4B→R5": "Renamed to MedicationUsage in R5. MedicationStatement does not exist in R5.",
+    },
+  },
+  {
+    resourceType: "MedicationUsage",
+    category: "clinical",
+    versions: ["R5"],
+    description: "Record of a patient using or having used a medication (renamed from MedicationStatement in R5).",
+    maturityLevel: 2,
+    useCases: [
+      "Recording current medications during admission",
+      "Documenting medication reconciliation",
+      "Tracking long-term medication use",
+    ],
+    keyFields: [
+      { name: "status", required: true, note: "Required. recorded | entered-in-error | draft" },
+      {
+        name: "medication",
+        required: true,
+        note: "Required in R5. Replaced medicationCodeableConcept/Reference with polymorphic medication.concept and medication.reference",
+      },
+      { name: "subject", required: true, note: "Required. Reference to the patient" },
+    ],
+    versionNotes: {
+      "R4B→R5": "Renamed from MedicationStatement in R5. medication field changed to polymorphic structure (medication.concept + medication.reference).",
+    },
   },
   {
     resourceType: "DiagnosticReport",

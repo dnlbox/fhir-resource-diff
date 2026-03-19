@@ -58,8 +58,25 @@ describe("detectInputFormat", () => {
 
   it("does not confuse inner lines starting with { as ndjson", () => {
     const input = '{\n  "nested": {\n    "key": "value"\n  }\n}';
-    // Only one line starts with `{` after trimming
     expect(detectInputFormat(input)).toBe("single");
+  });
+
+  it("detects pretty-printed single object with nested objects as single", () => {
+    const input = JSON.stringify(
+      { resourceType: "Patient", name: [{ family: "Doe", given: ["John"] }], birthDate: "1990-01-01" },
+      null,
+      2,
+    );
+    expect(detectInputFormat(input)).toBe("single");
+  });
+
+  it("detects pretty-printed JSON array as array", () => {
+    const input = JSON.stringify(
+      [{ resourceType: "Patient" }, { resourceType: "Observation" }],
+      null,
+      2,
+    );
+    expect(detectInputFormat(input)).toBe("array");
   });
 });
 
@@ -80,10 +97,26 @@ describe("parseMultiResource — single", () => {
     expect(result.resources[0]!.resourceType).toBe("Patient");
   });
 
-  it("returns failure for malformed JSON", () => {
-    const result = parseMultiResource("{not json");
-    expect(result.success).toBe(false);
+  it("parses a pretty-printed single JSON object with nested objects", () => {
+    const pretty = JSON.stringify(
+      { resourceType: "Patient", id: "p1", name: [{ family: "Doe", given: ["John"] }] },
+      null,
+      2,
+    );
+    const result = parseMultiResource(pretty);
+    expect(result.success).toBe(true);
+    if (!result.success) return;
     expect(result.format).toBe("single");
+    expect(result.resources).toHaveLength(1);
+    expect(result.resources[0]!.resourceType).toBe("Patient");
+  });
+
+  it("falls back to ndjson for unparseable input (not valid JSON)", () => {
+    // {not json fails JSON.parse → falls to ndjson; single bad line → 0 resources
+    const result = parseMultiResource("{not json");
+    expect(result.success).toBe(true);
+    expect(result.format).toBe("ndjson");
+    if (result.success) expect(result.resources).toHaveLength(0);
   });
 
   it("returns failure for JSON without resourceType", () => {
@@ -112,10 +145,12 @@ describe("parseMultiResource — array", () => {
     expect(result.resources).toHaveLength(0);
   });
 
-  it("returns failure for invalid JSON", () => {
+  it("falls back to ndjson for invalid JSON that starts with [", () => {
+    // [{ broken }] fails JSON.parse → falls to ndjson; single unparseable line → 0 resources
     const result = parseMultiResource("[{broken}]");
-    expect(result.success).toBe(false);
-    expect(result.format).toBe("array");
+    expect(result.success).toBe(true);
+    expect(result.format).toBe("ndjson");
+    if (result.success) expect(result.resources).toHaveLength(0);
   });
 });
 

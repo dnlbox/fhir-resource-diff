@@ -142,6 +142,86 @@ describe("statusValuesRule", () => {
     });
   });
 
+  describe("MedicationStatement (R4/R4B)", () => {
+    const validStatuses = [
+      "active",
+      "completed",
+      "entered-in-error",
+      "intended",
+      "stopped",
+      "on-hold",
+      "unknown",
+      "not-taken",
+    ] as const;
+
+    for (const status of validStatuses) {
+      it(`passes for status: ${status} in R4`, () => {
+        const findings = check({ resourceType: "MedicationStatement", status }, "R4");
+        expect(findings).toHaveLength(0);
+      });
+    }
+
+    it("warns for invalid status in R4", () => {
+      const findings = check({ resourceType: "MedicationStatement", status: "GARBAGE" }, "R4");
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.severity).toBe("warning");
+      expect(findings[0]?.ruleId).toBe("fhir-status-values");
+      expect(findings[0]?.message).toContain("GARBAGE");
+      expect(findings[0]?.message).toContain("MedicationStatement");
+    });
+
+    it("warns for invalid status in R4B", () => {
+      const findings = check({ resourceType: "MedicationStatement", status: "GARBAGE" }, "R4B");
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.ruleId).toBe("fhir-status-values");
+    });
+
+    it("warns for 'recorded' (R5 MedicationUsage value) used in R4", () => {
+      const findings = check({ resourceType: "MedicationStatement", status: "recorded" }, "R4");
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.message).toContain("recorded");
+    });
+
+    it("still warns when version is unspecified (versions filter only excludes on mismatch, not absence)", () => {
+      // No version → versions filter not applied, def runs for any value
+      const findings = check({ resourceType: "MedicationStatement", status: "GARBAGE" });
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.ruleId).toBe("fhir-status-values");
+    });
+  });
+
+  describe("MedicationUsage (R5)", () => {
+    it("passes for status: recorded in R5", () => {
+      const findings = check({ resourceType: "MedicationUsage", status: "recorded" }, "R5");
+      expect(findings).toHaveLength(0);
+    });
+
+    it("passes for status: entered-in-error in R5", () => {
+      const findings = check({ resourceType: "MedicationUsage", status: "entered-in-error" }, "R5");
+      expect(findings).toHaveLength(0);
+    });
+
+    it("passes for status: draft in R5", () => {
+      const findings = check({ resourceType: "MedicationUsage", status: "draft" }, "R5");
+      expect(findings).toHaveLength(0);
+    });
+
+    it("warns for invalid status in R5", () => {
+      const findings = check({ resourceType: "MedicationUsage", status: "GARBAGE" }, "R5");
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.severity).toBe("warning");
+      expect(findings[0]?.ruleId).toBe("fhir-status-values");
+      expect(findings[0]?.message).toContain("GARBAGE");
+      expect(findings[0]?.message).toContain("MedicationUsage");
+    });
+
+    it("warns for 'active' (R4 MedicationStatement value) used in R5", () => {
+      const findings = check({ resourceType: "MedicationUsage", status: "active" }, "R5");
+      expect(findings).toHaveLength(1);
+      expect(findings[0]?.message).toContain("active");
+    });
+  });
+
   describe("ExplanationOfBenefit", () => {
     it("warns for invalid outcome value", () => {
       const findings = check({
