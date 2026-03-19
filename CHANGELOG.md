@@ -4,6 +4,11 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.3.2] — 2026-03-19
+
+### Fixed
+- `--version` now reports the correct version from `package.json`; it was hardcoded to `0.1.0` since the initial release
+
 ## [0.3.1] — 2026-03-19
 
 ### Added
