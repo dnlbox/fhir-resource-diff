@@ -4,6 +4,13 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+- `validate -` now accepts multiple FHIR resources from stdin: a JSON array, NDJSON (one resource per line), or the existing single-object format — auto-detected without a flag (Spec 34)
+- Multi-resource text output: `[N/M] ResourceType/id` headers per resource, summary line (`N resources: X valid, Y invalid`) (Spec 34)
+- Multi-resource JSON output: array of result objects, each with `index`, `resource`, and the existing validation fields (Spec 34)
+- `--envelope` with `--format json` wraps the multi-resource array in the standard envelope (Spec 34)
+- `detectInputFormat` and `parseMultiResource` utilities in `src/cli/utils/` (Spec 34)
+
 ## [0.3.0] — 2026-03-16
 
 ### Added
