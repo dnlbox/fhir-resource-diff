@@ -64,6 +64,29 @@ export const STATUS_VALUES: StatusValueMap = {
       ],
     },
   ],
+  MedicationStatement: [
+    {
+      field: "status",
+      values: [
+        "active",
+        "completed",
+        "entered-in-error",
+        "intended",
+        "stopped",
+        "on-hold",
+        "unknown",
+        "not-taken",
+      ],
+      versions: ["R4", "R4B"],
+    },
+  ],
+  MedicationUsage: [
+    {
+      field: "status",
+      values: ["recorded", "entered-in-error", "draft"],
+      versions: ["R5"],
+    },
+  ],
   MedicationRequest: [
     {
       field: "status",

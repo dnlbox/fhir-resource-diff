@@ -7,22 +7,26 @@
 export type InputFormat = "single" | "array" | "ndjson";
 
 /**
- * Detect the format of raw stdin content without full JSON parsing.
+ * Detect the format of raw stdin content.
  *
  * Detection rules (applied in order):
- * 1. First non-whitespace character is `[` → array
- * 2. More than one line whose first non-whitespace character is `{` → ndjson
- * 3. Otherwise → single
+ * 1. Try JSON.parse on the full trimmed buffer:
+ *    - Parsed value is an array → "array"
+ *    - Parsed value is an object → "single"
+ * 2. Full parse failed → "ndjson" (line-by-line parsing attempted downstream)
  *
- * Intentionally cheap — full parsing happens downstream.
+ * Using full JSON.parse ensures pretty-printed single objects are correctly
+ * distinguished from NDJSON — the heuristic of counting `{`-starting lines
+ * misclassifies pretty-printed objects with nested object values.
  */
 export function detectInputFormat(raw: string): InputFormat {
-  const trimmed = raw.trimStart();
-  if (trimmed.startsWith("[")) return "array";
-
-  const curlBraceLineCount = raw
-    .split("\n")
-    .filter((line) => line.trimStart().startsWith("{")).length;
-
-  return curlBraceLineCount > 1 ? "ndjson" : "single";
+  const trimmed = raw.trim();
+  try {
+    const parsed: unknown = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) return "array";
+    if (typeof parsed === "object" && parsed !== null) return "single";
+  } catch {
+    // Not valid complete JSON — treat as NDJSON
+  }
+  return "ndjson";
 }

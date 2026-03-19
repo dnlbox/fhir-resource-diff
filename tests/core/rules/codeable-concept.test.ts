@@ -171,6 +171,33 @@ describe("codeableConceptRule", () => {
     expect(patientCodeFinding).toBeUndefined();
   });
 
+  describe("version-aware: AllergyIntolerance.type", () => {
+    it("does not warn for AllergyIntolerance.type as plain string in R4", () => {
+      const findings = check({ resourceType: "AllergyIntolerance", type: "allergy" }, "R4");
+      const typeFinding = findings.find((f) => f.path === "type" && f.message.includes("plain string"));
+      expect(typeFinding).toBeUndefined();
+    });
+
+    it("does not warn for AllergyIntolerance.type as plain string in R4B", () => {
+      const findings = check({ resourceType: "AllergyIntolerance", type: "intolerance" }, "R4B");
+      const typeFinding = findings.find((f) => f.path === "type" && f.message.includes("plain string"));
+      expect(typeFinding).toBeUndefined();
+    });
+
+    it("warns for AllergyIntolerance.type as plain string in R5 (should be CodeableConcept)", () => {
+      const findings = check({ resourceType: "AllergyIntolerance", type: "allergy" }, "R5");
+      const typeFinding = findings.find((f) => f.path === "type" && f.message.includes("plain string"));
+      expect(typeFinding).toBeDefined();
+      expect(typeFinding?.severity).toBe("warning");
+    });
+
+    it("warns for AllergyIntolerance.type as plain string when no version given (conservative)", () => {
+      const findings = check({ resourceType: "AllergyIntolerance", type: "allergy" });
+      const typeFinding = findings.find((f) => f.path === "type" && f.message.includes("plain string"));
+      expect(typeFinding).toBeDefined();
+    });
+  });
+
   it("passes for a clean resource with no Coding-like fields", () => {
     const findings = check({
       resourceType: "Patient",

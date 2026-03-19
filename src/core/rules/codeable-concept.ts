@@ -7,6 +7,15 @@ const RULE_ID = "fhir-codeable-concept";
 
 const URI_PREFIXES = ["http://", "https://", "urn:"] as const;
 
+/**
+ * Fields that are plain string codes (not CodeableConcept) in specific versions.
+ * Key: "ResourceType.fieldName", value: versions where it is a plain string.
+ * These would otherwise trigger a false positive from KNOWN_CODEABLE_CONCEPT_FIELDS.
+ */
+const PLAIN_STRING_CODE_FIELDS: Record<string, readonly string[]> = {
+  "AllergyIntolerance.type": ["R4", "R4B"],
+};
+
 /** Resource fields that should be CodeableConcepts (not plain strings). */
 const KNOWN_CODEABLE_CONCEPT_FIELDS: Record<string, readonly string[]> = {
   Observation: ["code", "valueCodeableConcept", "category"],
@@ -81,13 +90,19 @@ export const codeableConceptRule: ValidationRule = {
   description:
     "Coding and CodeableConcept objects must have correct shape; known CodeableConcept fields must not be plain strings",
 
-  check(resource: FhirResource, _version?: FhirVersion): ValidationError[] {
+  check(resource: FhirResource, version?: FhirVersion): ValidationError[] {
     const findings: ValidationError[] = [];
 
     // Check 1: Top-level known CodeableConcept fields must not be plain strings
     const knownFields = KNOWN_CODEABLE_CONCEPT_FIELDS[resource.resourceType];
     if (knownFields !== undefined) {
       for (const field of knownFields) {
+        // Skip fields that are plain string codes (not CodeableConcept) in this version
+        const skipVersions = PLAIN_STRING_CODE_FIELDS[`${resource.resourceType}.${field}`];
+        if (skipVersions !== undefined && version !== undefined && skipVersions.includes(version)) {
+          continue;
+        }
+
         const value = (resource as Record<string, unknown>)[field];
         if (typeof value === "string") {
           findings.push({

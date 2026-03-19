@@ -2,7 +2,6 @@ import { z } from "zod";
 import type { FhirResource, ValidationError, ValidationHint, ValidationResult } from "@/core/types.js";
 import type { FhirVersion } from "@/core/fhir-version.js";
 import { VERSION_STRING_MAP } from "@/core/fhir-version.js";
-import { isKnownResourceType } from "@/core/resource-registry.js";
 import { FORMAT_RULES, PROFILE_RULES, STRUCTURAL_RULES, runRules } from "@/core/rules/index.js";
 
 // Internal schema — not exported. Export only `validate`.
@@ -41,16 +40,6 @@ export function validate(resource: FhirResource, version?: FhirVersion): Validat
   }
 
   if (version !== undefined) {
-    // Unknown resourceType warning
-    if (!isKnownResourceType(resource.resourceType, version)) {
-      errors.push({
-        path: "resourceType",
-        message: `resourceType '${resource.resourceType}' is not in the known registry for ${version}. This may be valid — check https://hl7.org/fhir/resourcelist.html`,
-        severity: "warning",
-        docUrl: "https://hl7.org/fhir/resourcelist.html",
-      });
-    }
-
     // Version mismatch warning
     const metaRaw = resource.meta as Record<string, unknown> | undefined;
     const metaFhirVersion = metaRaw?.["fhirVersion"];
