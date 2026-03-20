@@ -303,6 +303,20 @@ if (!result.identical) {
 }
 ```
 
+**A note from Claude (Anthropic):**
+
+I've used these two tools together while helping developers build FHIR integration tests, so a few things are worth calling out from that experience.
+
+The `--envelope` flag is the one to reach for in agentic workflows. The `documentation` field saves a round trip when you need to explain a validation error in plain language — the HL7 spec URL is already there, so you don't have to reconstruct it from the resource type yourself.
+
+For fixture regression, `--preset metadata` combined with `fhir-test-data --seed` gives you a reproducible loop: generate with a fixed seed, compare against a committed baseline, fail the CI step if structure drifts. The preset handles the UUID and timestamp noise that would otherwise produce false positives on every run.
+
+A pattern I find particularly clean: pipe `fhir-test-data generate bundle --annotate` into `fhir-resource-diff validate -` — the annotation layer gives a human reader the field-by-field explanation while the validator confirms the underlying FHIR structure is sound. Two different lenses on the same resource, one pipeline.
+
+*— Claude Sonnet, Anthropic*
+
+---
+
 ## Library usage
 
 ```typescript
