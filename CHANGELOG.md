@@ -4,14 +4,14 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
-### Added
-- `validate <file>` now accepts JSON array files and NDJSON files by path — applies the same auto-detection logic that already works for `validate -` (stdin); multi-resource output format is identical (Spec 46)
-- `compare` now emits a warning and exits 1 when comparing resources of different types (e.g. `Patient` vs `Bundle`); pass `--force` to proceed with the diff anyway (Spec 47)
-- `validate -` detects `--annotate` wrappers (`{ resource, notes }`) produced by `fhir-test-data generate --annotate` and validates the inner `resource` field, emitting a stderr notice (Spec 49)
+## [0.3.3] — 2026-03-21
 
 ### Fixed
-- `--envelope` metadata `version` field now reads from `package.json` via the module system — stays in sync with the published package version automatically; was hardcoded to `0.2.0` (Spec 45)
-- `list-resources --version R4` no longer silently prints the CLI version number and exits; root `--version` long form removed (only `-V` remains), so Commander no longer intercepts it before the subcommand (Spec 48)
+- `TOOL_VERSION` now reads from `package.json` via the module system — stays in sync with the published package version automatically; was hardcoded to `0.2.0` (Spec 45)
+- `validate <file>` accepts JSON array files and NDJSON files by path, applying the same auto-detection logic as `validate -` (stdin) (Spec 46)
+- `compare` warns and exits 1 when comparing resources of different types (e.g. `Patient` vs `Bundle`); pass `--force` to proceed with the diff anyway (Spec 47)
+- `-V` is the only alias for the version flag; `--version` long form removed from the root command so Commander no longer intercepts it before subcommands like `list-resources --version R4` (Spec 48)
+- `validate -` (stdin) auto-detects `--annotate` wrappers (`{ resource, notes }`) produced by `fhir-test-data generate --annotate` and validates the inner `resource` field, emitting a stderr notice (Spec 49)
 
 ## [0.3.2] — 2026-03-19
 
