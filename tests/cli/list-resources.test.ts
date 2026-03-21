@@ -85,3 +85,26 @@ describe("list-resources command — validation", () => {
     expect(result.stderr).toContain("Unknown category");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Spec 48 — --version flag conflict
+// ---------------------------------------------------------------------------
+
+describe("list-resources --version flag conflict (spec 48)", () => {
+  it("does NOT silently print version number when --version R4 is passed", () => {
+    const result = runCli(["list-resources", "--version", "R4"]);
+    // Should NOT exit 0 silently printing a version string
+    // Either errors (unknown option) or exits non-zero
+    const stdout = result.stdout.trim();
+    // The stdout should NOT look like a semver string alone
+    const looksLikeVersion = /^\d+\.\d+\.\d+$/.test(stdout);
+    expect(looksLikeVersion).toBe(false);
+  });
+
+  it("--fhir-version R4 still filters correctly", () => {
+    const result = runCli(["list-resources", "--fhir-version", "R4"]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("R4");
+    expect(result.stdout).toContain("Patient");
+  });
+});

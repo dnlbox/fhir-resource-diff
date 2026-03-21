@@ -1,5 +1,10 @@
+import { createRequire } from "module";
+
+const _require = createRequire(import.meta.url);
+const { version } = _require("../../package.json") as { version: string };
+
 /**
- * Tool version constant. Update this when bumping the package version.
- * Not read from package.json at runtime (would require node:fs, breaking browser safety).
+ * Tool version read from package.json at startup via the module system.
+ * Stays in sync with the published package version automatically.
  */
-export const TOOL_VERSION = "0.2.0";
+export const TOOL_VERSION = version;

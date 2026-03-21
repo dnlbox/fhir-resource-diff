@@ -199,6 +199,32 @@ curl -s https://hapi.fhir.org/baseR4/Patient/592473 \
 echo "$ACTUAL" | fhir-resource-diff compare - expected.json --format json --envelope
 ```
 
+## Cross-resource-type comparison
+
+Comparing resources of different types (e.g. `Patient` vs `Bundle`) is almost always a mistake. The tool detects this automatically and exits 1 with a clear message:
+
+```bash
+fhir-resource-diff compare patient.json bundle.json
+# stderr: Warning: comparing resources of different types: Patient (left) vs Bundle (right)
+# stderr: This is almost always a mistake. Pass --force to diff anyway.
+# exit 1
+```
+
+Pass `--force` to proceed with the diff anyway (the warning is still printed):
+
+```bash
+fhir-resource-diff compare patient.json bundle.json --force
+# stderr: Warning: comparing resources of different types: Patient (left) vs Bundle (right)
+# → full diff output
+# exit 0
+```
+
+With `--format json` and no `--force`, the output is a structured error object:
+
+```json
+{ "error": "resourceTypeMismatch", "left": "Patient", "right": "Bundle" }
+```
+
 ## See also
 
 - [Output formats](/reference/output-formats) — full format documentation

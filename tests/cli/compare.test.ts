@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 import { diff } from "@/core/diff.js";
 import { parseJson } from "@/core/parse.js";
 import { formatText } from "@/formatters/text.js";
@@ -356,5 +358,78 @@ describe("--fhir-version flag (version detection in compare)", () => {
     expect(stderrSpy).not.toHaveBeenCalled();
 
     vi.restoreAllMocks();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Spec 47 — Cross-resource-type comparison warning (CLI integration)
+// ---------------------------------------------------------------------------
+
+const cwd = join(import.meta.dirname, "../..");
+
+function runCli(args: string[]) {
+  return spawnSync("node", ["--import", "tsx/esm", "src/cli/index.ts", ...args], {
+    cwd,
+    encoding: "utf-8",
+    env: { ...process.env },
+  });
+}
+
+describe("compare — cross-resource-type warning (spec 47)", () => {
+  it("exits 1 with a warning when comparing different resource types", () => {
+    const result = runCli([
+      "compare",
+      "examples/patient-a.json",
+      "examples/bundle-example.json",
+    ]);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("comparing resources of different types");
+    expect(result.stderr).toContain("Patient");
+    expect(result.stderr).toContain("Bundle");
+  });
+
+  it("emits the 'pass --force' hint when types differ without --force", () => {
+    const result = runCli([
+      "compare",
+      "examples/patient-a.json",
+      "examples/bundle-example.json",
+    ]);
+    expect(result.stderr).toContain("--force");
+  });
+
+  it("outputs JSON error object when --format json and types differ without --force", () => {
+    const result = runCli([
+      "compare",
+      "examples/patient-a.json",
+      "examples/bundle-example.json",
+      "--format",
+      "json",
+    ]);
+    expect(result.status).toBe(1);
+    const parsed = JSON.parse(result.stdout) as { error: string; left: string; right: string };
+    expect(parsed.error).toBe("resourceTypeMismatch");
+    expect(parsed.left).toBe("Patient");
+    expect(parsed.right).toBe("Bundle");
+  });
+
+  it("proceeds with diff when --force is passed", () => {
+    const result = runCli([
+      "compare",
+      "examples/patient-a.json",
+      "examples/bundle-example.json",
+      "--force",
+    ]);
+    expect(result.status).toBe(0);
+    expect(result.stderr).toContain("comparing resources of different types");
+    expect(result.stdout).toContain("difference");
+  });
+
+  it("does NOT warn when resource types match", () => {
+    const result = runCli([
+      "compare",
+      "examples/patient-a.json",
+      "examples/patient-b.json",
+    ]);
+    expect(result.stderr).not.toContain("comparing resources of different types");
   });
 });
