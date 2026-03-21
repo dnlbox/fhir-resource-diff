@@ -1,5 +1,4 @@
 import type { Command } from "commander";
-import { parseJson } from "@/core/parse.js";
 import { validate } from "@/core/validate.js";
 import { formatValidationText } from "@/formatters/text.js";
 import { formatValidationJson } from "@/formatters/json.js";
@@ -8,7 +7,7 @@ import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
 import { resolveFhirVersion } from "@/core/fhir-version.js";
 import { getResourceDocUrl } from "@/core/resource-registry.js";
 import { buildEnvelope } from "@/core/envelope.js";
-import { parseMultiResource } from "@/cli/utils/parse-multi-resource.js";
+import { parseMultiResource, unwrapAnnotateWrapper } from "@/cli/utils/parse-multi-resource.js";
 import type { FhirResource, ValidationResult } from "@/core/types.js";
 import type { FhirVersion } from "@/core/fhir-version.js";
 
@@ -102,6 +101,43 @@ function runSingleResource(
   process.exit(isInvalid(result) ? 1 : 0);
 }
 
+function runMultiResource(
+  resources: FhirResource[],
+  explicitVersion: FhirVersion | undefined,
+  opts: ValidateOptions,
+  useEnvelope: boolean,
+): void {
+  const entries: MultiEntry[] = resources.map((resource, i) => {
+    const resolvedVersion = resolveFhirVersion(explicitVersion, resource);
+    const result = validate(
+      resource,
+      explicitVersion !== undefined ? resolvedVersion : undefined,
+    );
+    return { index: i + 1, resource, result, resolvedVersion };
+  });
+
+  const hasAnyErrors = entries.some((entry) => isInvalid(entry.result));
+
+  if (!opts.quiet) {
+    let output: string;
+    if (opts.format === "json") {
+      const jsonOutput = formatMultiJson(entries);
+      if (useEnvelope) {
+        const parsed = JSON.parse(jsonOutput) as unknown;
+        const envelope = buildEnvelope("validate", entries[0]!.resolvedVersion, parsed);
+        output = JSON.stringify(envelope, null, 2);
+      } else {
+        output = jsonOutput;
+      }
+    } else {
+      output = formatMultiText(entries);
+    }
+    process.stdout.write(output + "\n");
+  }
+
+  process.exit(hasAnyErrors ? 1 : 0);
+}
+
 /**
  * Registers the validate command on the given Commander program.
  */
@@ -118,7 +154,7 @@ export function registerValidateCommand(program: Command): void {
     .option("--quiet", "Suppress all stdout output. Only exit code indicates result.")
     .option("--envelope", "Wrap JSON output in a metadata envelope (requires --format json)")
     .action(async (file: string, opts: ValidateOptions) => {
-      // 1. Read file
+      // 1. Read input
       const raw = await readFileOrExit(file);
 
       // 2. Resolve common options
@@ -131,68 +167,36 @@ export function registerValidateCommand(program: Command): void {
         useEnvelope = false;
       }
 
-      // 3. Multi-resource path — stdin only
+      // 3. For stdin, check for annotate wrapper first
       if (file === "-") {
-        const multiResult = parseMultiResource(raw);
-        if (!multiResult.success) {
-          process.stderr.write(
-            `Error: stdin input is not valid FHIR JSON: ${multiResult.error}\n`,
-          );
-          process.exit(2);
-        }
-
-        const { resources } = multiResult;
-
-        if (resources.length === 0) {
-          if (!opts.quiet) process.stdout.write("0 resources validated\n");
-          process.exit(0);
-        }
-
-        if (resources.length === 1) {
-          runSingleResource(resources[0]!, explicitVersion, opts, useEnvelope);
+        const unwrapped = unwrapAnnotateWrapper(raw);
+        if (unwrapped !== null) {
+          runSingleResource(unwrapped, explicitVersion, opts, useEnvelope);
           return;
         }
-
-        // Multiple resources
-        const entries: MultiEntry[] = resources.map((resource, i) => {
-          const resolvedVersion = resolveFhirVersion(explicitVersion, resource);
-          const result = validate(
-            resource,
-            explicitVersion !== undefined ? resolvedVersion : undefined,
-          );
-          return { index: i + 1, resource, result, resolvedVersion };
-        });
-
-        const hasAnyErrors = entries.some((entry) => isInvalid(entry.result));
-
-        if (!opts.quiet) {
-          let output: string;
-          if (opts.format === "json") {
-            const jsonOutput = formatMultiJson(entries);
-            if (useEnvelope) {
-              const parsed = JSON.parse(jsonOutput) as unknown;
-              const envelope = buildEnvelope("validate", entries[0]!.resolvedVersion, parsed);
-              output = JSON.stringify(envelope, null, 2);
-            } else {
-              output = jsonOutput;
-            }
-          } else {
-            output = formatMultiText(entries);
-          }
-          process.stdout.write(output + "\n");
-        }
-
-        process.exit(hasAnyErrors ? 1 : 0);
-        return;
       }
 
-      // 4. Single-resource path — file input
-      const parsed = parseJson(raw);
-      if (!parsed.success) {
-        process.stderr.write(`Error: "${file}" is not valid FHIR JSON: ${parsed.error}\n`);
+      // 4. Parse — supports single object, JSON array, and NDJSON for both stdin and file paths
+      const label = file === "-" ? "stdin input" : `"${file}"`;
+      const multiResult = parseMultiResource(raw);
+      if (!multiResult.success) {
+        process.stderr.write(`Error: ${label} is not valid FHIR JSON: ${multiResult.error}\n`);
         process.exit(2);
       }
 
-      runSingleResource(parsed.resource, explicitVersion, opts, useEnvelope);
+      const { resources } = multiResult;
+
+      if (resources.length === 0) {
+        if (!opts.quiet) process.stdout.write("0 resources validated\n");
+        process.exit(0);
+      }
+
+      if (resources.length === 1) {
+        runSingleResource(resources[0]!, explicitVersion, opts, useEnvelope);
+        return;
+      }
+
+      // Multiple resources
+      runMultiResource(resources, explicitVersion, opts, useEnvelope);
     });
 }

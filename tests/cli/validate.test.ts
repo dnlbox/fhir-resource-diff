@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 import { parseJson } from "@/core/parse.js";
 import { validate } from "@/core/validate.js";
 import { formatValidationText } from "@/formatters/text.js";
 import { formatValidationJson } from "@/formatters/json.js";
 import { parseVersionFlag } from "@/cli/utils/resolve-version.js";
+import { unwrapAnnotateWrapper } from "@/cli/utils/parse-multi-resource.js";
 
 // ---------------------------------------------------------------------------
 // Inline test fixtures
@@ -146,6 +149,159 @@ describe("validate command logic", () => {
       const result = runValidate('{"id": "abc", "name": "No type"}');
       expect(result).toBeNull();
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Spec 46 — validate multi-resource file path support (CLI integration)
+// ---------------------------------------------------------------------------
+
+describe("validate — multi-resource file path support (spec 46)", () => {
+  const fixturesDir = join(import.meta.dirname, "../fixtures");
+
+  it("validates a JSON array file by path", () => {
+    const result = runCli(["validate", join(fixturesDir, "patients-array.json")]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("[1/3]");
+    expect(result.stdout).toContain("[2/3]");
+    expect(result.stdout).toContain("[3/3]");
+    expect(result.stdout).toContain("3 resources: 3 valid, 0 invalid");
+  });
+
+  it("validates an NDJSON file by path", () => {
+    const result = runCli(["validate", join(fixturesDir, "patients.ndjson")]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("[1/3]");
+    expect(result.stdout).toContain("[3/3]");
+    expect(result.stdout).toContain("3 resources: 3 valid, 0 invalid");
+  });
+
+  it("validates a single resource file by path unchanged", () => {
+    const result = runCli(["validate", join(fixturesDir, "patient-minimal.json")]);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("valid");
+    expect(result.stdout).not.toContain("[1/");
+  });
+
+  it("produces JSON output for array file with --format json", () => {
+    const result = runCli(["validate", join(fixturesDir, "patients-array.json"), "--format", "json"]);
+    expect(result.status).toBe(0);
+    const parsed = JSON.parse(result.stdout) as unknown[];
+    expect(Array.isArray(parsed)).toBe(true);
+    expect(parsed).toHaveLength(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Spec 30 — annotate wrapper detection (unit tests)
+// ---------------------------------------------------------------------------
+
+describe("unwrapAnnotateWrapper", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns null for a plain FHIR resource", () => {
+    const raw = JSON.stringify({ resourceType: "Patient", id: "p1" });
+    const result = unwrapAnnotateWrapper(raw);
+    expect(result).toBeNull();
+  });
+
+  it("returns null for a JSON array", () => {
+    const raw = JSON.stringify([{ resourceType: "Patient", id: "p1" }]);
+    const result = unwrapAnnotateWrapper(raw);
+    expect(result).toBeNull();
+  });
+
+  it("returns null for an object that is not a wrapper (extra keys)", () => {
+    const raw = JSON.stringify({
+      resource: { resourceType: "Patient", id: "p1" },
+      notes: [],
+      extra: true,
+    });
+    const result = unwrapAnnotateWrapper(raw);
+    expect(result).toBeNull();
+  });
+
+  it("returns null when notes is not an array", () => {
+    const raw = JSON.stringify({
+      resource: { resourceType: "Patient", id: "p1" },
+      notes: "not-an-array",
+    });
+    const result = unwrapAnnotateWrapper(raw);
+    expect(result).toBeNull();
+  });
+
+  it("detects a valid annotate wrapper and emits a stderr notice", () => {
+    const stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const raw = JSON.stringify({
+      resource: { resourceType: "Patient", id: "p1" },
+      notes: [],
+    });
+    const result = unwrapAnnotateWrapper(raw);
+    expect(result).not.toBeNull();
+    expect(result?.resourceType).toBe("Patient");
+    expect(stderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining("detected --annotate wrapper"),
+    );
+  });
+
+  it("returns the inner resource from the wrapper", () => {
+    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const raw = JSON.stringify({
+      resource: { resourceType: "Observation", id: "obs-1", status: "final" },
+      notes: [{ key: "test" }],
+    });
+    const result = unwrapAnnotateWrapper(raw);
+    expect(result?.resourceType).toBe("Observation");
+    expect(result?.id).toBe("obs-1");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Spec 30 — annotate wrapper detection (CLI integration)
+// ---------------------------------------------------------------------------
+
+const cwd = join(import.meta.dirname, "../..");
+
+function runCli(args: string[], input?: string) {
+  return spawnSync("node", ["--import", "tsx/esm", "src/cli/index.ts", ...args], {
+    cwd,
+    input,
+    encoding: "utf-8",
+    env: { ...process.env },
+  });
+}
+
+describe("validate - annotate wrapper detection (spec 30)", () => {
+  it("validates the inner resource from an annotate wrapper via stdin", () => {
+    const input = JSON.stringify({
+      resource: { resourceType: "Patient", id: "p1" },
+      notes: [],
+    });
+    const result = runCli(["validate", "-"], input);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("valid");
+    expect(result.stderr).toContain("detected --annotate wrapper");
+  });
+
+  it("validates the inner resource even with notes present", () => {
+    const input = JSON.stringify({
+      resource: { resourceType: "Observation", id: "obs-1", status: "final" },
+      notes: [{ generatedAt: "2025-01-01", tags: ["fhir"] }],
+    });
+    const result = runCli(["validate", "-"], input);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("valid");
+    expect(result.stderr).toContain("detected --annotate wrapper");
+  });
+
+  it("does NOT treat a plain FHIR resource as an annotate wrapper", () => {
+    const input = JSON.stringify({ resourceType: "Patient", id: "p1" });
+    const result = runCli(["validate", "-"], input);
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("valid");
+    expect(result.stderr).not.toContain("detected --annotate wrapper");
   });
 });
 

@@ -122,22 +122,28 @@ echo "$FHIR_PAYLOAD" | fhir-resource-diff validate - --format json --fhir-versio
 
 Use `-` as the file argument to read from stdin.
 
-## Multi-resource stdin
+## Multi-resource input
 
-When reading from stdin (`-`), `validate` auto-detects whether the input is a single JSON object, a JSON array, or NDJSON (one resource per line) — no flag required.
+`validate` auto-detects whether the input is a single JSON object, a JSON array, or NDJSON (one resource per line) — no flag required. This works for both file paths and stdin (`-`).
 
 ```bash
-# JSON array — e.g. from a bulk export or fhir-test-data
+# JSON array file by path
+fhir-resource-diff validate patients.json
+
+# NDJSON file by path
+fhir-resource-diff validate patients.ndjson
+
+# JSON array via stdin
 cat resources.json | fhir-resource-diff validate -
 
-# NDJSON — one resource per line
+# NDJSON via stdin
 cat resources.ndjson | fhir-resource-diff validate -
 
 # Single resource — unchanged behaviour
-cat patient.json | fhir-resource-diff validate -
+fhir-resource-diff validate patient.json
 ```
 
-### Multi-resource text output
+### Multi-resource text output (file path or stdin)
 
 ```
 [1/3] Patient/abc123
@@ -197,6 +203,18 @@ echo "[]" | fhir-resource-diff validate -
 # stdout: 0 resources validated
 # exit 0
 ```
+
+## Annotate wrapper interop
+
+When `validate -` receives an `--annotate` wrapper produced by `fhir-test-data generate --annotate`, it automatically detects and unwraps it:
+
+```bash
+fhir-test-data generate patient --annotate | fhir-resource-diff validate -
+# stderr: Note: detected --annotate wrapper; validating inner resource
+# stdout: valid
+```
+
+Detection is automatic — no flag required. The wrapper format is `{ "resource": {...}, "notes": [...] }`.
 
 ## With --envelope
 

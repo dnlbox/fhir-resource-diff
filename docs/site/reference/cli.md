@@ -22,6 +22,7 @@ fhir-resource-diff compare <file-a> <file-b> [options]
 | `--exit-on-diff` | flag | false | Exit 1 when differences are found (for CI gates) |
 | `--quiet` | flag | false | Suppress all stdout output |
 | `--envelope` | flag | false | Wrap JSON output in metadata envelope (requires `--format json`) |
+| `--force` | flag | false | Proceed even when comparing resources of different types |
 
 **Presets:**
 
@@ -115,6 +116,16 @@ curl -s https://hapi.fhir.org/baseR4/Patient/1 \
 fhir-resource-diff compare a.json b.json \
   --ignore meta.lastUpdated,meta.versionId,id,text
 ```
+
+## Version flag
+
+Use `-V` to print the CLI version number:
+
+```bash
+fhir-resource-diff -V
+```
+
+The long form `--version` is intentionally not registered at root level — this prevents Commander from intercepting `--version` before subcommand parsers can see it. If you pass `--version` to a subcommand (e.g. `list-resources --version R4`), you will get an "unknown option" error rather than silently printing the version number. Use `--fhir-version` for subcommand version filtering.
 
 ## FHIR version strings
 

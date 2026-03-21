@@ -32,6 +32,7 @@ interface CompareOptions {
   fhirVersion?: string;
   quiet: boolean;
   envelope: boolean;
+  force: boolean;
 }
 
 const SECTION_HEADERS = new Set(["Changed:", "Added:", "Removed:", "Type-changed:"]);
@@ -114,6 +115,7 @@ export function registerCompareCommand(program: Command): void {
     .option("--fhir-version <ver>", "FHIR version: R4 | R4B | R5 (default: auto-detect or R4)")
     .option("--quiet", "Suppress all stdout output. Only exit code indicates result.")
     .option("--envelope", "Wrap JSON output in a metadata envelope (requires --format json)")
+    .option("--force", "Proceed even when comparing resources of different types")
     .action(async (fileA: string, fileB: string, opts: CompareOptions) => {
       if (fileA === "-" && fileB === "-") {
         process.stderr.write(
@@ -129,6 +131,30 @@ export function registerCompareCommand(program: Command): void {
       // 2. Parse — exit(2) on failure
       let resourceA: FhirResource = parseOrExit(fileA, rawA);
       let resourceB: FhirResource = parseOrExit(fileB, rawB);
+
+      // 2b. Check for cross-resource-type comparison
+      if (resourceA.resourceType !== resourceB.resourceType) {
+        const left = resourceA.resourceType;
+        const right = resourceB.resourceType;
+        process.stderr.write(
+          `Warning: comparing resources of different types: ${left} (left) vs ${right} (right)\n`,
+        );
+        if (!opts.force) {
+          if (opts.format === "json" && !opts.quiet) {
+            process.stdout.write(
+              JSON.stringify({ error: "resourceTypeMismatch", left, right }) + "\n",
+            );
+          } else if (!opts.quiet) {
+            process.stderr.write(
+              "This is almost always a mistake. Pass --force to diff anyway.\n",
+            );
+          }
+          process.exit(1);
+        }
+        process.stderr.write(
+          "This is almost always a mistake. Pass --force to diff anyway.\n",
+        );
+      }
 
       // 3. Resolve FHIR version
       const explicitVersion = parseVersionFlag(opts.fhirVersion);
