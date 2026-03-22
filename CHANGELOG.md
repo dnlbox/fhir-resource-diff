@@ -4,11 +4,6 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
-## [0.3.4] — 2026-03-21
-
-### Fixed
-- Deno compatibility: tsup/esbuild silently strips the `node:` prefix from built-in imports in bundled output, so the previous fix (`import { createRequire } from "node:module"`) still resolved to bare `"module"` in the bundle, which Deno rejects. The real fix reads the version from `package.json` in `tsup.config.ts` at build time and injects it as `__PACKAGE_VERSION__` via esbuild's `define` option. This eliminates the `createRequire`/`node:module` import from the bundle entirely — the version becomes a plain inlined string.
-
 ## [0.3.3] — 2026-03-21
 
 ### Fixed
@@ -18,6 +13,7 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 - `-V` is the only alias for the version flag; `--version` long form removed from the root command so Commander no longer intercepts it before subcommands like `list-resources --version R4` (Spec 48)
 - `validate -` (stdin) auto-detects `--annotate` wrappers (`{ resource, notes }`) produced by `fhir-test-data generate --annotate` and validates the inner `resource` field, emitting a stderr notice (Spec 49)
 - Built-in module imports now use the `node:` prefix (e.g. `"node:module"` instead of `"module"`) for Deno compatibility; Node.js 18+ accepts this prefix too, so no backwards-compatibility impact
+- Deno compatibility: tsup/esbuild silently strips the `node:` prefix from built-in imports in bundled output, so the previous fix (`import { createRequire } from "node:module"`) still resolved to bare `"module"` in the bundle, which Deno rejects. The real fix reads the version from `package.json` in `tsup.config.ts` at build time and injects it as `__PACKAGE_VERSION__` via esbuild's `define` option. This eliminates the `createRequire`/`node:module` import from the bundle entirely — the version becomes a plain inlined string.
 
 ## [0.3.2] — 2026-03-19
 
