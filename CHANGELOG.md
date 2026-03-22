@@ -4,6 +4,11 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.3.4] — 2026-03-21
+
+### Fixed
+- Deno compatibility: tsup/esbuild silently strips the `node:` prefix from built-in imports in bundled output, so the previous fix (`import { createRequire } from "node:module"`) still resolved to bare `"module"` in the bundle, which Deno rejects. The real fix reads the version from `package.json` in `tsup.config.ts` at build time and injects it as `__PACKAGE_VERSION__` via esbuild's `define` option. This eliminates the `createRequire`/`node:module` import from the bundle entirely — the version becomes a plain inlined string.
+
 ## [0.3.3] — 2026-03-21
 
 ### Fixed
