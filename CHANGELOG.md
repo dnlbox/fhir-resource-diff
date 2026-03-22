@@ -4,6 +4,12 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.3.4] — 2026-03-21
+
+### Fixed
+
+- Built-in module imports now use the `node:` prefix (e.g. `"node:module"` instead of `"module"`) for Deno compatibility; Node.js 18+ accepts this prefix too, so no backwards-compatibility impact
+
 ## [0.3.3] — 2026-03-21
 
 ### Fixed
