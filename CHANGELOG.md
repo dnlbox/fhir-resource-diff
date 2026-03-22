@@ -4,12 +4,6 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
-## [0.3.4] — 2026-03-21
-
-### Fixed
-
-- Built-in module imports now use the `node:` prefix (e.g. `"node:module"` instead of `"module"`) for Deno compatibility; Node.js 18+ accepts this prefix too, so no backwards-compatibility impact
-
 ## [0.3.3] — 2026-03-21
 
 ### Fixed
@@ -18,6 +12,7 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 - `compare` warns and exits 1 when comparing resources of different types (e.g. `Patient` vs `Bundle`); pass `--force` to proceed with the diff anyway (Spec 47)
 - `-V` is the only alias for the version flag; `--version` long form removed from the root command so Commander no longer intercepts it before subcommands like `list-resources --version R4` (Spec 48)
 - `validate -` (stdin) auto-detects `--annotate` wrappers (`{ resource, notes }`) produced by `fhir-test-data generate --annotate` and validates the inner `resource` field, emitting a stderr notice (Spec 49)
+- Built-in module imports now use the `node:` prefix (e.g. `"node:module"` instead of `"module"`) for Deno compatibility; Node.js 18+ accepts this prefix too, so no backwards-compatibility impact
 
 ## [0.3.2] — 2026-03-19
 
