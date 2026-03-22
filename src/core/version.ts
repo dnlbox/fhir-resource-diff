@@ -1,4 +1,4 @@
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 
 const _require = createRequire(import.meta.url);
 const { version } = _require("../../package.json") as { version: string };

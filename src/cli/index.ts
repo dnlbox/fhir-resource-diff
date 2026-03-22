@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import { registerCompareCommand } from "@/cli/commands/compare.js";
 import { registerValidateCommand } from "@/cli/commands/validate.js";
