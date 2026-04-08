@@ -4,6 +4,9 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+- `--version` long flag restored alongside `-V`; no subcommand conflict exists since all subcommands use `--fhir-version`
+
 ## [0.3.4] — 2026-03-21
 
 ### Fixed
