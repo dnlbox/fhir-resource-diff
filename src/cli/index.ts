@@ -17,7 +17,7 @@ const program = new Command();
 program
   .name("fhir-resource-diff")
   .description("CLI for diffing and validating FHIR JSON resources")
-  .version(cliVersion, "-V", "Print version number");
+  .version(cliVersion, "-V, --version", "Print version number");
 
 registerCompareCommand(program);
 registerValidateCommand(program);
