@@ -18,6 +18,7 @@ export default defineConfig({
     ["meta", { name: "twitter:card", content: "summary" }],
     ["meta", { name: "twitter:title", content: "fhir-resource-diff — FHIR diff, validate & compare CLI" }],
     ["meta", { name: "twitter:description", content: DESCRIPTION }],
+    ["meta", { name: "google-site-verification", content: "Ffbl73Sm-TtkxrvNsLRS417HB-VjOPRmerHZVfhF0QQ" }],
     [
       "script",
       { type: "application/ld+json" },
