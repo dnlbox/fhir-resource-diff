@@ -1,9 +1,48 @@
 import { defineConfig } from "vitepress";
 
+const HOSTNAME = "https://dnlbox.github.io/fhir-resource-diff";
+const DESCRIPTION =
+  "FHIR R4/R4B/R5 diff, validation, and comparison. TypeScript CLI and library for CI pipelines and AI agents. No server, no Java runtime.";
+
 export default defineConfig({
   title: "fhir-resource-diff",
-  description: "Diff, validate, and inspect FHIR resources. Fast. Local. CI-ready.",
+  description: DESCRIPTION,
   base: "/fhir-resource-diff/",
+  sitemap: { hostname: HOSTNAME + "/" },
+  head: [
+    ["meta", { property: "og:type", content: "website" }],
+    ["meta", { property: "og:site_name", content: "fhir-resource-diff" }],
+    ["meta", { property: "og:title", content: "fhir-resource-diff — FHIR diff, validate & compare CLI" }],
+    ["meta", { property: "og:description", content: DESCRIPTION }],
+    ["meta", { property: "og:url", content: HOSTNAME + "/" }],
+    ["meta", { name: "twitter:card", content: "summary" }],
+    ["meta", { name: "twitter:title", content: "fhir-resource-diff — FHIR diff, validate & compare CLI" }],
+    ["meta", { name: "twitter:description", content: DESCRIPTION }],
+    [
+      "script",
+      { type: "application/ld+json" },
+      JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "fhir-resource-diff",
+        description: DESCRIPTION,
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+        programmingLanguage: "TypeScript",
+        url: HOSTNAME + "/",
+        downloadUrl: "https://www.npmjs.com/package/fhir-resource-diff",
+        license: "https://opensource.org/licenses/MIT",
+        codeRepository: "https://github.com/dnlbox/fhir-resource-diff",
+        author: { "@type": "Person", name: "Daniel Veronez" },
+      }),
+    ],
+  ],
+  transformHead({ pageData }) {
+    const slug = pageData.relativePath
+      .replace(/index\.md$/, "")
+      .replace(/\.md$/, ".html");
+    return [["link", { rel: "canonical", href: `${HOSTNAME}/${slug}` }]];
+  },
   themeConfig: {
     nav: [
       { text: "Guide", link: "/guide/getting-started", activeMatch: "/guide/" },
