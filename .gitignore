@@ -27,6 +27,22 @@ coverage/
 # Claude Code
 .claude/
 
+# Internal maintainer notes (not published)
+AGENTS.md
+CLAUDE.md
+docs/AGENTS.md
+docs/PROJECT.md
+docs/specs/
+src/core/AGENTS.md
+src/formatters/AGENTS.md
+src/cli/AGENTS.md
+src/presets/AGENTS.md
+tests/AGENTS.md
+examples/AGENTS.md
+
+# Local archive (historical specs, research)
+.archive/
+
 # pnpm
 .pnpm-debug.log
 
