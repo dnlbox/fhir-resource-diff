@@ -86,22 +86,16 @@ of the project.
 
 ---
 
-## Spec-driven development
+## Proposing significant changes
 
-Significant features start as a spec file in `docs/specs/` before any code
-is written. Specs define the goal, interface design, acceptance criteria, and
-explicit out-of-scope items. This lets us align on direction before effort is
-invested.
+Before building anything non-trivial — a new command, a new validation rule
+family, a change to a core type — open a GitHub issue first. Describe the
+goal, the interface you have in mind, and what's explicitly out of scope.
+Fifteen minutes of alignment saves hours of rework if the direction doesn't
+fit.
 
-**To find open specs:**
-```bash
-grep -rL "Status.*complete" docs/specs/*.md
-```
-
-**Before building a significant feature:** open a GitHub issue with a draft
-spec. This takes 15 minutes and prevents you from writing code that won't be
-accepted. See [`docs/specs/ORCHESTRATOR.md`](docs/specs/ORCHESTRATOR.md) for
-the spec format and current build order.
+Bug fixes, test additions, and small self-contained improvements don't need
+this step — open a PR directly.
 
 ---
 
@@ -150,7 +144,7 @@ no subprocess spawning. Pass data directly to functions.
 
 ## Code style
 
-See [`AGENTS.md`](AGENTS.md) for the full conventions. The key patterns:
+The key patterns to match the existing codebase:
 
 **Pure functions over classes.** State is passed as parameters, not stored
 on objects. `src/core/` has no classes. A function that needs configuration
