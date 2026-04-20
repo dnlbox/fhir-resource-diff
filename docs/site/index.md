@@ -2,7 +2,8 @@
 layout: home
 hero:
   name: fhir-resource-diff
-  tagline: Diff, validate, and inspect FHIR resources. Fast. Local. CI-ready.
+  text: Diff. Validate. Inspect.
+  tagline: Structural FHIR resource operations for CI pipelines and AI agents. No server. No Java runtime.
   actions:
     - theme: brand
       text: Get started
@@ -38,3 +39,15 @@ fhir-resource-diff compare expected.json actual.json
 # Diff with JSON output for automation
 fhir-resource-diff compare a.json b.json --format json --envelope
 ```
+
+## Part of the FHIR operations toolkit
+
+Three focused CLI tools built for FHIR development workflows. Each does one job well — compose them in shell pipelines, CI steps, or AI agent chains instead of reaching for a single monolithic toolkit.
+
+| Tool | Purpose |
+|------|---------|
+| **fhir-resource-diff** *(this)* | Diff, validate, and inspect FHIR resources |
+| [fhir-capability-analyzer](https://dnlbox.github.io/fhir-capability-analyzer) | Analyze and compare FHIR server CapabilityStatements |
+| [fhir-test-data](https://dnlbox.github.io/fhir-test-data) | Generate valid FHIR test resources across 14 locales |
+
+The tools are independent — use one, two, or all three in any combination that fits your pipeline.
