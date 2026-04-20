@@ -8,6 +8,7 @@ export default defineConfig({
   title: "fhir-resource-diff",
   description: DESCRIPTION,
   base: "/fhir-resource-diff/",
+  appearance: 'dark',
   sitemap: { hostname: HOSTNAME + "/" },
   head: [
     ["meta", { property: "og:type", content: "website" }],
