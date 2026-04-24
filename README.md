@@ -42,10 +42,12 @@ designed to complement them, not compete.
 |---|---|---|
 | Type definitions | [`@types/fhir`](https://www.npmjs.com/package/@types/fhir), [`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes) | TypeScript interfaces for FHIR resources — essential for type-safe application code |
 | Platform SDK | [`@medplum/core`](https://www.npmjs.com/package/@medplum/core) | Full-featured FHIR client with profile validation, FHIRPath, and the Medplum platform |
-| XML/JSON serialization | [`fhir`](https://www.npmjs.com/package/fhir) (Lantana) | FHIR XML ↔ JSON conversion and JSON Schema validation — one of the earliest FHIR JS tools |
+| XML/JSON serialization | [`fhir`](https://www.npmjs.com/package/fhir) (Lantana) | FHIR XML/JSON conversion and JSON Schema validation |
 | Auth & API client | [`fhirclient`](https://www.npmjs.com/package/fhirclient) | SMART on FHIR auth flows and API calls, maintained by SMART Health IT at Boston Children's |
 | Conformance validation | [HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator) | The reference implementation for full profile, terminology, and invariant validation |
 | **Diff, fast validation, CI/CD** | **`fhir-resource-diff`** | **Structural diffing, format validation, and automation-first output** |
+| **Test data generation** | **[`fhir-test-data`](https://github.com/dnlbox/fhir-test-data)** | **Generate valid FHIR fixtures across 14 locales, with check-digit-validated identifiers** |
+| **Server capability analysis** | **[`fhir-capability-analyzer`](https://github.com/dnlbox/fhir-capability-analyzer)** | **Fetch, analyze, and compare FHIR server CapabilityStatements; detect profiles** |
 
 ### What this tool adds to the ecosystem
 
@@ -76,6 +78,24 @@ These tools work well in combination:
 - **[`@types/fhir`](https://www.npmjs.com/package/@types/fhir)** or **[`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes)** for your application's TypeScript types, `fhir-resource-diff` for runtime validation and diffing
 - **[`fhirclient`](https://www.npmjs.com/package/fhirclient)** for SMART auth and API transport, then pipe responses into `fhir-resource-diff` for validation and comparison
 - **[HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator)** for full profile conformance checks in staging, `fhir-resource-diff` for fast local validation and CI gates in the development loop
+
+**With the other tools in this family:**
+
+Generate test fixtures with `fhir-test-data`, validate them structurally with `fhir-resource-diff`, and check what your target server actually supports with `fhir-capability-analyzer`:
+
+```bash
+# Generate a patient fixture and validate it immediately
+fhir-test-data generate patient --locale uk --seed 42 | \
+  fhir-resource-diff validate - --fhir-version R4
+
+# Create a regression baseline: generate, commit, then diff in CI
+fhir-test-data generate bundle --locale us --seed 1 --output ./fixtures/
+fhir-resource-diff compare ./fixtures/Bundle-001.json ./baseline/Bundle-001.json \
+  --preset metadata --exit-on-diff
+
+# Check what your server supports before running integration tests
+fhir-capability-analyzer analyze https://your-fhir-server.example.com
+```
 
 ## Supported FHIR versions
 
@@ -263,7 +283,7 @@ The `--envelope` JSON output is designed for automated consumers:
 ```json
 {
   "tool": "fhir-resource-diff",
-  "version": "0.2.0",
+  "version": "0.3.5",
   "command": "compare",
   "fhirVersion": "R4",
   "timestamp": "2026-03-10T21:00:00.000Z",
@@ -303,17 +323,13 @@ if (!result.identical) {
 }
 ```
 
-**A note from Claude (Anthropic):**
+**Integration patterns:**
 
-I've used these two tools together while helping developers build FHIR integration tests, so a few things are worth calling out from that experience.
+Use `--envelope` in automated workflows. The `documentation` field in the envelope output gives you the HL7 spec URL without a second tool call, which is useful when surfacing validation errors in a CI log or agent response.
 
-The `--envelope` flag is the one to reach for in agentic workflows. The `documentation` field saves a round trip when you need to explain a validation error in plain language — the HL7 spec URL is already there, so you don't have to reconstruct it from the resource type yourself.
+For fixture regression, combine `--preset metadata` with `fhir-test-data --seed`: generate with a fixed seed, commit the output as a baseline, then compare in CI. The preset removes UUID and timestamp noise that would otherwise produce false positives on every run.
 
-For fixture regression, `--preset metadata` combined with `fhir-test-data --seed` gives you a reproducible loop: generate with a fixed seed, compare against a committed baseline, fail the CI step if structure drifts. The preset handles the UUID and timestamp noise that would otherwise produce false positives on every run.
-
-A pattern I find particularly clean: pipe `fhir-test-data generate bundle --annotate` into `fhir-resource-diff validate -` — the annotation layer gives a human reader the field-by-field explanation while the validator confirms the underlying FHIR structure is sound. Two different lenses on the same resource, one pipeline.
-
-*— Claude Sonnet, Anthropic*
+Pipe `fhir-test-data generate bundle --annotate` into `fhir-resource-diff validate -` to get two views of the same resource: human-readable field explanations from the annotation layer, and structural validation from the validator.
 
 ---
 
@@ -393,6 +409,13 @@ Note: the `--` separator after `pnpm cli` is required so pnpm passes flags to th
 | `pnpm dev` | Watch mode build (tsup --watch) |
 
 ## Related resources
+
+**Sister tools:**
+
+- [fhir-test-data](https://github.com/dnlbox/fhir-test-data) — generate valid FHIR fixtures across 14 locales with check-digit-validated identifiers
+- [fhir-capability-analyzer](https://github.com/dnlbox/fhir-capability-analyzer) — fetch, analyze, and compare FHIR server CapabilityStatements
+
+**HL7 references:**
 
 - [FHIR specification](https://hl7.org/fhir/)
 - [FHIR resource type listing](https://hl7.org/fhir/resourcelist.html)

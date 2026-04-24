@@ -1,8 +1,7 @@
 # fhir-resource-diff
 
-> A dedicated JavaScript and TypeScript library for diffing FHIR resources. Compare,
-> validate, and normalize FHIR R4/R4B/R5 JSON from the CLI or as a library, with
-> structured output designed for AI agents and CI pipelines.
+> Version 0.3.5. A TypeScript CLI and library for diffing, validating, and normalizing
+> FHIR R4 / R4B / R5 JSON — with structured output designed for AI agents and CI pipelines.
 
 `fhir-resource-diff` compares two FHIR resources path by path, producing a classified
 list of every addition, removal, and change at the field level. It validates FHIR JSON
@@ -30,7 +29,7 @@ npm install -g fhir-resource-diff    # global CLI
 ## Key CLI commands
 
 ```bash
-# Compare two resources — outputs path-level diff
+# Compare two resources
 fhir-resource-diff compare patient-a.json patient-b.json
 
 # Validate a resource
@@ -39,32 +38,51 @@ fhir-resource-diff validate patient.json --fhir-version R4
 # Validate from stdin (pipe-friendly)
 curl https://fhir-server/Patient/123 | fhir-resource-diff validate - --fhir-version R4
 
-# Get structured JSON output with metadata envelope (designed for AI/LLM consumers)
+# Use a preset to ignore metadata noise (metadata | clinical | strict)
+fhir-resource-diff compare a.json b.json --preset metadata
+
+# Structured JSON output with metadata envelope (designed for AI/LLM consumers)
 fhir-resource-diff compare a.json b.json --format json --envelope
 
-# Look up a FHIR resource type with maturity level, use cases, and key fields
+# CI gate: exit 1 if differences found
+fhir-resource-diff compare expected.json actual.json --exit-on-diff --quiet
+
+# Look up a FHIR resource type with HL7 documentation links
 fhir-resource-diff info Observation --fhir-version R4
 
 # List all known FHIR resource types
 fhir-resource-diff list-resources --fhir-version R4
 ```
 
-## AI agent and LLM integration
+## Exit codes
 
-`fhir-resource-diff` is explicitly designed for AI agent use:
+- `0` — success (no differences / no errors)
+- `1` — differences found (with --exit-on-diff) or validation errors
+- `2` — input error (file not found, invalid JSON, unknown resource type)
+
+Warnings and informational findings never produce a non-zero exit.
+
+## Presets
+
+Named presets for common ignore patterns:
+
+- `metadata` — ignores id, meta.*, text, contained (useful for comparing resources that differ only in server-assigned fields)
+- `clinical` — ignores metadata fields plus non-clinical administrative fields
+- `strict` — no ignores; compares every field
+
+## AI agent and LLM integration
 
 - **Stdin support** — pipe FHIR payloads directly without writing temp files
 - **`--format json`** — structured, parseable output for downstream processing
-- **`--envelope`** — wraps output with tool version, FHIR version, timestamp, and HL7 documentation URL in a single JSON object
-- **Severity-aware exit codes** — warnings and informational findings never produce a non-zero exit; only hard errors do
+- **`--envelope`** — wraps output with tool version, FHIR version, timestamp, and HL7 documentation URL
 - **`--quiet`** — suppresses stdout for exit-code-only checks
 
-Envelope output example — everything an agent needs in one parse:
+Envelope output example:
 
 ```json
 {
   "tool": "fhir-resource-diff",
-  "version": "0.2.0",
+  "version": "0.3.5",
   "command": "compare",
   "fhirVersion": "R4",
   "timestamp": "2026-03-15T20:00:00.000Z",
@@ -72,7 +90,7 @@ Envelope output example — everything an agent needs in one parse:
     "resourceType": "Patient",
     "identical": false,
     "summary": { "added": 2, "removed": 0, "changed": 3, "total": 5 },
-    "entries": [ ... ],
+    "entries": [ "..." ],
     "documentation": "https://hl7.org/fhir/R4/patient.html"
   }
 }
@@ -83,17 +101,13 @@ Envelope output example — everything an agent needs in one parse:
 ```typescript
 import { parseJson, validate, diff, normalize } from "fhir-resource-diff";
 
-// Parse
 const parsed = parseJson(rawJson);
 if (!parsed.success) throw new Error(parsed.error);
 
-// Validate
 const result = validate(parsed.resource, "R4");
 // result.valid — boolean
 // result.errors — ValidationError[] with path, message, severity, docUrl
-// result.hint — optional pointer to HL7 FHIR Validator for full conformance
 
-// Diff
 const diffResult = diff(resourceA, resourceB, {
   ignorePaths: ["meta.lastUpdated", "id"],
 });
@@ -103,14 +117,19 @@ const diffResult = diff(resourceA, resourceB, {
 
 ## Supported FHIR versions
 
-R4 (4.0.1), R4B (4.3.0), R5 (5.0.0). Auto-detected from `meta.fhirVersion` or
+R4 (4.0.1), R4B (4.3.0), R5 (5.0.0). Auto-detected from `fhirVersion` field or
 specified explicitly with `--fhir-version`.
+
+## Companion tools
+
+- [`fhir-test-data`](https://www.npmjs.com/package/fhir-test-data) — generate valid FHIR fixtures across 14 locales; pipe into `fhir-resource-diff validate -`
+- [`fhir-capability-analyzer`](https://www.npmjs.com/package/fhir-capability-analyzer) — fetch and analyze FHIR server CapabilityStatements
 
 ## What this library does NOT do
 
 - Full StructureDefinition / profile conformance validation — use the
   [HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator)
-- XML ↔ JSON conversion — use the [`fhir`](https://www.npmjs.com/package/fhir) package
+- XML to JSON conversion — use the [`fhir`](https://www.npmjs.com/package/fhir) package
 - FHIRPath evaluation — use [`@medplum/core`](https://www.npmjs.com/package/@medplum/core)
 - Terminology / ValueSet validation
 
@@ -119,5 +138,4 @@ specified explicitly with `--fhir-version`.
 - [Documentation](https://dnlbox.github.io/fhir-resource-diff/)
 - [npm](https://www.npmjs.com/package/fhir-resource-diff)
 - [GitHub](https://github.com/dnlbox/fhir-resource-diff)
-- [Showcase with real HL7 R4 examples](https://github.com/dnlbox/fhir-resource-diff/blob/main/SHOWCASE.md)
 - [FHIR specification](https://hl7.org/fhir/)
