@@ -4,8 +4,15 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-04-24
+
 ### Changed
 - `--version` long flag restored alongside `-V`; no subcommand conflict exists since all subcommands use `--fhir-version`
+- README: added `fhir-test-data` and `fhir-capability-analyzer` to the ecosystem table and Related resources; replaced the "note from Claude" with a clean integration patterns section; corrected the envelope example version number
+- `llms.txt`: updated to v0.3.5, added presets documentation, added cross-references to `fhir-test-data` and `fhir-capability-analyzer`
+
+### Added
+- Required-field tests for `DiagnosticReport` (status and code) in the rule test suite — the rules were already correct but had no dedicated test coverage
 
 ## [0.3.4] — 2026-03-21
 

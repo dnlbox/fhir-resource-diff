@@ -126,6 +126,49 @@ describe("requiredFieldsRule", () => {
       const findings = check({ resourceType: "Encounter" });
       expect(findings).toHaveLength(0);
     });
+
+    it("passes when status and class are present in R4", () => {
+      const findings = check(
+        {
+          resourceType: "Encounter",
+          status: "finished",
+          class: { system: "http://terminology.hl7.org/CodeSystem/v3-ActCode", code: "AMB" },
+        },
+        "R4",
+      );
+      expect(findings).toHaveLength(0);
+    });
+  });
+
+  describe("DiagnosticReport", () => {
+    it("requires status and code", () => {
+      const findings = check({ resourceType: "DiagnosticReport" });
+      const paths = findings.map((f) => f.path);
+      expect(paths).toContain("status");
+      expect(paths).toContain("code");
+    });
+
+    it("reports only the missing field when one is present", () => {
+      const missingCode = check({ resourceType: "DiagnosticReport", status: "final" });
+      expect(missingCode.map((f) => f.path)).toContain("code");
+      expect(missingCode.map((f) => f.path)).not.toContain("status");
+
+      const missingStatus = check({
+        resourceType: "DiagnosticReport",
+        code: { coding: [{ system: "http://loinc.org", code: "58410-2" }] },
+      });
+      expect(missingStatus.map((f) => f.path)).toContain("status");
+      expect(missingStatus.map((f) => f.path)).not.toContain("code");
+    });
+
+    it("passes when status and code are present", () => {
+      const findings = check({
+        resourceType: "DiagnosticReport",
+        status: "final",
+        code: { coding: [{ system: "http://loinc.org", code: "58410-2" }] },
+      });
+      expect(findings).toHaveLength(0);
+    });
   });
 
   it("treats an empty array as missing for array fields like author", () => {
