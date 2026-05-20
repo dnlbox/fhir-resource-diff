@@ -1,0 +1,69 @@
+/* Load JetBrains Mono from Google Fonts — must come first */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* Brand colour palette ported from the VitePress theme */
+/* Primary: #1ad1b8 (teal), Secondary: #19a9c6 (blue-teal), dark bg: #071019 */
+
+:root {
+  --sl-color-accent-low: rgba(26, 209, 184, 0.14);
+  --sl-color-accent: #0fa896;
+  --sl-color-accent-high: #1ad1b8;
+  --sl-color-text-accent: #1ad1b8;
+
+  /* Use JetBrains Mono for code — same as VitePress theme */
+  --sl-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+
+
+:root[data-theme="dark"] {
+  --sl-color-bg: #071019;
+  --sl-color-bg-sidebar: #071019;
+  --sl-color-bg-nav: #071019;
+  --sl-color-hairline-light: #21405a;
+  --sl-color-hairline-medium: #21405a;
+  --sl-color-gray-1: #e2e8f0;
+  --sl-color-gray-2: #9fb5c7;
+  --sl-color-gray-3: #9fb5c7;
+  --sl-color-gray-4: #21405a;
+  --sl-color-gray-5: #0c1e2e;
+  --sl-color-gray-6: #071019;
+  --sl-color-gray-7: #071019;
+  --sl-color-black: #071019;
+}
+
+/* CommandOutput component styles */
+.cmd-output {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.cmd-output-label {
+  font-family: var(--sl-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 1rem;
+  background: var(--sl-color-gray-6, #1a1a2e);
+  color: var(--sl-color-gray-2);
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  text-transform: uppercase;
+}
+
+.cmd-output-label.label-command {
+  color: var(--sl-color-accent-high);
+}
+
+.cmd-output-label.label-output {
+  color: var(--sl-color-gray-2);
+}
+
+.cmd-output > .expressive-code {
+  border-radius: 0;
+  border: none;
+  margin: 0;
+}

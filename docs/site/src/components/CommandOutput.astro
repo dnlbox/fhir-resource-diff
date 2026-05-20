@@ -1,0 +1,48 @@
+---
+/**
+ * CommandOutput — pairs a bash command with its output as a single visual unit.
+ *
+ * Design choice: a labelled two-section card rather than Starlight <Tabs>.
+ * Rationale: command and output are read together (cause and effect), not
+ * switched between. Tabs imply either/or; this is always and.
+ *
+ * Usage in MDX:
+ *   import CommandOutput from "@components/CommandOutput.astro";
+ *
+ *   <CommandOutput
+ *     command="fhir-resource-diff validate patient.json --format json"
+ *     output={`{"valid": true, "errors": [], "hint": null}`}
+ *     outputLang="json"
+ *   />
+ *
+ * Props:
+ *   command     — the bash command string (displayed as bash)
+ *   output      — the output string (displayed verbatim)
+ *   outputLang  — highlight language for output block (default: "text")
+ *   title       — optional label override for the output section
+ */
+
+interface Props {
+  command: string;
+  output: string;
+  outputLang?: string;
+  title?: string;
+}
+
+const { command, output, outputLang = "text", title = "Output" } = Astro.props;
+
+// Escape backticks so the injected code doesn't break the template literal
+const escapedCommand = command.replace(/`/g, "\\`");
+const escapedOutput = output.replace(/`/g, "\\`");
+---
+
+<div class="cmd-output not-content">
+  <div class="cmd-output-label label-command">Command</div>
+  <div class="cmd-output-block">
+    <pre class={`language-bash`}><code set:html={escapedCommand} /></pre>
+  </div>
+  <div class="cmd-output-label label-output">{title}</div>
+  <div class="cmd-output-block">
+    <pre class={`language-${outputLang}`}><code set:html={escapedOutput} /></pre>
+  </div>
+</div>
