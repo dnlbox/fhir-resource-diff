@@ -1,0 +1,251 @@
+---
+title: Validate
+description: The validate command — what it checks, severity model, JSON output format, stdin, multi-resource input, and envelope.
+sidebar:
+  order: 2
+---
+
+The `validate` command catches common FHIR mistakes before you submit a resource to a server — format problems, structural issues, and unknown resource types. It's a fast, local sanity check designed for the development loop.
+
+## Basic usage
+
+```bash
+fhir-resource-diff validate examples/showcase/patient-chalmers.json --fhir-version R4
+```
+
+```
+valid
+  ℹ For full FHIR schema validation, use the official HL7 FHIR Validator
+    → https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator
+```
+
+A clean resource shows `valid`. The note about the HL7 Validator is a scope footer — it appears whenever `--fhir-version` is specified and is not a finding about your resource. `valid (with warnings)` only appears when the tool actually found something to flag in your data.
+
+## Version-aware validation
+
+```bash
+fhir-resource-diff validate resource.json --fhir-version R5
+```
+
+The `--fhir-version` flag enables version-aware checks — the resource type is validated against the registry for that specific version, and the HL7 documentation links in output point to the correct version.
+
+Without `--fhir-version`, the tool auto-detects the version from `meta.fhirVersion` or defaults to R4.
+
+## What this tool checks
+
+| Check | Severity | Description |
+|-------|----------|-------------|
+| Valid JSON | error | Malformed JSON fails immediately |
+| `resourceType` present | error | Required on every FHIR resource |
+| `resourceType` non-empty | error | Empty string is not a valid resource type |
+| FHIR `id` format | warning | Must match `[A-Za-z0-9\-.]{1,64}` — servers reject silently otherwise |
+| Date formats | warning | FHIR uses a strict ISO 8601 subset; `2024/03/15` or `03-15-2024` are caught |
+| Reference string format | warning | `subject.reference` must be `ResourceType/id`, an absolute URL, `#fragment`, or `urn:` — bare IDs like `"12345"` are flagged |
+| Known resource type | info | Checked against the registry for the specified FHIR version |
+
+## What it doesn't check — and why
+
+Full FHIR schema validation requires StructureDefinitions from the specification: required fields, cardinality, value set bindings, profile conformance, and invariants. Bundling and keeping those current is a significant maintenance surface.
+
+The [HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator) is the authoritative tool for full conformance. `fhir-resource-diff` catches the common mistakes that cause server rejections and surface data quality issues — it's the fast check in your development loop, not the compliance gate in staging.
+
+## JSON output format
+
+```bash
+fhir-resource-diff validate patient.json --format json
+```
+
+```json
+{
+  "valid": true,
+  "errors": [],
+  "hint": {
+    "message": "For full FHIR schema validation, use the official HL7 FHIR Validator",
+    "url": "https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator"
+  }
+}
+```
+
+When there are findings:
+
+```json
+{
+  "valid": false,
+  "errors": [
+    {
+      "severity": "error",
+      "path": "resourceType",
+      "message": "resourceType is required",
+      "ruleId": "required-resource-type"
+    },
+    {
+      "severity": "warning",
+      "path": "id",
+      "message": "id must match [A-Za-z0-9\\-.]{1,64}",
+      "ruleId": "id-format"
+    }
+  ],
+  "hint": null
+}
+```
+
+Each error has:
+- `severity` — `error`, `warning`, or `info`
+- `path` — dot-notation path to the field with the problem
+- `message` — human-readable description
+- `ruleId` — stable identifier for the rule (useful for suppression or automation)
+
+## Severity model
+
+Only `severity: error` findings produce a non-zero exit code. Warnings and info findings surface in output but never break pipelines.
+
+| Severity | Exit code | When |
+|----------|-----------|------|
+| error | 1 | Invalid JSON, missing resourceType |
+| warning | 0 | Date format, id format, reference format |
+| info | 0 | Unknown resource type, informational notes |
+
+## Quiet mode for CI
+
+```bash
+fhir-resource-diff validate patient.json --quiet
+echo $?  # 0 = no errors, 1 = errors found
+```
+
+`--quiet` suppresses all stdout output. Useful when you only need the exit code in a CI step and don't want to capture or discard output.
+
+## Stdin pipe
+
+```bash
+# Validate a resource fetched from a FHIR server
+curl -s https://hapi.fhir.org/baseR4/Patient/592473 \
+  | fhir-resource-diff validate - --fhir-version R4
+
+# Validate from a variable (no temp file needed)
+echo "$FHIR_PAYLOAD" | fhir-resource-diff validate - --format json --fhir-version R4
+```
+
+Use `-` as the file argument to read from stdin.
+
+## Multi-resource input
+
+`validate` auto-detects whether the input is a single JSON object, a JSON array, or NDJSON (one resource per line) — no flag required. This works for both file paths and stdin (`-`).
+
+```bash
+# JSON array file by path
+fhir-resource-diff validate patients.json
+
+# NDJSON file by path
+fhir-resource-diff validate patients.ndjson
+
+# JSON array via stdin
+cat resources.json | fhir-resource-diff validate -
+
+# NDJSON via stdin
+cat resources.ndjson | fhir-resource-diff validate -
+
+# Single resource — unchanged behaviour
+fhir-resource-diff validate patient.json
+```
+
+### Multi-resource text output (file path or stdin)
+
+```
+[1/3] Patient/abc123
+valid
+
+[2/3] Patient/def456
+invalid
+  ✗ resourceType: resourceType must be a non-empty string
+
+[3/3] Observation/ghi789
+valid
+
+---
+3 resources: 2 valid, 1 invalid
+```
+
+Each block has a `[index/total] ResourceType/id` header (`ResourceType (no id)` when `id` is absent). A summary line follows the last block. A single-element array uses the existing single-resource output format (no header, no summary).
+
+### Multi-resource JSON output
+
+```bash
+cat resources.json | fhir-resource-diff validate - --format json
+```
+
+```json
+[
+  {
+    "index": 1,
+    "resource": { "resourceType": "Patient", "id": "abc123" },
+    "valid": true
+  },
+  {
+    "index": 2,
+    "resource": { "resourceType": "Patient", "id": "def456" },
+    "valid": false,
+    "errors": [
+      { "path": "resourceType", "message": "resourceType must be a non-empty string", "severity": "error" }
+    ]
+  }
+]
+```
+
+`--envelope` wraps the array in the standard metadata envelope when combined with `--format json`.
+
+### Exit codes for multiple resources
+
+| Condition | Exit code |
+|-----------|-----------|
+| All resources valid (no errors) | `0` |
+| At least one resource has error-severity issues | `1` |
+| Input could not be parsed at all | `2` |
+
+### Empty input
+
+```bash
+echo "[]" | fhir-resource-diff validate -
+# stdout: 0 resources validated
+# exit 0
+```
+
+## Annotate wrapper interop
+
+When `validate -` receives an `--annotate` wrapper produced by `fhir-test-data generate --annotate`, it automatically detects and unwraps it:
+
+```bash
+fhir-test-data generate patient --annotate | fhir-resource-diff validate -
+# stderr: Note: detected --annotate wrapper; validating inner resource
+# stdout: valid
+```
+
+Detection is automatic — no flag required. The wrapper format is `{ "resource": {...}, "notes": [...] }`.
+
+## With --envelope
+
+```bash
+fhir-resource-diff validate patient.json --format json --envelope
+```
+
+```json
+{
+  "tool": "fhir-resource-diff",
+  "version": "0.2.0",
+  "command": "validate",
+  "fhirVersion": "R4",
+  "timestamp": "2026-03-14T15:56:25.686Z",
+  "result": {
+    "valid": true,
+    "errors": [],
+    "hint": null
+  }
+}
+```
+
+The envelope adds tool version, FHIR version, and timestamp — useful for audit trails and automated pipelines that need to know when and how a validation was run.
+
+## See also
+
+- [Exit codes](/fhir-resource-diff/reference/exit-codes/) — full severity model and exit code table
+- [Output formats](/fhir-resource-diff/reference/output-formats/) — text, JSON, markdown, envelope
+- [CLI reference](/fhir-resource-diff/reference/cli/) — all flags for `validate`
