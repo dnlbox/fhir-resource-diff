@@ -5,6 +5,7 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 ## [Unreleased]
 
 ### Changed
+- Dev: bumped typescript 5.9→6; added `"ignoreDeprecations": "6.0"` to tsconfig.json to silence two TS6 deprecation warnings (`baseUrl` and `esModuleInterop: false`) — both intentional and will be revisited before TypeScript 7. No user-facing behaviour change.
 - Dev: migrated to ESLint flat config; bumped eslint 8→10, @typescript-eslint 7→8 (+ typescript-eslint meta), vitest 2→3, eslint-config-prettier 9→10, zod 3→4. No user-facing behaviour change; validate.ts surface unchanged.
 
 ## [0.3.5] - 2026-04-24
