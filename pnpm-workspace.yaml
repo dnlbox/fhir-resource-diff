@@ -1,0 +1,5 @@
+# Per-project pnpm config (this is not a monorepo).
+# `allowBuilds` replaces the removed `pnpm.onlyBuiltDependencies` family.
+allowBuilds:
+  esbuild: true
+  lefthook: true
