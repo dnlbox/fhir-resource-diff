@@ -5,6 +5,7 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 ## [Unreleased]
 
 ### Changed
+- Upgraded CLI framework `commander` 12→14. No user-facing behaviour change expected; `--help`, `--version`, and subcommand signatures (`validate`, `compare`, `normalize`, `info`, `list-resources`) are unchanged. If `--help` output formatting shifts (whitespace), it is upstream cosmetic.
 - Dev: bumped typescript 5.9→6; added `"ignoreDeprecations": "6.0"` to tsconfig.json to silence two TS6 deprecation warnings (`baseUrl` and `esModuleInterop: false`) — both intentional and will be revisited before TypeScript 7. No user-facing behaviour change.
 - Dev: migrated to ESLint flat config; bumped eslint 8→10, @typescript-eslint 7→8 (+ typescript-eslint meta), vitest 2→3, eslint-config-prettier 9→10, zod 3→4. No user-facing behaviour change; validate.ts surface unchanged.
 
