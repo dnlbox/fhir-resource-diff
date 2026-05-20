@@ -89,9 +89,10 @@
     "vitepress": "^1.6.4",
     "vitest": "^3.2.4"
   },
+  "packageManager": "pnpm@10.32.1",
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.0.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
