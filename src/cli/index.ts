@@ -10,7 +10,6 @@ import { registerNormalizeCommand } from "@/cli/commands/normalize.js";
 import { registerInfoCommand } from "@/cli/commands/info.js";
 import { registerListResourcesCommand } from "@/cli/commands/list-resources.js";
 
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const cliVersion = typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "dev";
 
 const program = new Command();
