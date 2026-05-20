@@ -31,7 +31,11 @@ export default defineConfig({
         baseUrl:
           "https://github.com/dnlbox/fhir-resource-diff/edit/main/docs/site/",
       },
-      customCss: ["./src/styles/custom.css"],
+      customCss: [
+        "./src/theme/tokens/theme-teal.css",
+        "./src/theme/styles/base.css",
+        "./src/styles/custom.css"
+      ],
       sidebar: [
         {
           label: "Guide",

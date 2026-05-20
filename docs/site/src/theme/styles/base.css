@@ -1,0 +1,249 @@
+/* --------------------------------------------------------------------------
+ * Shared Starlight Layout & Typography Overrides
+ * Part of @fhir-toolkit/docs-theme
+ * -------------------------------------------------------------------------- */
+
+/* Tighten heading letter spacing for displaying geometric fonts nicely */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Sidebar selected/active link treatment (left border approach) */
+.sidebar-content a[aria-current="page"],
+nav.sidebar a[aria-current="page"] {
+  background-color: var(--sl-color-accent-low) !important;
+  color: var(--sl-color-text-accent) !important;
+  border-inline-start: 2px solid var(--sl-color-accent);
+  font-weight: 600;
+}
+
+.sidebar-content a:not([aria-current="page"]):hover,
+nav.sidebar a:not([aria-current="page"]):hover {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+}
+
+/* "On this page" right-sidebar active link highlight */
+.right-sidebar a[aria-current="true"],
+.table-of-contents a[aria-current="true"] {
+  color: var(--sl-color-text-accent) !important;
+  font-weight: 600;
+}
+
+/* Inline code inside headings */
+h1 code,
+h2 code,
+h3 code {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+  padding: 0.1em 0.3em;
+  border-radius: 0.25em;
+}
+
+/* Markdown links styling */
+.sl-markdown-content a {
+  color: var(--sl-color-text-link);
+}
+
+.sl-markdown-content a:hover {
+  color: var(--sl-color-text-link-hover);
+}
+
+/* -------------------------------------------------------------------------
+ * Expressive Code styling overrides
+ * ------------------------------------------------------------------------- */
+.expressive-code .copy {
+  opacity: 1;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+ * Splash Hero Section Backdrop
+ * Renders an inline SVG geometric grid pattern over a radial gradient
+ * -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  background-image:
+    linear-gradient(
+      135deg,
+      var(--sl-color-bg) 0%,
+      color-mix(in srgb, var(--sl-color-accent-low) 60%, var(--sl-color-bg)) 100%
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='none'/%3E%3Cpath d='M0 20h40M20 0v40' stroke='currentColor' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: auto, 40px 40px;
+  border-radius: 0.75rem;
+  padding: 2rem 1.5rem;
+  color: var(--grid-watermark-color);
+}
+
+/* Inject grid color */
+.hero path {
+  color: var(--grid-watermark-color);
+  stroke-opacity: var(--grid-watermark-opacity);
+}
+
+:root[data-theme="dark"] .hero {
+  background-image:
+    linear-gradient(
+      135deg,
+      var(--sl-color-bg) 0%,
+      color-mix(in srgb, var(--sl-color-accent-low) 80%, var(--sl-color-bg)) 100%
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='none'/%3E%3Cpath d='M0 20h40M20 0v40' stroke='currentColor' stroke-opacity='0.1' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Display H1 hero styling */
+.hero-title {
+  font-family: var(--sl-font);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.hero-tagline {
+  font-family: var(--sl-font);
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* --------------------------------------------------------------------------
+ * Layout Spacing Improvements on Wide Viewports (min-width: 72rem)
+ * Locks sidebar and centers main content pane to solve vertical line gaps.
+ * -------------------------------------------------------------------------- */
+@media (min-width: 72rem) {
+  /* Lock the right sidebar container width */
+  .right-sidebar-container {
+    width: var(--sl-sidebar-width) !important;
+  }
+
+  /* Force the main content pane to fill the remaining viewport space */
+  :global([data-has-sidebar][data-has-toc]) .main-pane {
+    width: calc(100% - var(--sl-sidebar-width)) !important;
+  }
+
+  /* Center the content container within the main pane */
+  .main-pane .sl-container {
+    margin-inline: auto !important;
+    max-width: var(--sl-content-width) !important;
+  }
+
+  /* Keep the table of contents list locked within the sidebar width */
+  .right-sidebar-panel .sl-container {
+    max-width: calc(var(--sl-sidebar-width) - 2 * var(--sl-sidebar-pad-x)) !important;
+    width: 100% !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * CommandOutput Terminal Simulator Styles
+ * -------------------------------------------------------------------------- */
+.cmd-output {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--sl-color-hairline);
+  font-family: var(--sl-font-mono);
+  font-size: 0.875rem;
+  margin-block: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.cmd-output__header {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: color-mix(in srgb, var(--sl-color-bg-sidebar) 70%, var(--sl-color-bg));
+  border-bottom: 1px solid var(--sl-color-hairline-light);
+}
+
+.cmd-output__dots {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.cmd-output__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+}
+
+.cmd-output__dot--red { background-color: #ef4444; }
+.cmd-output__dot--yellow { background-color: #eab308; }
+.cmd-output__dot--green { background-color: #22c55e; }
+
+.cmd-output__title {
+  font-size: 0.725rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sl-color-text-accent);
+  margin-left: 1rem;
+  opacity: 0.8;
+  user-select: none;
+}
+
+.cmd-output__prompt {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background-color: color-mix(in srgb, var(--sl-color-accent-low) 30%, var(--sl-color-bg-sidebar));
+  border-bottom: 1px solid var(--sl-color-hairline-light);
+}
+
+.cmd-output__prompt-symbol {
+  color: var(--sl-color-accent);
+  font-weight: 700;
+  user-select: none;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+
+.cmd-output__command {
+  color: var(--sl-color-text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.cmd-output__result {
+  padding: 0.75rem 1rem;
+  margin: 0 !important;
+  background-color: color-mix(in srgb, var(--sl-color-bg-sidebar) 50%, var(--sl-color-bg)) !important;
+  color: var(--sl-color-text);
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.5;
+  max-height: 28rem;
+  overflow-y: auto;
+  border: none !important;
+}
+
+.cmd-output__result code {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Locale Badge (shared) */
+.locale-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--sl-font-mono);
+}

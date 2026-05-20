@@ -1,0 +1,66 @@
+/* Load IBM Plex Mono or JetBrains Mono */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+/*
+ * Theme Tokens: Indigo-Blue (fhir-capability-analyzer)
+ */
+
+:root {
+  --sl-font: "Plus Jakarta Sans Variable", system-ui, sans-serif;
+  --sl-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Common tokens */
+:root {
+  --sl-color-accent-low: rgba(59, 130, 246, 0.14);
+  --sl-color-accent: #2563eb;
+  --sl-color-accent-high: #3b82f6;
+  --sl-color-text-accent: #1d4ed8;
+}
+
+/* Light Mode */
+:root[data-theme="light"] {
+  --sl-color-bg: #f8fafc;
+  --sl-color-bg-nav: #f8fafc;
+  --sl-color-bg-sidebar: #f1f5f9;
+  --sl-color-hairline-light: #e2e8f0;
+  --sl-color-hairline: #cbd5e1;
+
+  --sl-color-text: #0f172a;
+  --sl-color-text-accent: #2563eb;
+  --sl-color-text-link: #1d4ed8;
+  --sl-color-text-link-hover: #3b82f6;
+}
+
+/* Dark Mode */
+:root[data-theme="dark"] {
+  --sl-color-bg: #090d16;
+  --sl-color-bg-sidebar: #090d16;
+  --sl-color-bg-nav: #090d16;
+  --sl-color-hairline-light: #1e293b;
+  --sl-color-hairline: #334155;
+  --sl-color-gray-1: #f1f5f9;
+  --sl-color-gray-2: #94a3b8;
+  --sl-color-gray-3: #94a3b8;
+  --sl-color-gray-4: #1e293b;
+  --sl-color-gray-5: #0f172a;
+  --sl-color-gray-6: #090d16;
+  --sl-color-gray-7: #090d16;
+  --sl-color-black: #090d16;
+
+  --sl-color-text: #f8fafc;
+  --sl-color-text-accent: #60a5fa;
+  --sl-color-text-link: #60a5fa;
+  --sl-color-text-link-hover: #93c5fd;
+}
+
+/* Splash Hero Watermark Grid Color */
+.hero {
+  --grid-watermark-color: #3b82f6;
+  --grid-watermark-opacity: 0.08;
+}
+
+:root[data-theme="dark"] .hero {
+  --grid-watermark-color: #60a5fa;
+  --grid-watermark-opacity: 0.1;
+}
