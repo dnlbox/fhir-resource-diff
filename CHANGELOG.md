@@ -5,6 +5,8 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 ## [Unreleased]
 
 ### Changed
+- **BREAKING**: minimum Node version raised from 20 to 22 (`engines.node >=22.0.0`). Driven by upstream pnpm 11.x dropping Node 20 support (uses `node:sqlite`, available in Node 22.13+ only). `@types/node` bumped to `^24` (LTS line). `packageManager` field added (`pnpm@10.32.1`) to pin CI pnpm version; CI workflows updated to read from `packageManager` instead of a hardcoded `version` constraint.
+- Upgraded CLI framework `commander` 12→14. No user-facing behaviour change expected; `--help`, `--version`, and subcommand signatures (`validate`, `compare`, `normalize`, `info`, `list-resources`) are unchanged. If `--help` output formatting shifts (whitespace), it is upstream cosmetic.
 - Dev: bumped typescript 5.9→6; added `"ignoreDeprecations": "6.0"` to tsconfig.json to silence two TS6 deprecation warnings (`baseUrl` and `esModuleInterop: false`) — both intentional and will be revisited before TypeScript 7. No user-facing behaviour change.
 - Dev: migrated to ESLint flat config; bumped eslint 8→10, @typescript-eslint 7→8 (+ typescript-eslint meta), vitest 2→3, eslint-config-prettier 9→10, zod 3→4. No user-facing behaviour change; validate.ts surface unchanged.
 
