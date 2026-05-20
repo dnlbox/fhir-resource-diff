@@ -6,18 +6,15 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": ".",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "ignoreDeprecations": "6.0",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": false,
     "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
