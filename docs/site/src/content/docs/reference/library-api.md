@@ -303,6 +303,6 @@ const types = listResourceTypes("R4");
 
 ## See also
 
-- [Output formats](/fhir-resource-diff/reference/output-formats/) — JSON structure details
-- [Exit codes](/fhir-resource-diff/reference/exit-codes/) — severity model
-- [AI agents & automation](/fhir-resource-diff/guide/ai-agents/) — programmatic usage patterns
+- [Output formats](/reference/output-formats/) — JSON structure details
+- [Exit codes](/reference/exit-codes/) — severity model
+- [AI agents & automation](/guide/ai-agents/) — programmatic usage patterns

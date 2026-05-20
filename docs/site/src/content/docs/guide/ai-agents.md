@@ -157,6 +157,6 @@ if (left.success && right.success) {
 
 ## See also
 
-- [Library API](/fhir-resource-diff/reference/library-api/) — full TypeScript API documentation
-- [Output formats](/fhir-resource-diff/reference/output-formats/) — JSON and envelope format details
-- [CI/CD integration](/fhir-resource-diff/guide/ci-cd/) — GitHub Actions patterns
+- [Library API](/reference/library-api/) — full TypeScript API documentation
+- [Output formats](/reference/output-formats/) — JSON and envelope format details
+- [CI/CD integration](/guide/ci-cd/) — GitHub Actions patterns

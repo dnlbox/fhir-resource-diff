@@ -89,5 +89,5 @@ The tool accepts these version strings (case-insensitive):
 
 ## See also
 
-- [Info & list-resources](/fhir-resource-diff/guide/info/) — exploring the resource registry by version
-- [CLI reference](/fhir-resource-diff/reference/cli/) — `--fhir-version` flag across all commands
+- [Info & list-resources](/guide/info/) — exploring the resource registry by version
+- [CLI reference](/reference/cli/) — `--fhir-version` flag across all commands

@@ -246,6 +246,6 @@ The envelope adds tool version, FHIR version, and timestamp — useful for audit
 
 ## See also
 
-- [Exit codes](/fhir-resource-diff/reference/exit-codes/) — full severity model and exit code table
-- [Output formats](/fhir-resource-diff/reference/output-formats/) — text, JSON, markdown, envelope
-- [CLI reference](/fhir-resource-diff/reference/cli/) — all flags for `validate`
+- [Exit codes](/reference/exit-codes/) — full severity model and exit code table
+- [Output formats](/reference/output-formats/) — text, JSON, markdown, envelope
+- [CLI reference](/reference/cli/) — all flags for `validate`

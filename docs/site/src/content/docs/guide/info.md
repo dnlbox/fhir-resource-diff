@@ -132,5 +132,5 @@ Returns an array of resource type objects with `name`, `category`, `description`
 
 ## See also
 
-- [FHIR versions (R4/R4B/R5)](/fhir-resource-diff/guide/fhir-versions/) — version differences and auto-detection
-- [CLI reference](/fhir-resource-diff/reference/cli/) — all flags for `info` and `list-resources`
+- [FHIR versions (R4/R4B/R5)](/guide/fhir-versions/) — version differences and auto-detection
+- [CLI reference](/reference/cli/) — all flags for `info` and `list-resources`

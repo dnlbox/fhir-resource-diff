@@ -131,6 +131,6 @@ The `summary` counts are useful for automated triage: a step that checks `result
 
 ## See also
 
-- [Exit codes](/fhir-resource-diff/reference/exit-codes/) — full severity model
-- [Output formats](/fhir-resource-diff/reference/output-formats/) — JSON format documentation
-- [AI agents & automation](/fhir-resource-diff/guide/ai-agents/) — stdin, programmatic patterns
+- [Exit codes](/reference/exit-codes/) — full severity model
+- [Output formats](/reference/output-formats/) — JSON format documentation
+- [AI agents & automation](/guide/ai-agents/) — stdin, programmatic patterns

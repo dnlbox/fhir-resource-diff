@@ -210,6 +210,6 @@ The envelope is designed for automated consumers: an agent can parse this once a
 
 ## See also
 
-- [Library API](/fhir-resource-diff/reference/library-api/) — programmatic access to formatters
-- [Exit codes](/fhir-resource-diff/reference/exit-codes/) — how severity affects exit codes
-- [AI agents & automation](/fhir-resource-diff/guide/ai-agents/) — envelope patterns for automation
+- [Library API](/reference/library-api/) — programmatic access to formatters
+- [Exit codes](/reference/exit-codes/) — how severity affects exit codes
+- [AI agents & automation](/guide/ai-agents/) — envelope patterns for automation

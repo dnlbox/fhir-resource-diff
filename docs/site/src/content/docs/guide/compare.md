@@ -232,7 +232,7 @@ With `--format json` and no `--force`, the output is a structured error object:
 
 ## See also
 
-- [Output formats](/fhir-resource-diff/reference/output-formats/) — full format documentation
-- [Exit codes](/fhir-resource-diff/reference/exit-codes/) — exit code semantics
-- [CLI reference](/fhir-resource-diff/reference/cli/) — all flags for `compare`
-- [AI agents & automation](/fhir-resource-diff/guide/ai-agents/) — stdin, envelope, programmatic patterns
+- [Output formats](/reference/output-formats/) — full format documentation
+- [Exit codes](/reference/exit-codes/) — exit code semantics
+- [CLI reference](/reference/cli/) — all flags for `compare`
+- [AI agents & automation](/guide/ai-agents/) — stdin, envelope, programmatic patterns

@@ -91,6 +91,6 @@ echo "$result" | jq '.errors | map(select(.severity == "warning")) | length'
 
 ## See also
 
-- [Validate](/fhir-resource-diff/guide/validate/) — severity model for validation checks
-- [CI/CD integration](/fhir-resource-diff/guide/ci-cd/) — using exit codes in GitHub Actions
-- [Output formats](/fhir-resource-diff/reference/output-formats/) — JSON structure for programmatic access
+- [Validate](/guide/validate/) — severity model for validation checks
+- [CI/CD integration](/guide/ci-cd/) — using exit codes in GitHub Actions
+- [Output formats](/reference/output-formats/) — JSON structure for programmatic access

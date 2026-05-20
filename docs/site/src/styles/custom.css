@@ -1,20 +1,29 @@
 /* Load JetBrains Mono from Google Fonts — must come first */
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
 
+/* Space Grotesk variable font — hero H1 display face only */
+@import "@fontsource-variable/space-grotesk/index.css";
+
 /* Brand colour palette ported from the VitePress theme */
 /* Primary: #1ad1b8 (teal), Secondary: #19a9c6 (blue-teal), dark bg: #071019 */
+
+/* -------------------------------------------------------------------------
+   Shared tokens (light + dark)
+   ---------------------------------------------------------------------- */
 
 :root {
   --sl-color-accent-low: rgba(26, 209, 184, 0.14);
   --sl-color-accent: #0fa896;
   --sl-color-accent-high: #1ad1b8;
-  --sl-color-text-accent: #1ad1b8;
+  --sl-color-text-accent: #0d8c7d;
 
   /* Use JetBrains Mono for code — same as VitePress theme */
   --sl-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-
+/* -------------------------------------------------------------------------
+   Dark-mode tokens
+   ---------------------------------------------------------------------- */
 
 :root[data-theme="dark"] {
   --sl-color-bg: #071019;
@@ -30,9 +39,106 @@
   --sl-color-gray-6: #071019;
   --sl-color-gray-7: #071019;
   --sl-color-black: #071019;
+
+  /* Dark-mode accent text must be readable on dark bg */
+  --sl-color-text-accent: #1ad1b8;
 }
 
-/* CommandOutput component styles */
+/* -------------------------------------------------------------------------
+   Issue 2: Sidebar selected / active item contrast
+   Replace solid teal background treatment with a left-border accent approach
+   so text stays readable in both modes.
+   ---------------------------------------------------------------------- */
+
+/* Active sidebar item — remove teal bg, use border + accent text instead */
+.sidebar-content a[aria-current="page"],
+nav.sidebar a[aria-current="page"] {
+  background-color: var(--sl-color-accent-low) !important;
+  color: var(--sl-color-text-accent) !important;
+  border-inline-start: 2px solid var(--sl-color-accent-high);
+  font-weight: 600;
+}
+
+/* Hover state — subtle, no contrast issue */
+.sidebar-content a:not([aria-current="page"]):hover,
+nav.sidebar a:not([aria-current="page"]):hover {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+}
+
+/* "On this page" right-nav active item */
+.right-sidebar a[aria-current="true"],
+.table-of-contents a[aria-current="true"] {
+  color: var(--sl-color-text-accent) !important;
+  font-weight: 600;
+}
+
+/* Inline code in headings — use accent-low background, keep readable */
+h1 code,
+h2 code,
+h3 code {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+  padding: 0.1em 0.3em;
+  border-radius: 0.25em;
+}
+
+/* Body links — ensure sufficient contrast in both modes */
+:root[data-theme="dark"] .sl-markdown-content a {
+  color: #38d9c4;
+}
+
+:root[data-theme="dark"] .sl-markdown-content a:hover {
+  color: #1ad1b8;
+}
+
+:root:not([data-theme="dark"]) .sl-markdown-content a {
+  color: #0a7a6e;
+}
+
+:root:not([data-theme="dark"]) .sl-markdown-content a:hover {
+  color: #0fa896;
+}
+
+/* -------------------------------------------------------------------------
+   Issue 1: Hero section -- radial gradient backdrop
+   ---------------------------------------------------------------------- */
+
+/* Splash hero wrapper */
+.hero {
+  position: relative;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    rgba(26, 209, 184, 0.12) 0%,
+    transparent 70%
+  );
+}
+
+/* Ensure hero content sits above the gradient */
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Display font for hero H1 only */
+.hero h1 {
+  font-family: "Space Grotesk Variable", "Space Grotesk", var(--sl-font-system), sans-serif;
+  font-variation-settings: "wght" 700;
+  letter-spacing: -0.02em;
+}
+
+/* -------------------------------------------------------------------------
+   CommandOutput component styles
+   ---------------------------------------------------------------------- */
+
 .cmd-output {
   display: grid;
   gap: 0;

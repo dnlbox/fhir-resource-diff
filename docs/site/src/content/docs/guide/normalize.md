@@ -78,5 +78,5 @@ fhir-resource-diff normalize patient.json | jq '.name'
 
 ## See also
 
-- [Compare command](/fhir-resource-diff/guide/compare/) — using --normalize in compare
-- [CLI reference](/fhir-resource-diff/reference/cli/) — all flags for `normalize`
+- [Compare command](/guide/compare/) — using --normalize in compare
+- [CLI reference](/reference/cli/) — all flags for `normalize`

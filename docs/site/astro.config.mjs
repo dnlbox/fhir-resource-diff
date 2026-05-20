@@ -43,7 +43,7 @@ export default defineConfig({
         },
         {
           label: "Ecosystem",
-          link: "/fhir-resource-diff/ecosystem/",
+          link: "/ecosystem/",
         },
       ],
       head: [
