@@ -7,5 +7,4 @@ declare const __PACKAGE_VERSION__: string;
  * Tool version injected at build time from package.json.
  * Stays in sync with the published package version automatically.
  */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 export const TOOL_VERSION: string = typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "dev";
