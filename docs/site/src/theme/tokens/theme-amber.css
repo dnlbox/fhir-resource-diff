@@ -1,0 +1,62 @@
+/*
+ * Theme Tokens: Amber-Terracotta (fhir-test-data)
+ */
+
+:root {
+  --sl-font: "Plus Jakarta Sans Variable", system-ui, sans-serif;
+  --sl-font-mono: "IBM Plex Mono", "Fira Code", "Cascadia Code", monospace;
+}
+
+/* Light Mode */
+:root[data-theme="light"] {
+  --sl-color-accent-low: #fdf0e6;
+  --sl-color-accent: #c2733a;
+  --sl-color-accent-high: #8c4a1e;
+
+  /* Backdrop: warm off-white */
+  --sl-color-bg: #fdfaf7;
+  --sl-color-bg-nav: #fdfaf7;
+  --sl-color-bg-sidebar: #f8f3ee;
+  --sl-color-hairline-light: #e8ddd2;
+  --sl-color-hairline: #d8cbbf;
+
+  /* Text */
+  --sl-color-text: #1c1510;
+  --sl-color-text-accent: #c2733a;
+}
+
+/* Dark Mode */
+:root[data-theme="dark"] {
+  --sl-color-accent-low: #2d1a08;
+  --sl-color-accent: #e8944a;
+  --sl-color-accent-high: #f5b87c;
+
+  /* Deep warm dark background */
+  --sl-color-bg: #14100c;
+  --sl-color-bg-nav: #1a140f;
+  --sl-color-bg-sidebar: #1a140f;
+  --sl-color-hairline-light: #2e221a;
+  --sl-color-hairline: #3d2e22;
+
+  /* Text */
+  --sl-color-text: #f0e8df;
+  --sl-color-text-accent: #e8944a;
+}
+
+/* Splash Hero Watermark Grid Color */
+.hero {
+  --grid-watermark-color: #c2733a;
+  --grid-watermark-opacity: 0.08;
+}
+
+:root[data-theme="dark"] .hero {
+  --grid-watermark-color: #e8944a;
+  --grid-watermark-opacity: 0.1;
+}
+
+/* Custom badges */
+.locale-badge {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
+  border: 1px solid color-mix(in srgb, var(--sl-color-accent) 25%, transparent);
+}

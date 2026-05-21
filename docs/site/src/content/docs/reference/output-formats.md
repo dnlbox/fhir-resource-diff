@@ -1,4 +1,9 @@
-# Output formats
+---
+title: Output formats
+description: All output formats for fhir-resource-diff — text, JSON, markdown, and envelope. Format availability by command.
+sidebar:
+  order: 3
+---
 
 Every command supports multiple output formats. The format is selected with `--format <fmt>`.
 
@@ -174,7 +179,7 @@ fhir-resource-diff compare a.json b.json --format json --envelope
     "resourceType": "Patient",
     "identical": false,
     "summary": { "added": 1, "removed": 1, "changed": 2, "typeChanged": 0, "total": 4 },
-    "entries": [...],
+    "entries": ["..."],
     "documentation": "https://hl7.org/fhir/R4/patient.html"
   }
 }
@@ -197,14 +202,14 @@ The envelope is designed for automated consumers: an agent can parse this once a
 
 | Command | text | json | markdown | envelope |
 |---------|------|------|----------|---------|
-| `compare` | ✓ | ✓ | ✓ | ✓ (with --format json) |
-| `validate` | ✓ | ✓ | — | ✓ (with --format json) |
-| `normalize` | stdout only | — | — | — |
-| `info` | ✓ | ✓ | — | — |
-| `list-resources` | ✓ | ✓ | — | — |
+| `compare` | yes | yes | yes | yes (with --format json) |
+| `validate` | yes | yes | no | yes (with --format json) |
+| `normalize` | stdout only | no | no | no |
+| `info` | yes | yes | no | no |
+| `list-resources` | yes | yes | no | no |
 
 ## See also
 
-- [Library API](/reference/library-api) — programmatic access to formatters
-- [Exit codes](/reference/exit-codes) — how severity affects exit codes
-- [AI agents & automation](/guide/ai-agents) — envelope patterns for automation
+- [Library API](/reference/library-api/) — programmatic access to formatters
+- [Exit codes](/reference/exit-codes/) — how severity affects exit codes
+- [AI agents & automation](/guide/ai-agents/) — envelope patterns for automation

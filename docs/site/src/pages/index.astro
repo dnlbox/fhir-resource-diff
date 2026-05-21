@@ -1,0 +1,1365 @@
+---
+import { Code } from 'astro/components';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/plus-jakarta-sans';
+
+const title = "fhir-resource-diff";
+const tagline = "Structural FHIR resource operations for CI pipelines and AI agents. No server. No Java runtime.";
+
+const installCmd = "npm install -g fhir-resource-diff";
+
+const terminalTabs = [
+  {
+    id: "cli-validate",
+    label: "CLI: Validate",
+    desc: "Validate FHIR resource syntax, reference structures, and date-time formats.",
+    cmd: "fhir-resource-diff validate patient.json --fhir-version R4",
+    lang: "json",
+    output: `{
+  "valid": false,
+  "fhirVersion": "R4",
+  "issues": [
+    {
+      "severity": "error",
+      "path": "Patient.birthDate",
+      "message": "Value '1980/12/31' does not match FHIR date format (YYYY-MM-DD)",
+      "url": "http://hl7.org/fhir/R4/datatypes.html#date"
+    },
+    {
+      "severity": "warning",
+      "path": "Patient.identifier[0].system",
+      "message": "Reference 'nhs-number' is not a valid absolute URI",
+      "url": "http://hl7.org/fhir/R4/datatypes.html#uri"
+    }
+  ]
+}`
+  },
+  {
+    id: "cli-compare",
+    label: "CLI: Compare & Diff",
+    desc: "Compare two FHIR JSON resources field-by-field and output structural differences.",
+    cmd: "fhir-resource-diff compare baseline.json updated.json --format json",
+    lang: "json",
+    output: `{
+  "equal": false,
+  "diff": [
+    {
+      "op": "replace",
+      "path": "Patient.name[0].given[0]",
+      "oldValue": "John",
+      "newValue": "Johnny"
+    },
+    {
+      "op": "add",
+      "path": "Patient.telecom[1]",
+      "newValue": {
+        "system": "email",
+        "value": "johnny@work.com"
+      }
+    }
+  ]
+}`
+  },
+  {
+    id: "library-sdk",
+    label: "TypeScript SDK",
+    desc: "Programmatic validation and normalized structural comparison in Node/Browser.",
+    cmd: "import { compareResources, validateResource } from 'fhir-resource-diff';",
+    lang: "typescript",
+    output: `import { compareResources, validateResource } from "fhir-resource-diff";
+
+const result = validateResource(patientJson, { version: "R4" });
+if (!result.valid) {
+  console.log("Validation errors:", result.issues);
+}
+
+// Normalized comparison (ignores formatting/key order differences)
+const diffResult = compareResources(beforeJson, afterJson, {
+  ignoreMetadata: true
+});
+console.log(\`Equal: \${diffResult.equal}, Deltas: \${diffResult.diff.length}\`);`
+  }
+];
+
+const features = [
+  {
+    title: "Path-Level Diff",
+    desc: "Compare two FHIR resources field by field. Every added, removed, and changed value is tracked with dot-notation paths and array index tracking — including nested CodeableConcepts, extensions, and identifiers.",
+    icon: "list-format"
+  },
+  {
+    title: "Structured Validation",
+    desc: "Catch common FHIR mistakes before submission — id format, date patterns, reference string shape, known resource types — with severity levels (error, warning, info) and links to HL7 documentation.",
+    icon: "check-badge"
+  },
+  {
+    title: "CI/CD Native",
+    desc: "--exit-on-diff fails a build step when resources diverge. --quiet suppresses stdout for exit-code-only gates. --envelope wraps output in a metadata envelope for automated triage.",
+    icon: "setting"
+  },
+  {
+    title: "AI Agent Friendly",
+    desc: "Every command supports stdin pipes, --format json for structured output, and --envelope for metadata wrapping with tool version, FHIR version, timestamps, and HL7 doc URLs.",
+    icon: "puzzle"
+  },
+  {
+    title: "Multi-Version R4/R4B/R5",
+    desc: "Auto-detects target version from fhirVersion or allows explicit overrides. Handles version-specific structural variations under the hood.",
+    icon: "fhir"
+  },
+  {
+    title: "Browser Safe",
+    desc: "No Node-specific APIs. Runs anywhere: inside CLI wrapper, React apps, Chrome Extensions, Deno, or Cloudflare Workers.",
+    icon: "safe"
+  }
+];
+
+const customTheme = {
+  name: 'custom-terminal',
+  type: 'dark',
+  colors: {
+    'editor.background': '#0b1e2e',
+    'editor.foreground': '#f8fafc',
+  },
+  settings: [
+    {
+      settings: {
+        foreground: '#f8fafc',
+        background: '#0b1e2e',
+      }
+    },
+    {
+      scope: ['comment', 'punctuation.definition.comment'],
+      settings: {
+        foreground: '#64748b',
+      }
+    },
+    {
+      scope: ['string', 'string.quoted'],
+      settings: {
+        foreground: '#1ad1b8',
+      }
+    },
+    {
+      scope: ['constant.numeric', 'constant.language', 'constant.character', 'constant.other'],
+      settings: {
+        foreground: '#38bdf8',
+      }
+    },
+    {
+      scope: ['keyword', 'storage.type', 'storage.modifier'],
+      settings: {
+        foreground: '#38bdf8',
+        fontStyle: 'bold',
+      }
+    },
+    {
+      scope: ['entity.name.function', 'support.function'],
+      settings: {
+        foreground: '#60a5fa',
+      }
+    },
+    {
+      scope: ['variable', 'meta.definition.variable'],
+      settings: {
+        foreground: '#f8fafc',
+      }
+    }
+  ]
+};
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — FHIR Diff & Validate</title>
+    <meta name="description" content={tagline} />
+    <link rel="icon" type="image/svg+xml" href="/fhir-resource-diff/favicon.svg" />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} — FHIR Diff & Validate`} />
+    <meta property="og:description" content={tagline} />
+    <meta property="og:url" content="https://dnlbox.github.io/fhir-resource-diff/" />
+    
+    <!-- inline script to prevent light/dark flash -->
+    <script is:inline>
+      const getTheme = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme')) {
+          return localStorage.getItem('starlight-theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      };
+      document.documentElement.setAttribute('data-theme', getTheme());
+    </script>
+  </head>
+  <body>
+    <!-- Mesh Gradients Background -->
+    <div class="mesh-container" aria-hidden="true">
+      <div class="mesh-glow glow-1"></div>
+      <div class="mesh-glow glow-2"></div>
+      <div class="mesh-glow glow-3"></div>
+      <div class="grid-watermark"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+      <div class="header-container">
+        <a href="/fhir-resource-diff/" class="logo-area">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="6" fill="var(--accent-color)" fill-opacity="0.1"/>
+            <path d="M7 12H17M12 7V17" stroke="var(--accent-color)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <span class="logo-text">{title}</span>
+        </a>
+        
+        <nav class="nav-links">
+          <a href="/fhir-resource-diff/guide/getting-started/">Guide</a>
+          <a href="/fhir-resource-diff/reference/cli/">Reference</a>
+          <a href="https://dnlbox.github.io/fhir-resource-diff/ecosystem/">Ecosystem</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+            <!-- Sun Icon (shown in dark theme) -->
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+            <!-- Moon Icon (shown in light theme) -->
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+          </button>
+          
+          <a href="https://github.com/dnlbox/fhir-resource-diff" class="social-icon" aria-label="GitHub" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="badge-container">
+          <span class="toolkit-badge">
+            <span class="badge-dot"></span>
+            Part of the FHIR operations toolkit
+          </span>
+        </div>
+        
+        <h1 class="hero-title">
+          Diff & Validate FHIR resources,<br/>
+          <span class="gradient-text">locally.</span>
+        </h1>
+        
+        <p class="hero-tagline">{tagline}</p>
+        
+        <div class="hero-ctas">
+          <a href="/fhir-resource-diff/guide/getting-started/" class="cta-primary">
+            Get started
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="/fhir-resource-diff/reference/cli/" class="cta-secondary">
+            CLI Reference
+          </a>
+        </div>
+
+        <div class="install-box-wrapper">
+          <div class="install-box">
+            <span class="prompt-sym">$</span>
+            <code class="install-cmd">{installCmd}</code>
+            <button id="copy-install" class="copy-btn" aria-label="Copy install command">
+              <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <svg class="check-icon hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Terminal Section -->
+      <section class="terminal-section">
+        <div class="terminal-window">
+          <!-- Window Header -->
+          <div class="terminal-header">
+            <div class="window-controls">
+              <span class="control close"></span>
+              <span class="control minimize"></span>
+              <span class="control maximize"></span>
+            </div>
+            <span class="terminal-title">bash — fhir-resource-diff demo</span>
+            <div class="terminal-lang">CLI v0.8.4</div>
+          </div>
+          
+          <!-- Terminal Main Body -->
+          <div class="terminal-body">
+            <!-- Left Navigation Sidebar -->
+            <div class="terminal-tabs">
+              {terminalTabs.map((tab, idx) => (
+                <button 
+                  class={`tab-btn ${idx === 0 ? 'active' : ''}`}
+                  data-tab={tab.id}
+                  role="tab"
+                  aria-selected={idx === 0 ? 'true' : 'false'}
+                >
+                  <span class="tab-label">{tab.label}</span>
+                  <span class="tab-desc">{tab.desc}</span>
+                </button>
+              ))}
+            </div>
+            
+            <!-- Right Output Screen -->
+            <div class="terminal-screen">
+              {terminalTabs.map((tab, idx) => (
+                <div 
+                  id={`panel-${tab.id}`} 
+                  class={`terminal-panel ${idx === 0 ? 'active' : ''}`}
+                  role="tabpanel"
+                >
+                  <div class="terminal-prompt-line">
+                    <span class="prompt-sym">$</span>
+                    <span class="typed-command">{tab.cmd}</span>
+                  </div>
+                  <div class="terminal-code-block">
+                    <Code code={tab.output} lang={tab.lang} theme={customTheme} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Grid Section -->
+      <section class="features-section">
+        <div class="section-header">
+          <h2 class="section-title">Engineered for Robust Integration</h2>
+          <p class="section-subtitle">No server, no Java runtime, and zero external downloads. Lightweight core libraries that fit directly into pipelines.</p>
+        </div>
+
+        <div class="features-grid">
+          {features.map((feat) => (
+            <div class="feature-card">
+              <div class="feature-icon-wrapper">
+                {feat.icon === "list-format" && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                  </svg>
+                )}
+                {feat.icon === "check-badge" && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <polyline points="9 11 11 13 15 9"></polyline>
+                  </svg>
+                )}
+                {feat.icon === "setting" && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                )}
+                {feat.icon === "puzzle" && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 11V9a2 2 0 0 0-2-2h-2m-4 0H7a2 2 0 0 0-2 2v2m0 4v2a2 2 0 0 0 2 2h2m4 0h2a2 2 0 0 0 2-2v-2"></path>
+                    <path d="M12 2v4M12 18v4M4 12H2M22 12h-2"></path>
+                  </svg>
+                )}
+                {feat.icon === "fhir" && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon>
+                    <line x1="12" y1="22" x2="12" y2="12"></line>
+                    <line x1="22" y1="8.5" x2="12" y2="12"></line>
+                    <line x1="2" y1="8.5" x2="12" y2="12"></line>
+                  </svg>
+                )}
+                {feat.icon === "safe" && (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                )}
+              </div>
+              <h3 class="feature-title">{feat.title}</h3>
+              <p class="feature-desc">{feat.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Ecosystem Pipeline Map -->
+      <section class="ecosystem-section">
+        <div class="section-header">
+          <h2 class="section-title">The FHIR Operations Toolkit</h2>
+          <p class="section-subtitle">A suite of independent CLI engines that compose together seamlessly for development, CI/CD, and agentic workflows.</p>
+        </div>
+
+        <div class="pipeline-container">
+          <!-- Flow Pipeline SVG -->
+          <svg class="pipeline-svg" viewBox="0 0 800 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Glow Background Line -->
+            <path class="flow-line-glow" d="M180 60 H 620" stroke="var(--accent-color)" stroke-width="8" stroke-opacity="0.15" />
+            <!-- Main Connecting Line -->
+            <path class="flow-line" d="M180 60 H 620" stroke="var(--border-color)" stroke-width="3" />
+            <!-- Animated Flow Particles -->
+            <path class="flow-line-particles" d="M180 60 H 620" stroke="var(--accent-color)" stroke-width="3" stroke-dasharray="10, 40" />
+          </svg>
+
+          <!-- Toolkit Nodes -->
+          <div class="pipeline-nodes">
+            <!-- Node 1: fhir-test-data -->
+            <a href="https://dnlbox.github.io/fhir-test-data" class="node-card link-node">
+              <div class="node-badge">1. Generate</div>
+              <h3 class="node-title">fhir-test-data</h3>
+              <p class="node-text">Synthetic patient & clinical resources mapped to 14 locales with check-digit validation.</p>
+              <span class="link-label">View Docs ➔</span>
+            </a>
+
+            <!-- Node 2: fhir-resource-diff -->
+            <div class="node-card active-node">
+              <div class="node-badge">2. Diff & Validate</div>
+              <h3 class="node-title">fhir-resource-diff</h3>
+              <p class="node-text">Structure-aware diff engine and path-level validation. Fails builds on delta violations.</p>
+              <span class="active-badge">Active Project</span>
+            </div>
+
+            <!-- Node 3: fhir-capability-analyzer -->
+            <a href="https://dnlbox.github.io/fhir-capability-analyzer" class="node-card link-node">
+              <div class="node-badge">3. Capability Check</div>
+              <h3 class="node-title">fhir-capability-analyzer</h3>
+              <p class="node-text">Fetch capability statements, compare configurations, and detect profile compliance.</p>
+              <span class="link-label">View Docs ➔</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <span>Released under the MIT License.</span>
+        <span>Copyright © 2026 Daniel Veronez</span>
+      </div>
+    </footer>
+
+    <!-- Client-side Interactive Logic Script -->
+    <script>
+      // 1. Terminal Tab Switching Logic
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panels = document.querySelectorAll('.terminal-panel');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Deactivate all tabs and panels
+          tabs.forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          panels.forEach(p => p.classList.remove('active'));
+
+          // Activate selected tab and panel
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          
+          const tabId = tab.getAttribute('data-tab');
+          const panel = document.getElementById(`panel-${tabId}`);
+          if (panel) {
+            panel.classList.add('active');
+          }
+        });
+      });
+
+      // 2. Copy Install Command Logic
+      const copyBtn = document.getElementById('copy-install');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+          const commandText = "npm install -g fhir-resource-diff";
+          try {
+            await navigator.clipboard.writeText(commandText);
+            const copyIcon = copyBtn.querySelector('.copy-icon');
+            const checkIcon = copyBtn.querySelector('.check-icon');
+            
+            if (copyIcon && checkIcon) {
+              copyIcon.classList.add('hidden');
+              checkIcon.classList.remove('hidden');
+              copyBtn.classList.add('copied');
+              
+              setTimeout(() => {
+                copyIcon.classList.remove('hidden');
+                checkIcon.classList.add('hidden');
+                copyBtn.classList.remove('copied');
+              }, 2000);
+            }
+          } catch (err) {
+            console.error('Failed to copy text: ', err);
+          }
+        });
+      }
+
+      // 3. Theme Toggle Logic (synced with Starlight)
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('starlight-theme', newTheme);
+          
+          // Dispatch event to notify Starlight if needed
+          window.dispatchEvent(new Event('theme-changed'));
+        });
+      }
+    </script>
+
+    <!-- Page styling -->
+    <style>
+      :root {
+        /* Default colors (Dark mode variables) */
+        --bg-color: #071019;
+        --text-color: #f8fafc;
+        --text-muted: #9fb5c7;
+        --accent-color: #1ad1b8;
+        --accent-rgb: 26, 209, 184;
+        --accent-glow: rgba(26, 209, 184, 0.15);
+        --border-color: #21405a;
+        --card-bg: rgba(12, 30, 46, 0.5);
+        --card-hover-border: rgba(26, 209, 184, 0.4);
+        --header-bg: rgba(7, 16, 25, 0.8);
+        --terminal-bg: #0b1e2e;
+        --terminal-tabs-bg: #071019;
+        --terminal-active-tab: #0e273c;
+      }
+
+      :root[data-theme="light"] {
+        --bg-color: #f8fafc;
+        --text-color: #0f172a;
+        --text-muted: #475569;
+        --accent-color: #0fa896;
+        --accent-rgb: 15, 168, 150;
+        --accent-glow: rgba(15, 168, 150, 0.08);
+        --border-color: #cbd5e1;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --card-hover-border: rgba(15, 168, 150, 0.4);
+        --header-bg: rgba(248, 250, 252, 0.8);
+        --terminal-bg: #f1f5f9;
+        --terminal-tabs-bg: #e2e8f0;
+        --terminal-active-tab: #f8fafc;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-family: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+        color: var(--text-color);
+        background-color: var(--bg-color);
+        scroll-behavior: smooth;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      /* Background Mesh Gradients */
+      .mesh-container {
+        position: fixed;
+        inset: 0;
+        z-index: -10;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .mesh-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.12;
+        mix-blend-mode: screen;
+        transition: opacity 0.5s ease;
+      }
+
+      :root[data-theme="light"] .mesh-glow {
+        opacity: 0.04;
+        mix-blend-mode: multiply;
+      }
+
+      .glow-1 {
+        top: -10%;
+        left: 20%;
+        width: 50vw;
+        height: 50vw;
+        background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+        animation: float-slow 20s infinite alternate ease-in-out;
+      }
+
+      .glow-2 {
+        bottom: 10%;
+        right: 10%;
+        width: 40vw;
+        height: 40vw;
+        background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+        animation: float-slow 25s infinite alternate-reverse ease-in-out;
+      }
+
+      .glow-3 {
+        top: 40%;
+        left: -10%;
+        width: 35vw;
+        height: 35vw;
+        background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+        animation: float-slow 18s infinite alternate ease-in-out;
+      }
+
+      .grid-watermark {
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M60 0H0v60h60V0z' fill='none'/%3E%3Cpath d='M60 0H0v1h59v59h1V0zM0 60h60v-1H1V0H0v60z' fill='currentColor' fill-opacity='0.03'/%3E%3C/svg%3E");
+        background-size: 60px 60px;
+        opacity: 1;
+      }
+
+      @keyframes float-slow {
+        0% {
+          transform: translate(0, 0) scale(1);
+        }
+        100% {
+          transform: translate(5%, 8%) scale(1.15);
+        }
+      }
+
+      /* Header styling */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--header-bg);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .header-container {
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: var(--text-color);
+        font-weight: 700;
+        font-size: 1.125rem;
+        letter-spacing: -0.01em;
+      }
+
+      .logo-text {
+        font-family: 'Space Grotesk Variable', 'Space Grotesk', sans-serif;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.925rem;
+        transition: color 0.2s;
+      }
+
+      .nav-links a:hover {
+        color: var(--text-color);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+      }
+
+      .theme-toggle, .social-icon {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        transition: color 0.2s, background-color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .theme-toggle:hover, .social-icon:hover {
+        color: var(--text-color);
+        background-color: var(--border-color);
+      }
+
+      .moon-icon {
+        display: none;
+      }
+
+      :root[data-theme="light"] .sun-icon {
+        display: none;
+      }
+
+      :root[data-theme="light"] .moon-icon {
+        display: block;
+      }
+
+      /* Main content wrapper */
+      .main-content {
+        flex: 1;
+        max-width: 80rem;
+        width: 100%;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        text-align: center;
+        max-width: 50rem;
+        margin: 0 auto 5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .badge-container {
+        margin-bottom: 1.5rem;
+      }
+
+      .toolkit-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 1rem;
+        background-color: var(--border-color);
+        border: 1px solid var(--border-color);
+        border-radius: 9999px;
+        font-size: 0.775rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        background-color: #10b981;
+        border-radius: 50%;
+        animation: pulse-dot 2s infinite;
+      }
+
+      @keyframes pulse-dot {
+        0% {
+          transform: scale(0.9);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1.3);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.9);
+          opacity: 0.6;
+        }
+      }
+
+      .hero-title {
+        font-family: 'Space Grotesk Variable', 'Space Grotesk', sans-serif;
+        font-size: clamp(2.5rem, 6vw, 4.25rem);
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, var(--accent-color) 30%, #38bdf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-tagline {
+        font-size: clamp(1.1rem, 2.5vw, 1.25rem);
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        font-weight: 400;
+      }
+
+      .hero-ctas {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .cta-primary, .cta-secondary {
+        text-decoration: none;
+        padding: 0.875rem 1.75rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.975rem;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .cta-primary {
+        background-color: var(--accent-color);
+        color: #071019;
+        border: 1px solid var(--accent-color);
+        box-shadow: 0 4px 20px var(--accent-glow);
+      }
+
+      .cta-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px var(--accent-glow);
+        background-color: color-mix(in srgb, var(--accent-color) 90%, white);
+      }
+
+      .cta-secondary {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(8px);
+      }
+
+      .cta-secondary:hover {
+        border-color: var(--text-muted);
+        transform: translateY(-2px);
+      }
+
+      /* Install box */
+      .install-box-wrapper {
+        width: 100%;
+        max-width: 25rem;
+      }
+
+      .install-box {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-family: var(--sl-font-mono, ui-monospace, monospace);
+        font-size: 0.85rem;
+        backdrop-filter: blur(8px);
+        width: 100%;
+      }
+
+      .prompt-sym {
+        color: var(--accent-color);
+        font-weight: 700;
+        user-select: none;
+      }
+
+      .install-cmd {
+        color: var(--text-color);
+        flex: 1;
+        text-align: left;
+      }
+
+      .copy-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0.35rem;
+        border-radius: 0.25rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .copy-btn:hover {
+        color: var(--text-color);
+        background-color: var(--border-color);
+      }
+
+      .copy-btn.copied {
+        color: #10b981;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Terminal Window Sandbox */
+      .terminal-section {
+        margin-bottom: 6rem;
+      }
+
+      .terminal-window {
+        background-color: var(--terminal-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .terminal-header {
+        background-color: var(--header-bg);
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .window-controls {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .control {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .close { background-color: #ef4444; }
+      .minimize { background-color: #f59e0b; }
+      .maximize { background-color: #10b981; }
+
+      .terminal-title {
+        font-size: 0.775rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        letter-spacing: 0.02em;
+        font-family: var(--sl-font-mono, ui-monospace, monospace);
+      }
+
+      .terminal-lang {
+        font-size: 0.75rem;
+        color: var(--accent-color);
+        font-weight: 600;
+        font-family: var(--sl-font-mono, ui-monospace, monospace);
+      }
+
+      .terminal-body {
+        display: flex;
+        min-height: 25rem;
+        flex-direction: column;
+      }
+
+      @media (min-width: 48rem) {
+        .terminal-body {
+          flex-direction: row;
+        }
+      }
+
+      /* Terminal tabs (sidebar) */
+      .terminal-tabs {
+        background-color: var(--terminal-tabs-bg);
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        border-bottom: 1px solid var(--border-color);
+        overflow-x: auto;
+      }
+
+      @media (min-width: 48rem) {
+        .terminal-tabs {
+          width: 18rem;
+          flex-direction: column;
+          border-bottom: none;
+          border-right: 1px solid var(--border-color);
+          overflow-x: visible;
+        }
+      }
+
+      .tab-btn {
+        background: none;
+        border: none;
+        padding: 0.875rem 1.25rem;
+        text-align: left;
+        width: auto;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex-shrink: 0;
+        border-bottom: 2px solid transparent;
+      }
+
+      @media (min-width: 48rem) {
+        .tab-btn {
+          width: 100%;
+          border-bottom: none;
+          border-left: 3px solid transparent;
+        }
+      }
+
+      .tab-btn:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+        color: var(--text-color);
+      }
+
+      .tab-btn.active {
+        background-color: var(--terminal-active-tab);
+        color: var(--text-color);
+        border-bottom-color: var(--accent-color);
+      }
+
+      @media (min-width: 48rem) {
+        .tab-btn.active {
+          border-left-color: var(--accent-color);
+          border-bottom-color: transparent;
+        }
+      }
+
+      .tab-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+
+      .tab-desc {
+        font-size: 0.725rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+        display: none;
+      }
+
+      @media (min-width: 48rem) {
+        .tab-desc {
+          display: block;
+        }
+      }
+
+      /* Terminal Output Screen */
+      .terminal-screen {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--terminal-bg);
+      }
+
+      .terminal-panel {
+        display: none;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+      }
+
+      .terminal-panel.active {
+        display: flex;
+      }
+
+      .terminal-prompt-line {
+        display: flex;
+        gap: 0.5rem;
+        font-family: var(--sl-font-mono, ui-monospace, monospace);
+        font-size: 0.85rem;
+        color: var(--text-color);
+      }
+
+      .typed-command {
+        color: var(--text-color);
+        word-break: break-all;
+      }
+
+      .terminal-code-block {
+        flex: 1;
+        font-family: var(--sl-font-mono, ui-monospace, monospace);
+        font-size: 0.825rem;
+        line-height: 1.5;
+        border-radius: 0.375rem;
+        overflow: auto;
+      }
+
+      .terminal-code-block pre {
+        background-color: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* Features section */
+      .features-section {
+        margin-bottom: 6rem;
+      }
+
+      .section-header {
+        text-align: center;
+        max-width: 42rem;
+        margin: 0 auto 3.5rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.75rem;
+      }
+
+      .section-subtitle {
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-size: 0.975rem;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 48rem) {
+        .features-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 64rem) {
+        .features-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .feature-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 2rem;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(8px);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--card-hover-border);
+        box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.05);
+      }
+
+      .feature-icon-wrapper {
+        color: var(--accent-color);
+        background-color: var(--accent-glow);
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+        transition: transform 0.3s ease;
+      }
+
+      .feature-card:hover .feature-icon-wrapper {
+        transform: scale(1.1) rotate(2deg);
+      }
+
+      .feature-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.01em;
+      }
+
+      .feature-desc {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+
+      /* Ecosystem visualizer */
+      .ecosystem-section {
+        margin-bottom: 4rem;
+      }
+
+      .pipeline-container {
+        position: relative;
+        padding: 2rem 0;
+        margin: 0 auto;
+        max-width: 68rem;
+      }
+
+      .pipeline-svg {
+        position: absolute;
+        top: 2rem;
+        left: 0;
+        width: 100%;
+        height: 120px;
+        z-index: 1;
+        pointer-events: none;
+        display: none;
+      }
+
+      @media (min-width: 64rem) {
+        .pipeline-svg {
+          display: block;
+        }
+      }
+
+      .flow-line-particles {
+        animation: flow-run 8s infinite linear;
+      }
+
+      @keyframes flow-run {
+        to {
+          stroke-dashoffset: -250;
+        }
+      }
+
+      .pipeline-nodes {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      @media (min-width: 64rem) {
+        .pipeline-nodes {
+          flex-direction: row;
+          justify-content: space-between;
+          padding-top: 20px;
+        }
+      }
+
+      .node-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.5rem 1.75rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        backdrop-filter: blur(8px);
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.25s ease;
+      }
+
+      .link-node:hover {
+        border-color: var(--text-muted);
+        transform: translateY(-2px);
+      }
+
+      .node-badge {
+        font-size: 0.675rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .node-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .node-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      .active-node {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 24px var(--accent-glow);
+        transform: scale(1.02);
+      }
+
+      .active-badge {
+        font-size: 0.7rem;
+        color: #071019;
+        background-color: var(--accent-color);
+        padding: 0.15rem 0.5rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        align-self: flex-start;
+        margin-top: 0.5rem;
+      }
+
+      .link-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--accent-color);
+        margin-top: 0.5rem;
+        display: inline-block;
+      }
+
+      /* Footer */
+      .site-footer {
+        border-top: 1px solid var(--border-color);
+        padding: 2.5rem 1.5rem;
+        margin-top: auto;
+        background-color: var(--header-bg);
+      }
+
+      .footer-container {
+        max-width: 80rem;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      @media (min-width: 48rem) {
+        .footer-container {
+          flex-direction: row;
+        }
+      }
+    </style>
+  </body>
+</html>

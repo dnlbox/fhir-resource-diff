@@ -1,4 +1,9 @@
-# Library API
+---
+title: Library API
+description: TypeScript API reference for fhir-resource-diff — parseJson, validate, diff, normalize, formatters, envelope, and core types.
+sidebar:
+  order: 2
+---
 
 `fhir-resource-diff` exports a browser-safe TypeScript API. The core library has no Node.js dependencies and works in React, Vite, Cloudflare Workers, and any bundler.
 
@@ -144,7 +149,7 @@ type DiffSummary = {
 
 ### normalize
 
-Normalize a FHIR resource to a canonical form.
+Normalise a FHIR resource to a canonical form.
 
 ```typescript
 import { parseJson, normalize } from "fhir-resource-diff";
@@ -152,7 +157,7 @@ import { parseJson, normalize } from "fhir-resource-diff";
 const parsed = parseJson(rawJson);
 if (!parsed.success) throw new Error(parsed.error);
 
-const normalized = normalize(parsed.resource, { preset: "canonical" });
+const normalised = normalize(parsed.resource, { preset: "canonical" });
 ```
 
 **Signature:**
@@ -298,6 +303,6 @@ const types = listResourceTypes("R4");
 
 ## See also
 
-- [Output formats](/reference/output-formats) — JSON structure details
-- [Exit codes](/reference/exit-codes) — severity model
-- [AI agents & automation](/guide/ai-agents) — programmatic usage patterns
+- [Output formats](/reference/output-formats/) — JSON structure details
+- [Exit codes](/reference/exit-codes/) — severity model
+- [AI agents & automation](/guide/ai-agents/) — programmatic usage patterns

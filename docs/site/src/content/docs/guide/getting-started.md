@@ -1,4 +1,9 @@
-# Getting started
+---
+title: Getting started
+description: Install fhir-resource-diff and run your first validate, compare, and info commands.
+sidebar:
+  order: 1
+---
 
 `fhir-resource-diff` is a CLI and library for comparing and validating FHIR JSON resources — fast, local, no infrastructure dependencies.
 
@@ -114,7 +119,7 @@ The `--` separator after `pnpm cli` is required so pnpm passes flags to the scri
 
 ## Next steps
 
-- [Validate command deep-dive](/guide/validate) — what it checks, what it skips, JSON output format
-- [Compare command deep-dive](/guide/compare) — diff output, --ignore, output formats
-- [CI/CD integration](/guide/ci-cd) — GitHub Actions examples, exit codes, quiet mode
-- [CLI reference](/reference/cli) — all flags for all commands
+- [Validate command deep-dive](/guide/validate/) — what it checks, what it skips, JSON output format
+- [Compare command deep-dive](/guide/compare/) — diff output, --ignore, output formats
+- [CI/CD integration](/guide/ci-cd/) — GitHub Actions examples, exit codes, quiet mode
+- [CLI reference](/reference/cli/) — all flags for all commands

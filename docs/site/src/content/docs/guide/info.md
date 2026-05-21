@@ -1,4 +1,9 @@
-# Info & list-resources
+---
+title: Info & list-resources
+description: Explore the FHIR resource registry from the terminal — look up resource types and list all types by version and category.
+sidebar:
+  order: 5
+---
 
 Two commands for exploring the FHIR resource landscape without leaving the terminal.
 
@@ -83,7 +88,7 @@ foundation
 base
   Patient                 Demographics and administrative information about an individual
   Practitioner            A person with a formal responsibility in healthcare
-  Organization            A formally recognized grouping of people or organizations
+  Organisation            A formally recognised grouping of people or organisations
   ...
 
 clinical
@@ -94,7 +99,7 @@ clinical
   ...
 
 financial
-  Claim                   Claim, pre-determination, or pre-authorization
+  Claim                   Claim, pre-determination, or pre-authorisation
   Coverage                Insurance or medical plan coverage
   ExplanationOfBenefit    Explanation of Benefit resource
 ```
@@ -127,5 +132,5 @@ Returns an array of resource type objects with `name`, `category`, `description`
 
 ## See also
 
-- [FHIR versions (R4/R4B/R5)](/guide/fhir-versions) — version differences and auto-detection
-- [CLI reference](/reference/cli) — all flags for `info` and `list-resources`
+- [FHIR versions (R4/R4B/R5)](/guide/fhir-versions/) — version differences and auto-detection
+- [CLI reference](/reference/cli/) — all flags for `info` and `list-resources`

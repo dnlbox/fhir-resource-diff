@@ -1,4 +1,9 @@
-# FHIR versions (R4 / R4B / R5)
+---
+title: FHIR versions (R4/R4B/R5)
+description: How fhir-resource-diff handles FHIR R4, R4B, and R5 — auto-detection, explicit version flag, and version differences.
+sidebar:
+  order: 8
+---
 
 `fhir-resource-diff` supports FHIR R4, R4B, and R5 — auto-detected or explicit.
 
@@ -46,7 +51,7 @@ The `--fhir-version` flag is accepted by all commands: `validate`, `compare`, `n
 
 **Documentation links:** The `info` command and `--envelope` output link to the correct version of the HL7 specification. Without `--fhir-version`, links for all versions are shown.
 
-**Normalization:** Version-aware normalization where applicable.
+**Normalisation:** Version-aware normalisation where applicable.
 
 **Resource registry:** `list-resources --fhir-version R5` returns only types present in R5.
 
@@ -84,5 +89,5 @@ The tool accepts these version strings (case-insensitive):
 
 ## See also
 
-- [Info & list-resources](/guide/info) — exploring the resource registry by version
-- [CLI reference](/reference/cli) — `--fhir-version` flag across all commands
+- [Info & list-resources](/guide/info/) — exploring the resource registry by version
+- [CLI reference](/reference/cli/) — `--fhir-version` flag across all commands
