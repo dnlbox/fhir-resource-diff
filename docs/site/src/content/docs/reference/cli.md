@@ -1,4 +1,9 @@
-# CLI reference
+---
+title: CLI reference
+description: Complete flag reference for all fhir-resource-diff commands — compare, validate, normalize, info, list-resources.
+sidebar:
+  order: 1
+---
 
 Complete flag reference for all `fhir-resource-diff` commands.
 
@@ -18,7 +23,7 @@ fhir-resource-diff compare <file-a> <file-b> [options]
 | `--fhir-version <ver>` | `R4` \| `R4B` \| `R5` | auto-detect or `R4` | FHIR version for validation and doc links |
 | `--ignore <paths>` | comma-separated | — | Dot-notation paths to exclude from comparison (e.g. `meta.lastUpdated,id`) |
 | `--preset <name>` | `metadata` \| `clinical` \| `strict` | — | Named set of paths to ignore |
-| `--normalize <name>` | `canonical` \| `none` | — | Apply normalization before comparing |
+| `--normalize <name>` | `canonical` \| `none` | — | Apply normalisation before comparing |
 | `--exit-on-diff` | flag | false | Exit 1 when differences are found (for CI gates) |
 | `--quiet` | flag | false | Suppress all stdout output |
 | `--envelope` | flag | false | Wrap JSON output in metadata envelope (requires `--format json`) |
@@ -50,7 +55,7 @@ fhir-resource-diff validate <file> [options]
 
 ## normalize
 
-Normalize a FHIR resource to a canonical form.
+Normalise a FHIR resource to a canonical form.
 
 ```
 fhir-resource-diff normalize <file> [options]
@@ -59,9 +64,9 @@ fhir-resource-diff normalize <file> [options]
 | Argument / Flag | Type | Default | Description |
 |-----------------|------|---------|-------------|
 | `file` | path or `-` | required | Resource file, or `-` to read from stdin |
-| `--preset <name>` | `canonical` \| `none` | `canonical` | Normalization preset |
+| `--preset <name>` | `canonical` \| `none` | `canonical` | Normalisation preset |
 | `--fhir-version <ver>` | `R4` \| `R4B` \| `R5` | auto-detect or `R4` | FHIR version |
-| `--output <path>` | file path | stdout | Write normalized output to a file instead of stdout |
+| `--output <path>` | file path | stdout | Write normalised output to a file instead of stdout |
 | `--quiet` | flag | false | Suppress stdout output |
 
 ## info

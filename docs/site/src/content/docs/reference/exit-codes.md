@@ -1,4 +1,9 @@
-# Exit codes
+---
+title: Exit codes
+description: Exit code reference for fhir-resource-diff — severity model, per-command table, and CI usage examples.
+sidebar:
+  order: 4
+---
 
 `fhir-resource-diff` uses exit codes consistently across all commands. Exit codes are severity-aware — not every finding produces a non-zero exit.
 
@@ -86,6 +91,6 @@ echo "$result" | jq '.errors | map(select(.severity == "warning")) | length'
 
 ## See also
 
-- [Validate](/guide/validate) — severity model for validation checks
-- [CI/CD integration](/guide/ci-cd) — using exit codes in GitHub Actions
-- [Output formats](/reference/output-formats) — JSON structure for programmatic access
+- [Validate](/guide/validate/) — severity model for validation checks
+- [CI/CD integration](/guide/ci-cd/) — using exit codes in GitHub Actions
+- [Output formats](/reference/output-formats/) — JSON structure for programmatic access

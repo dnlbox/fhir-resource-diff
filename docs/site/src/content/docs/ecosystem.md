@@ -1,4 +1,7 @@
-# The FHIR TypeScript ecosystem
+---
+title: The FHIR TypeScript ecosystem
+description: How fhir-resource-diff fits into the wider JavaScript/TypeScript FHIR ecosystem — complementary tools, integration patterns, and intentional scope limits.
+---
 
 The JavaScript/TypeScript FHIR community has built excellent tools across the stack — type systems, API clients, platform SDKs, auth libraries, and IG authoring tools. Each project solves a different slice of the problem, and `fhir-resource-diff` is designed to complement them, not compete.
 
@@ -8,7 +11,7 @@ The JavaScript/TypeScript FHIR community has built excellent tools across the st
 |---|---|---|
 | Type definitions | [`@types/fhir`](https://www.npmjs.com/package/@types/fhir), [`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes) | TypeScript interfaces for FHIR resources — essential for type-safe application code |
 | Platform SDK | [`@medplum/core`](https://www.npmjs.com/package/@medplum/core) | Full-featured FHIR client with profile validation, FHIRPath, and the Medplum platform |
-| XML/JSON serialization | [`fhir`](https://www.npmjs.com/package/fhir) (Lantana) | FHIR XML ↔ JSON conversion and JSON Schema validation — one of the earliest FHIR JS tools |
+| XML/JSON serialisation | [`fhir`](https://www.npmjs.com/package/fhir) (Lantana) | FHIR XML to JSON conversion and JSON Schema validation — one of the earliest FHIR JS tools |
 | Auth & API client | [`fhirclient`](https://www.npmjs.com/package/fhirclient) | SMART on FHIR auth flows and API calls, maintained by SMART Health IT at Boston Children's |
 | Conformance validation | [HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator) | The reference implementation for full profile, terminology, and invariant validation |
 | **Diff, fast validation, CI/CD** | **`fhir-resource-diff`** | **Structural diffing, format validation, and automation-first output** |
@@ -35,9 +38,9 @@ Every command supports `--format json` for structured output, `--envelope` for m
 
 These tools work well in combination:
 
-**[`@types/fhir`](https://www.npmjs.com/package/@types/fhir)** or **[`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes)** for your application's TypeScript types, `fhir-resource-diff` for runtime validation and diffing.
+[`@types/fhir`](https://www.npmjs.com/package/@types/fhir) or [`@medplum/fhirtypes`](https://www.npmjs.com/package/@medplum/fhirtypes) for your application's TypeScript types, `fhir-resource-diff` for runtime validation and diffing.
 
-**[`fhirclient`](https://www.npmjs.com/package/fhirclient)** for SMART auth and API transport, then pipe responses into `fhir-resource-diff` for validation and comparison:
+[`fhirclient`](https://www.npmjs.com/package/fhirclient) for SMART auth and API transport, then pipe responses into `fhir-resource-diff` for validation and comparison:
 
 ```bash
 # Fetch a resource and validate it
@@ -46,7 +49,7 @@ curl -s -H "Authorization: Bearer $TOKEN" \
   | fhir-resource-diff validate - --fhir-version R4
 ```
 
-**[HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator)** for full profile conformance checks in staging, `fhir-resource-diff` for fast local validation and CI gates in the development loop. The two tools are complementary: fast feedback locally, thorough conformance checking before release.
+[HL7 FHIR Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator) for full profile conformance checks in staging, `fhir-resource-diff` for fast local validation and CI gates in the development loop. The two tools are complementary: fast feedback locally, thorough conformance checking before release.
 
 ## What this tool intentionally doesn't do
 
@@ -55,7 +58,7 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 | Out of scope | Why |
 |---|---|
 | StructureDefinition parsing | Changes the fundamental character of the project — requires package downloads or a Java runtime |
-| XML ↔ JSON conversion | Different problem; use the [`fhir`](https://www.npmjs.com/package/fhir) package |
+| XML to JSON conversion | Different problem; use the [`fhir`](https://www.npmjs.com/package/fhir) package |
 | FHIRPath evaluation | Out of scope; use [`@medplum/core`](https://www.npmjs.com/package/@medplum/core) |
 | Full terminology validation | Requires a live terminology server |
 | Profile conformance | The HL7 Validator evaluates them; we surface profile declarations |

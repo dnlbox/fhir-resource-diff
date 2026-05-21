@@ -1,4 +1,9 @@
-# Validate
+---
+title: Validate
+description: The validate command — what it checks, severity model, JSON output format, stdin, multi-resource input, and envelope.
+sidebar:
+  order: 2
+---
 
 The `validate` command catches common FHIR mistakes before you submit a resource to a server — format problems, structural issues, and unknown resource types. It's a fast, local sanity check designed for the development loop.
 
@@ -241,6 +246,6 @@ The envelope adds tool version, FHIR version, and timestamp — useful for audit
 
 ## See also
 
-- [Exit codes](/reference/exit-codes) — full severity model and exit code table
-- [Output formats](/reference/output-formats) — text, JSON, markdown, envelope
-- [CLI reference](/reference/cli) — all flags for `validate`
+- [Exit codes](/reference/exit-codes/) — full severity model and exit code table
+- [Output formats](/reference/output-formats/) — text, JSON, markdown, envelope
+- [CLI reference](/reference/cli/) — all flags for `validate`

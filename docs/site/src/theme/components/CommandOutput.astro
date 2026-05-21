@@ -1,0 +1,46 @@
+---
+/**
+ * CommandOutput — renders a CLI invocation alongside its output as a terminal window mockup.
+ * Supports slot-based output (e.g. from fhir-test-data) or prop-based output (e.g. from fhir-resource-diff).
+ */
+
+interface Props {
+  /** The CLI command string to display in the prompt line (Option A) */
+  cmd?: string;
+  /** The CLI command string to display in the prompt line (Option B) */
+  command?: string;
+  /** The CLI output content (Option B) */
+  output?: string;
+  /** Language for syntax highlighting (e.g. 'json', 'diff') */
+  outputLang?: string;
+  /** Header title override (defaults to "Terminal") */
+  title?: string;
+}
+
+const { cmd, command, output, outputLang = "text", title } = Astro.props;
+const displayCommand = command || cmd || "";
+const hasOutputProp = output !== undefined;
+
+// Escape backticks so the injected code doesn't break the template literal
+const escapedOutput = output ? output.replace(/`/g, "\\`") : "";
+---
+
+<div class="cmd-output not-content" role="region" aria-label={`Command: ${displayCommand}`}>
+  <div class="cmd-output__header">
+    <div class="cmd-output__dots">
+      <span class="cmd-output__dot cmd-output__dot--red"></span>
+      <span class="cmd-output__dot cmd-output__dot--yellow"></span>
+      <span class="cmd-output__dot cmd-output__dot--green"></span>
+    </div>
+    <span class="cmd-output__title">{title || "Terminal"}</span>
+  </div>
+  <div class="cmd-output__prompt">
+    <span class="cmd-output__prompt-symbol" aria-hidden="true">$</span>
+    <code class="cmd-output__command">{displayCommand}</code>
+  </div>
+  {hasOutputProp ? (
+    <pre class="cmd-output__result"><code class={`language-${outputLang}`} set:html={escapedOutput} /></pre>
+  ) : (
+    <pre class="cmd-output__result"><slot /></pre>
+  )}
+</div>

@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # needed for VitePress git-based last-updated timestamps
 
       - uses: pnpm/action-setup@v4
 
@@ -31,12 +29,17 @@ jobs:
           node-version: "22"
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm docs:build
+      - name: Install docs dependencies
+        working-directory: docs/site
+        run: pnpm install --frozen-lockfile
+
+      - name: Build docs
+        working-directory: docs/site
+        run: pnpm build
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/site/.vitepress/dist
+          path: docs/site/dist
 
   deploy:
     environment:

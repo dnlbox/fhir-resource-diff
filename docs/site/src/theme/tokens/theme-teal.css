@@ -1,0 +1,58 @@
+/* Load JetBrains Mono from Google Fonts — must come first */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+/*
+ * Theme Tokens: Teal/Mint (fhir-resource-diff)
+ */
+
+:root {
+  --sl-font: "Space Grotesk Variable", system-ui, sans-serif;
+  --sl-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root {
+  --sl-color-accent-low: rgba(26, 209, 184, 0.14);
+  --sl-color-accent: #0fa896;
+  --sl-color-accent-high: #1ad1b8;
+  --sl-color-text-accent: #0d8c7d;
+}
+
+/* Light Mode */
+:root[data-theme="light"] {
+  /* Link contrast */
+  --sl-color-text-link: #0a7a6e;
+  --sl-color-text-link-hover: #0fa896;
+}
+
+/* Dark Mode */
+:root[data-theme="dark"] {
+  --sl-color-bg: #071019;
+  --sl-color-bg-sidebar: #071019;
+  --sl-color-bg-nav: #071019;
+  --sl-color-hairline-light: #21405a;
+  --sl-color-hairline-medium: #21405a;
+  --sl-color-gray-1: #e2e8f0;
+  --sl-color-gray-2: #9fb5c7;
+  --sl-color-gray-3: #9fb5c7;
+  --sl-color-gray-4: #21405a;
+  --sl-color-gray-5: #0c1e2e;
+  --sl-color-gray-6: #071019;
+  --sl-color-gray-7: #071019;
+  --sl-color-black: #071019;
+
+  /* Dark-mode accent text must be readable on dark bg */
+  --sl-color-text-accent: #1ad1b8;
+  --sl-color-text-link: #38d9c4;
+  --sl-color-text-link-hover: #1ad1b8;
+}
+
+/* Splash Hero Watermark Grid Color */
+.hero {
+  --grid-watermark-color: #1ad1b8;
+  --grid-watermark-opacity: 0.08;
+}
+
+:root[data-theme="dark"] .hero {
+  --grid-watermark-color: #1ad1b8;
+  --grid-watermark-opacity: 0.1;
+}

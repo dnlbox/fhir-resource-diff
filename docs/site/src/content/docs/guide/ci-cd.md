@@ -1,4 +1,9 @@
-# CI/CD integration
+---
+title: CI/CD integration
+description: GitHub Actions examples, exit codes, quiet mode, and envelope output for automated FHIR resource validation pipelines.
+sidebar:
+  order: 6
+---
 
 `fhir-resource-diff` is designed for CI pipelines — exit codes are severity-aware, output is machine-readable, and `--quiet` mode produces zero stdout.
 
@@ -116,7 +121,7 @@ fhir-resource-diff compare a.json b.json --format json --envelope
     "resourceType": "Patient",
     "identical": false,
     "summary": { "added": 5, "removed": 0, "changed": 3, "typeChanged": 0, "total": 8 },
-    "entries": [...],
+    "entries": ["..."],
     "documentation": "https://hl7.org/fhir/R4/patient.html"
   }
 }
@@ -126,6 +131,6 @@ The `summary` counts are useful for automated triage: a step that checks `result
 
 ## See also
 
-- [Exit codes](/reference/exit-codes) — full severity model
-- [Output formats](/reference/output-formats) — JSON format documentation
-- [AI agents & automation](/guide/ai-agents) — stdin, programmatic patterns
+- [Exit codes](/reference/exit-codes/) — full severity model
+- [Output formats](/reference/output-formats/) — JSON format documentation
+- [AI agents & automation](/guide/ai-agents/) — stdin, programmatic patterns

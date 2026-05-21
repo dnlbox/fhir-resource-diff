@@ -1,4 +1,9 @@
-# Compare
+---
+title: Compare
+description: The compare command — field-by-field FHIR resource diffing, ignore presets, output formats, and CI integration.
+sidebar:
+  order: 3
+---
 
 The `compare` command diffs two FHIR resources field by field, tracking every added, removed, and changed value with dot-notation paths and array index tracking.
 
@@ -113,7 +118,7 @@ Removed:
   meta.profile[0]                                ← vital signs profile
 ```
 
-The diff cleanly surfaces the structural differences between observation subtypes: vital signs use `component[]` (systolic + diastolic as parts of one observation), lab results use a top-level `valueQuantity` with a reference range. Trying to migrate data between these shapes without a diff tool means manually cross-referencing the spec — here it's one command.
+The diff cleanly surfaces the structural differences between observation subtypes: vital signs use `component[]` (systolic + diastolic as parts of one observation), lab results use a top-level `valueQuantity` with a reference range.
 
 ## Output formats
 
@@ -178,7 +183,7 @@ fhir-resource-diff compare a.json b.json --format json --envelope
     "resourceType": "Patient",
     "identical": false,
     "summary": { "added": 5, "removed": 0, "changed": 3, "typeChanged": 0, "total": 8 },
-    "entries": [...],
+    "entries": ["..."],
     "documentation": "https://hl7.org/fhir/R4/patient.html"
   }
 }
@@ -227,7 +232,7 @@ With `--format json` and no `--force`, the output is a structured error object:
 
 ## See also
 
-- [Output formats](/reference/output-formats) — full format documentation
-- [Exit codes](/reference/exit-codes) — exit code semantics
-- [CLI reference](/reference/cli) — all flags for `compare`
-- [AI agents & automation](/guide/ai-agents) — stdin, envelope, programmatic patterns
+- [Output formats](/reference/output-formats/) — full format documentation
+- [Exit codes](/reference/exit-codes/) — exit code semantics
+- [CLI reference](/reference/cli/) — all flags for `compare`
+- [AI agents & automation](/guide/ai-agents/) — stdin, envelope, programmatic patterns

@@ -1,4 +1,9 @@
-# AI agents & automation
+---
+title: AI agents & automation
+description: Using fhir-resource-diff in AI agents and automated tooling — stdin pipes, envelope output, and TypeScript library patterns.
+sidebar:
+  order: 7
+---
 
 `fhir-resource-diff` is designed for automated tooling. Every command supports stdin pipes, `--format json` for structured output, and `--envelope` for metadata wrapping — so agents and test harnesses can work with FHIR payloads without writing temp files.
 
@@ -38,7 +43,7 @@ echo "$ACTUAL_PAYLOAD" | fhir-resource-diff compare - expected.json \
     "resourceType": "Patient",
     "identical": false,
     "summary": { "added": 5, "removed": 0, "changed": 3, "typeChanged": 0, "total": 8 },
-    "entries": [...],
+    "entries": ["..."],
     "documentation": "https://hl7.org/fhir/R4/patient.html"
   }
 }
@@ -101,7 +106,7 @@ The `--envelope` flag (requires `--format json`) wraps output in a metadata enve
   "command": "validate",
   "fhirVersion": "R4",
   "timestamp": "2026-03-14T15:56:25.686Z",
-  "result": { ... }
+  "result": {}
 }
 ```
 
@@ -152,6 +157,6 @@ if (left.success && right.success) {
 
 ## See also
 
-- [Library API](/reference/library-api) — full TypeScript API documentation
-- [Output formats](/reference/output-formats) — JSON and envelope format details
-- [CI/CD integration](/guide/ci-cd) — GitHub Actions patterns
+- [Library API](/reference/library-api/) — full TypeScript API documentation
+- [Output formats](/reference/output-formats/) — JSON and envelope format details
+- [CI/CD integration](/guide/ci-cd/) — GitHub Actions patterns
