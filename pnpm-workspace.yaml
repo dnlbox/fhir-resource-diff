@@ -1,5 +1,8 @@
-# Per-project pnpm config (this is not a monorepo).
-# `allowBuilds` replaces the removed `pnpm.onlyBuiltDependencies` family.
+packages:
+  - docs/site
+
+# allowBuilds applies workspace-wide; all native-addon packages must be listed here.
 allowBuilds:
   esbuild: true
   lefthook: true
+  sharp: true
