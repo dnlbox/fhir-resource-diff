@@ -2,7 +2,7 @@
 
 All notable changes are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.4.0] - 2026-06-01
 
 ### Changed
 - Dev: migrated pnpm config from `package.json` `pnpm.onlyBuiltDependencies` (removed in pnpm 11) to `pnpm-workspace.yaml` `allowBuilds`. `packageManager` and `engines.pnpm` bumped to pnpm 11. No user-facing behaviour change; published package surface is identical.
