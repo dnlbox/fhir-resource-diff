@@ -29,8 +29,7 @@ jobs:
           node-version: "22"
           cache: pnpm
 
-      - name: Install docs dependencies
-        working-directory: docs/site
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build docs
