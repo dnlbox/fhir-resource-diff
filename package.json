@@ -68,7 +68,7 @@
     "docs:preview": "pnpm --dir docs/site preview"
   },
   "dependencies": {
-    "commander": "^14.0.3",
+    "commander": "^15.0.0",
     "picocolors": "^1.1.1",
     "zod": "^4.4.3"
   },
